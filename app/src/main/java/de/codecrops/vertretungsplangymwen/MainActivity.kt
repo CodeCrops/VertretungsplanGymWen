@@ -13,6 +13,6 @@ class MainActivity : AppCompatActivity() {
 
        //text.setText(HttpPull.getToday())
 
-        //test luca
+        //test lol luca
     }
 }
