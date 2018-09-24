@@ -11,6 +11,4 @@ object HttpPull {
         return getRequest.execute("http://gym-wen.de/vp/morgen.htm").get()
     }
     */
-
-    //lel
 }
