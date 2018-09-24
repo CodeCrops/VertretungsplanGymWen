@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class HttpGetRequest : AsyncTask<String, Void, String>() {
-    private val requestMethod = "GEI"
+    private val requestMethod = "GET"
     private val readTimeout = 15000
     private val connectionTimeout = 15000
 
