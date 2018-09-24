@@ -11,8 +11,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        text.setText(HttpPull.getToday())
-        
+       //text.setText(HttpPull.getToday())
+
         //test luca
     }
 }
