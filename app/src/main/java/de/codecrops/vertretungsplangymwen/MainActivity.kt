@@ -13,6 +13,4 @@ class MainActivity : AppCompatActivity() {
 
        text.setText(HttpPull.getToday())
     }
-
-    //Save
 }
