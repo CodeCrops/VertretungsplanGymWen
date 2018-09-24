@@ -12,7 +12,5 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
        //text.setText(HttpPull.getToday())
-
-        //test lol luca
     }
 }
