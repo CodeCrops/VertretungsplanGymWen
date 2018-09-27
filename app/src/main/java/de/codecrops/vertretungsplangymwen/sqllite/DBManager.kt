@@ -17,6 +17,15 @@ class DBManager(context: Context) {
         vpCursor = updateVertretungsplanCursor()
     }
 
+    /**
+     * @param klasse Die Klasse, welche die Vertretung betrifft (in Kursen ist dies die Kursnummer)
+     * @param stunde Die Stunde, in welcher die Vertretung stattfindet
+     * @param vertretung Die Lehrkraft, welche die Vertretung durchführt (evtl. auch hier "entfällt XYZ")
+     * @param fach Das Fach, welches anstelle des ursprünglichen Fachs unterrichtet wird (nur nötig, wenn es entfällt)
+     * @param raum Der Raum, in welchem anstelle des ursprünglichen Raums unterrichtet wird (nicht nötig, wenn es entfällt)
+     * @param sonstiges Sonstige Informationen
+     */
+
     fun addDataToVertretungsplanDB(klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?) {
         /*
         ACHTUNG:
@@ -38,6 +47,10 @@ class DBManager(context: Context) {
         //Erstellt eine neue Zeile in der DB mit den Daten von values
         db.insert(DBContracts.PlanContract.TABLE_NAME, null, values)
     }
+
+    /**
+     * @return Gibt den neuen Cursor des Vertretungsplans zurück : Cursor
+     */
 
     fun updateVertretungsplanCursor():Cursor {
         /*

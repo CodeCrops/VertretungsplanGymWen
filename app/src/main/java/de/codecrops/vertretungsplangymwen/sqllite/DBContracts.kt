@@ -19,15 +19,15 @@ object DBContracts {
                      Dadurch wird die gesamte DB geflusht und für den neuen Contract aufgebaut.
              */
 
-            val TABLE_NAME = "vertretungsplan"
-            val _ID = BaseColumns._ID
-            val COLUMN_LISTID = "listID"
-            val COLUMN_KLASSE = "klasse"
-            val COLUMN_STUNDE = "stunde"
-            val COLUMN_VERTRETUNG = "vertretung"
-            val COLUMN_FACH = "fach"
-            val COLUMN_RAUM = "raum"
-            val COLUMN_SONSTIGES = "sonstiges"
+            const val TABLE_NAME = "vertretungsplan"
+            const val _ID = BaseColumns._ID
+            const val COLUMN_LISTID = "listID"
+            const val COLUMN_KLASSE = "klasse"
+            const val COLUMN_STUNDE = "stunde"
+            const val COLUMN_VERTRETUNG = "vertretung"
+            const val COLUMN_FACH = "fach"
+            const val COLUMN_RAUM = "raum"
+            const val COLUMN_SONSTIGES = "sonstiges"
         }
     }
 

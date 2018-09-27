@@ -14,7 +14,7 @@ class VertretungsplanDBHelper(context: Context) : SQLiteOpenHelper(context, DB_N
         val DB_NAME = "VertretungsPlan.db"
 
         //Konstante zur Erstellung des TABLES aus PlanContract
-        private val SQL_CREATE_ENTRIES =
+        private const val SQL_CREATE_ENTRIES =
                 "CREATE TABLE " + DBContracts.PlanContract.TABLE_NAME + " (" +
                         DBContracts.PlanContract.COLUMN_LISTID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                         DBContracts.PlanContract.COLUMN_KLASSE + " TEXT NOT NULL," +
@@ -26,16 +26,21 @@ class VertretungsplanDBHelper(context: Context) : SQLiteOpenHelper(context, DB_N
                         ")"
 
         //Konstante zur Löschung aller Inhalte der DB
-        private val SQL_DELETE_ENTRIES =
+        private const val SQL_DELETE_ENTRIES =
                 "DROP TABLE IF EXISTS " +
                         DBContracts.PlanContract.TABLE_NAME
     }
 
+    /**
+     * @param db Die Datenbank, auf welcher der VertretungsTABLE erstellt werden soll
+     */
     override fun onCreate(db: SQLiteDatabase) {
         //Erstellt in der DB die TABLES usw. (Init für DB)
         db.execSQL(SQL_CREATE_ENTRIES)
     }
-
+    /**
+     * @param db Die Datenbank, auf welcher der VertretungsTABLE aktualisiert werden soll
+     */
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         //Flusht alte DB und erstellt neue TABLES usw (mithilfe von onCreate())
         db.execSQL(SQL_DELETE_ENTRIES)
