@@ -1,4 +1,4 @@
-package de.codecrops.vertretungsplangymwen.sqllite
+package de.codecrops.vertretungsplangymwen.sqlite
 
 import android.provider.BaseColumns
 

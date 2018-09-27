@@ -1,4 +1,4 @@
-package de.codecrops.vertretungsplangymwen.sqllite
+package de.codecrops.vertretungsplangymwen.sqlite
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
