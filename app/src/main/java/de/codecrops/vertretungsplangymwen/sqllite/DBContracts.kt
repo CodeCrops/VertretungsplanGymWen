@@ -2,7 +2,7 @@ package de.codecrops.vertretungsplangymwen.sqllite
 
 import android.provider.BaseColumns
 
-object DBContract {
+object DBContracts {
 
     //Inner class implements BaseColums
     class PlanContract : BaseColumns {
@@ -18,7 +18,6 @@ object DBContract {
             ACHTUNG: Bei Änderungen hier, muss im DBHelper die Version erhöht werden
                      Dadurch wird die gesamte DB geflusht und für den neuen Contract aufgebaut.
              */
-
 
             val TABLE_NAME = "vertretungsplan"
             val _ID = BaseColumns._ID

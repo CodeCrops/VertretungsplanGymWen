@@ -15,20 +15,20 @@ class VertretungsplanDBHelper(context: Context) : SQLiteOpenHelper(context, DB_N
 
         //Konstante zur Erstellung des TABLES aus PlanContract
         private val SQL_CREATE_ENTRIES =
-                "CREATE TABLE " + DBContract.PlanContract.TABLE_NAME + " (" +
-                        DBContract.PlanContract.COLUMN_LISTID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                        DBContract.PlanContract.COLUMN_KLASSE + " TEXT NOT NULL," +
-                        DBContract.PlanContract.COLUMN_STUNDE + " INTEGER NOT NULL," +
-                        DBContract.PlanContract.COLUMN_VERTRETUNG + " TEXT NOT NULL," +
-                        DBContract.PlanContract.COLUMN_FACH + " TEXT," +
-                        DBContract.PlanContract.COLUMN_RAUM + " TEXT," +
-                        DBContract.PlanContract.COLUMN_SONSTIGES + " TEXT" +
+                "CREATE TABLE " + DBContracts.PlanContract.TABLE_NAME + " (" +
+                        DBContracts.PlanContract.COLUMN_LISTID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        DBContracts.PlanContract.COLUMN_KLASSE + " TEXT NOT NULL," +
+                        DBContracts.PlanContract.COLUMN_STUNDE + " INTEGER NOT NULL," +
+                        DBContracts.PlanContract.COLUMN_VERTRETUNG + " TEXT NOT NULL," +
+                        DBContracts.PlanContract.COLUMN_FACH + " TEXT," +
+                        DBContracts.PlanContract.COLUMN_RAUM + " TEXT," +
+                        DBContracts.PlanContract.COLUMN_SONSTIGES + " TEXT" +
                         ")"
 
         //Konstante zur Löschung aller Inhalte der DB
         private val SQL_DELETE_ENTRIES =
                 "DROP TABLE IF EXISTS " +
-                        DBContract.PlanContract.TABLE_NAME
+                        DBContracts.PlanContract.TABLE_NAME
     }
 
     override fun onCreate(db: SQLiteDatabase) {
