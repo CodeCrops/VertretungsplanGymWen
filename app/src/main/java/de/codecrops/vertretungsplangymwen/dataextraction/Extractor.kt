@@ -1,5 +1,6 @@
 package de.codecrops.vertretungsplangymwen.dataextraction
 
+import java.text.DateFormat
 import java.util.*
 
 /**
@@ -16,11 +17,7 @@ import java.util.*
 
 class Extractor(data: String) {
 
-    /*
-    Der Konstruktor Date ist deprecated und muss später mit DateFormat.parse() erstetzt werden, was
-    aber aktuell nicht funktioniert.
-     */
-    val date: Date = Date(data.substring(
+    val date: Date = DateFormat.getDateInstance().parse(data.substring(
             data.indexOf("</Title>") - 10,
             data.indexOf("</Title>")
     ))
