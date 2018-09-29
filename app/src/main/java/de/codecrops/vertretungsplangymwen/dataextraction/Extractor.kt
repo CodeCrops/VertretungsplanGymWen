@@ -38,14 +38,14 @@ class Extractor(data: String) {
         //Entfernt die letzte unnötige Zeile mit dem einzigen Inhalt: "</tr>"
         lineList.removeAt(lineList.size -1)
 
-        //Diese for-Schleife geht jede einzelne Zeile der Tabelle durch
-        for (line: String in lineList) {
-
-            /*
+        /*
             Der Counter ist wichtig, damit Später die Spalten der Tabelle den
             Zeilen zugeordnet werden können.
              */
-            var count = 0
+        var count = 0
+
+        //Diese for-Schleife geht jede einzelne Zeile der Tabelle durch
+        for (line: String in lineList) {
 
             //Dies ist eine Liste der einzelnen Spalten der Tabelle in der Zeile "line"
             val colonList = line.split("\n") as ArrayList<String>
