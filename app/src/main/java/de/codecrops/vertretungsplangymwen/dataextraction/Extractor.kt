@@ -1,7 +1,9 @@
 package de.codecrops.vertretungsplangymwen.dataextraction
 
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Diese Klasse wandelt den html String in eine in der App nutzbare Form um und stellt
@@ -17,14 +19,19 @@ import java.util.*
 
 class Extractor(data: String) {
 
-    val date: Date = DateFormat.getDateInstance().parse(data.substring(
-            data.indexOf("</Title>") - 10,
-            data.indexOf("</Title>")
-    ))
-
+    val date: Date
     val table: ArrayList<ArrayList<String>> = arrayListOf()
 
     init {
+
+        /*
+        Dies erstellt zuerst ein "SimpleDateFormat" mit dem richtigen Format und
+        formatiert dann den aus der html Datei geschnittenen String zu einem Date Objekt
+         */
+        date = SimpleDateFormat("dd.MM.YYYY", Locale.GERMANY).parse(data.substring(
+                data.indexOf("</Title>") - 10,
+                data.indexOf("</Title>")
+        ))
 
         //Schneidet die eigentliche Tabelle aus dem html Document String
         val tableString = data.substring(data.indexOf
