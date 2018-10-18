@@ -21,7 +21,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
 
     /**
      * Diese Methode initialisiert den Download der Datei und gibt den fertigen String zurück
-     * @param params Die Ziel-URL
+     * @param params Ein String Array, das als erstes Element die Ziel-URL enthalten muss
      * @return der String der html Datei
      */
     override fun doInBackground(vararg params: String?): String {
@@ -44,7 +44,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
     }
 
     /**
-     * Erstellt die eigentliche URL Verbindung, liest die html Datei aus und schließt die
+     * Initialisiert die eigentliche URL Verbindung, liest die html Datei aus und schließt die
      * Verbindung wieder.
      * @param url Die URL der zu herunterladenden html Datei
      * @return Der String der html Datei
