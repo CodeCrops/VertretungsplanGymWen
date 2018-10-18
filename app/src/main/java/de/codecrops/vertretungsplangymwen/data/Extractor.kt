@@ -1,6 +1,5 @@
-package de.codecrops.vertretungsplangymwen.dataextraction
+package de.codecrops.vertretungsplangymwen.data
 
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
