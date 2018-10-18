@@ -1,5 +1,6 @@
 package de.codecrops.vertretungsplangymwen.data
 
+import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -18,11 +19,23 @@ import kotlin.collections.ArrayList
 
 class Extractor(data: String) {
 
-    val date: Date
+    var unauthorized = false
+    lateinit var date: Date
     val table: ArrayList<ArrayList<String>> = arrayListOf()
 
     init {
+        /**
+         * Überprüft, ob der ResponseCode 401 ist, was bedeuten würde, dass Nutzername oder
+         * Passwort falsch ist.
+         */
+        if(data.equals("401")) {
+            unauthorized = true
+        } else {
+            extract(data)
+        }
+    }
 
+    private fun extract(data: String) {
         /*
         Dies erstellt zuerst ein "SimpleDateFormat" mit dem richtigen Format und
         formatiert dann den aus der html Datei geschnittenen String zu einem Date Objekt
@@ -35,7 +48,7 @@ class Extractor(data: String) {
         //Schneidet die eigentliche Tabelle aus dem html Document String
         val tableString = data.substring(data.indexOf
         ("<table class=\"TabelleVertretungen\" cellpadding=\"2px\">")
-        + "<table class=\"TabelleVertretungen\" cellpadding=\"2px\">".length,
+                + "<table class=\"TabelleVertretungen\" cellpadding=\"2px\">".length,
                 data.lastIndexOf("</table>"))
 
         //Erstellt eine Liste der Tabellenzeilen

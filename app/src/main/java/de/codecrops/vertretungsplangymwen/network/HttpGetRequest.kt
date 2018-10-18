@@ -71,9 +71,13 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
             urlConnection.connectTimeout = 20000
             urlConnection.connect()
 
-            if(urlConnection.responseCode == 200) {
+            if(urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
                 inputStream = urlConnection.inputStream
                 response = readFromStream(inputStream)
+            } else
+                //Gibt den Fehlercode 401 zurück, wenn Nutzername oder Passwort falsch sind
+                if(urlConnection.responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+                return "401"
             }
         } catch (e: IOException) {
 
