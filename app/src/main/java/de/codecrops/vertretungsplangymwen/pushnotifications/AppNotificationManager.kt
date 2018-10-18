@@ -1,10 +1,9 @@
 package de.codecrops.vertretungsplangymwen.pushnotifications
 
-import android.app.Notification
 import android.content.Context
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
-import de.codecrops.vertretungsplangymwen.Vertretung
+import de.codecrops.vertretungsplangymwen.data.VertretungData
 
 /**
  * Diese Klasse bietet alle nötigen Methoden um dem Nutzer zu informieren
@@ -16,7 +15,7 @@ import de.codecrops.vertretungsplangymwen.Vertretung
  */
 
 class AppNotificationManager(val context: Context) {
-    private val list: ArrayList<Vertretung> = arrayListOf()
+    private val list: ArrayList<VertretungData> = arrayListOf()
     private val notifyList: ArrayList<NotificationCompat.Builder> = arrayListOf()
 
     companion object {
@@ -29,7 +28,7 @@ class AppNotificationManager(val context: Context) {
         for (v in list) {
             notifyList.add(NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID)
                     //.setSmallIcon(R.drawable.notification_icon)
-                    .setContentTitle("${v.hour} ${v.representant}")
+                    .setContentTitle("${v.stunde} ${v.vertretung}")
                     .setContentText(v.toString())
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setGroup(DEFAULT_GROUP_ID)
@@ -50,9 +49,9 @@ class AppNotificationManager(val context: Context) {
 
     /**
      * lässt ein Vertretungobjekt hinzufügen
-     * @param vertretung Vertretungsobjekt
+     * @param vertretungData Vertretungsobjekt
      */
-    fun add(vertretung: Vertretung) {
-        list.add(vertretung)
+    fun add(vertretungData: VertretungData) {
+        list.add(vertretungData)
     }
 }
