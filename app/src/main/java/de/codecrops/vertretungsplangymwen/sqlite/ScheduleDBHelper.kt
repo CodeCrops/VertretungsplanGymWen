@@ -4,14 +4,14 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
-class VertretungsplanDBHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+class ScheduleDBHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
 
     //ACHTUNG: Sollte der Contract geändert werden, muss hier DB_VERSION erhöht werden!
 
     companion object {
         //Einstellungen
         val DB_VERSION = 1
-        val DB_NAME = "VertretungsPlan.db"
+        val DB_NAME = "VertretungsPlanApp.db"
 
         //Konstante zur Erstellung des TABLES aus PlanContract
         private const val SQL_CREATE_ENTRIES =

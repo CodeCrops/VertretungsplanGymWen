@@ -7,12 +7,16 @@ import android.database.sqlite.SQLiteDatabase
 
 class DBManager(context: Context) {
 
-    var dbHelper : VertretungsplanDBHelper
+    var scheduleDBHelper : ScheduleDBHelper
+    var lehrerDBHelper : LehrerDBHelper
     var db : SQLiteDatabase
 
     init {
-        dbHelper = VertretungsplanDBHelper(context)
-        db = dbHelper.writableDatabase
+        scheduleDBHelper = ScheduleDBHelper(context)
+        lehrerDBHelper = LehrerDBHelper(context)
+
+        //es wird die DB aus scheduleDBHelper verwendet, welche allerdings keinen Unterschied zu lehrerDBHelper aufweißt
+        db = scheduleDBHelper.writableDatabase
     }
 
     /**
@@ -23,7 +27,6 @@ class DBManager(context: Context) {
      * @param raum Der Raum, in welchem anstelle des ursprünglichen Raums unterrichtet wird (nicht nötig, wenn es entfällt)
      * @param sonstiges Sonstige Informationen
      */
-
     fun addDataToVertretungsDB(klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?) {
         /*
         ACHTUNG:
@@ -67,18 +70,20 @@ class DBManager(context: Context) {
      */
     fun hasPupilVertretung(klasse: String) : Boolean {
         val cursor = getPlanCursorByKlasse(klasse)
-        if(cursor.moveToNext()) return true
-        return false
+        if(cursor.moveToNext()) {
+            cursor.close()
+            return true
+        } else cursor.close(); return false
     }
 
     /**
      * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
-     * @return ArrayList<VertretungsData> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
+     * @return ArrayList<ScheduleEntry> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
      */
-    fun getVertretungenByKlasse(klasse: String): ArrayList<VertretungsData> {
+    fun getVertretungenByKlasse(klasse: String): ArrayList<ScheduleEntry> {
 
         //result wird vorbereitet
-        val result = ArrayList<VertretungsData>()
+        val result = ArrayList<ScheduleEntry>()
 
         //cursor wird von DB geholt
         val cursor = getPlanCursorByKlasse(klasse)
@@ -86,7 +91,7 @@ class DBManager(context: Context) {
         //while schleife zum bearbeiten des Cursors
         while (cursor.moveToNext()) {
             result.add( //füget result die neue Vertretungsstunde hinzu
-                    VertretungsData( //erstellt ein neues Objekt von VertretungsData
+                    ScheduleEntry( //erstellt ein neues Objekt von ScheduleEntry
                             cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
                             cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
                             cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
@@ -100,6 +105,69 @@ class DBManager(context: Context) {
         cursor.close()
 
         return result
+    }
+
+    /**
+     * @param kuerzel Das Kürzel der Lehrkraft, welche überprüft wird
+     * @return Boolean - true:ist bereits enthalten ; false:noch nicht enthalten
+     */
+    fun isLehrerAlreadyInDB(kuerzel: String) : Boolean {
+        val selektion = DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel
+        val cursor = db.query(DBContracts.LehrerContract.TABLE_NAME, null, selektion, null, null, null, null, null)
+        if(cursor.moveToNext()) {
+            cursor.close()
+            return true
+        } else cursor.close(); return false
+    }
+
+
+    /**
+     * @param kuerzel Das Kürzel des Lehrers, welcher entfernt werden soll
+     */
+    fun removeLehrerFromDB(kuerzel: String) {
+        db.delete(DBContracts.LehrerContract.TABLE_NAME, DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel, null)
+    }
+
+    /**
+     * @param kuerzel Das Kürzel der Lehrkraft
+     * @param nachname Der Nachname der Lehrkraft
+     * @param vorname Der Vorname der Lehrkraft (nullable, falls nicht bekannt)
+     * @param geschlecht Das Geschlecht der Lehrkraft
+     */
+    fun addLehrerToDB(kuerzel: String, nachname: String, vorname: String?, geschlecht: String) {
+
+        //Lehrer wird entfernt, falls er bereits vorhanden ist -> Update wäre auch möglich, aber jetzt isses halt so ;)
+        if(isLehrerAlreadyInDB(kuerzel)) removeLehrerFromDB(kuerzel)
+
+        //Erstellt ein ContentValues-Objekt und fügt die Daten hinzu
+        val values = ContentValues().apply {
+            put(DBContracts.LehrerContract.COLUMN_KUERZEL, kuerzel)
+            put(DBContracts.LehrerContract.COLUMN_NACHNAME, nachname)
+            if(vorname != null) put(DBContracts.LehrerContract.COLUMN_VORNAME, vorname)
+            put(DBContracts.LehrerContract.COLUMN_GESCHLECHT, geschlecht)
+        }
+
+        //Erstellt eine neue Zeile in der DB mit den Daten von values
+        db.insert(DBContracts.LehrerContract.TABLE_NAME, null, values)
+    }
+
+    /**
+     * @param kuerzel Das Kürzel der Lehrkraft von welcher man die Informationen haben möchte
+     * @return LehrerData: ein Objekt gefüllt mit den Daten des spezifischen Lehrers
+     */
+    fun getLehrerInformation(kuerzel: String) : LehrerData {
+        val selection = DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel
+        val cursor = db.query(DBContracts.LehrerContract.TABLE_NAME, null, selection, null, null, null, null, null)
+        if(cursor.moveToNext()) {
+             val result = LehrerData(
+                    kuerzel,
+                    cursor.getString(cursor.getColumnIndex(DBContracts.LehrerContract.COLUMN_NACHNAME)),
+                    cursor.getString(cursor.getColumnIndex(DBContracts.LehrerContract.COLUMN_VORNAME)),
+                    cursor.getString(cursor.getColumnIndex(DBContracts.LehrerContract.COLUMN_GESCHLECHT))
+             )
+            cursor.close()
+            return result
+        } else cursor.close(); return LehrerData(kuerzel, "FEHLER", "FEHLER", "FEHLER")
     }
 
 }

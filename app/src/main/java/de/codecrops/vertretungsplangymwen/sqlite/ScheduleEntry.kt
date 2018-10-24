@@ -16,5 +16,9 @@ ACHTUNG!!!
 ACHTUNG!!!
  */
 
-class VertretungsData(val klasse: String, val  stunde: Int, val  vertretung: String, val   fach: String?, val   raum: String?, val   sonstiges: String?) {
+data class ScheduleEntry(val klasse: String, val  stunde: Int, val  vertretung: String, val   fach: String?, val   raum: String?, val   sonstiges: String?) {
+
+    override fun toString(): String {
+        return "$klasse $stunde Std. $vertretung Fach: $fach Raum: $raum; $sonstiges"
+    }
 }

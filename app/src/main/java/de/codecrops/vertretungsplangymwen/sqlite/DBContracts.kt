@@ -1,8 +1,14 @@
 package de.codecrops.vertretungsplangymwen.sqlite
 
+import android.net.Uri
 import android.provider.BaseColumns
 
 object DBContracts {
+
+    const val CONTENT_AUTHORITY = "de.codecrops.vertretungsplangymwen"
+    val BASE_CONTENT_URI = Uri.parse("content:// $CONTENT_AUTHORITY")
+    const val PATH_SCHEDULE = PlanContract.TABLE_NAME
+
 
     //Inner class implements BaseColums
     class PlanContract : BaseColumns {
@@ -28,6 +34,25 @@ object DBContracts {
             const val COLUMN_FACH = "fach"
             const val COLUMN_RAUM = "raum"
             const val COLUMN_SONSTIGES = "sonstiges"
+        }
+    }
+
+    //Inner class implements BaseColumns
+    class LehrerContract : BaseColumns {
+        companion object {
+
+            /*
+            ACHTUNG: Bei Änderungen hier, muss im DBHelper die Version erhöht werden
+                     Dadurch wird die gesamte DB geflusht und für den neuen Contract aufgebaut.
+             */
+
+            const val TABLE_NAME = "lehrer"
+            const val _ID = BaseColumns._ID
+            const val COLUMN_LISTID = "listID"
+            const val COLUMN_KUERZEL = "kuerzel"
+            const val COLUMN_VORNAME = "vorname"
+            const val COLUMN_NACHNAME = "nachname"
+            const val COLUMN_GESCHLECHT = "geschlecht"
         }
     }
 
