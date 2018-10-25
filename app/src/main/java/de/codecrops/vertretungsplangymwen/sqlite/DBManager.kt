@@ -7,16 +7,16 @@ import android.database.sqlite.SQLiteDatabase
 
 class DBManager(context: Context) {
 
-    var scheduleDBHelper : ScheduleDBHelper
-    var lehrerDBHelper : LehrerDBHelper
+    var dataBaseHelper : DataBaseHelper
     var db : SQLiteDatabase
 
     init {
-        scheduleDBHelper = ScheduleDBHelper(context)
-        lehrerDBHelper = LehrerDBHelper(context)
+        dataBaseHelper = DataBaseHelper(context)
 
-        //es wird die DB aus scheduleDBHelper verwendet, welche allerdings keinen Unterschied zu lehrerDBHelper aufweißt
-        db = scheduleDBHelper.writableDatabase
+        //onCreate() im Helper wird erst gecallt, wenn writeableDatabase oder readableDatabase aufgerufen wird -> "initAufrufen"
+
+        //es ist (nach dem initialisieren) egal von welchem Objekt die DB geholt wird, da es sich um die gleiche DB handelt
+        db = dataBaseHelper.writableDatabase
     }
 
     /**
@@ -55,7 +55,7 @@ class DBManager(context: Context) {
     fun getPlanCursorByKlasse(klasse: String): Cursor {
 
         //Erstellt die Selection (die WHERE-Clause)
-        val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = $klasse"
+        val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse'"
 
         //Erhalte den Cursor von der DB
         val cursor = db.query(DBContracts.PlanContract.TABLE_NAME, null, selection, null, null, null, null)
@@ -112,8 +112,8 @@ class DBManager(context: Context) {
      * @return Boolean - true:ist bereits enthalten ; false:noch nicht enthalten
      */
     fun isLehrerAlreadyInDB(kuerzel: String) : Boolean {
-        val selektion = DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel
-        val cursor = db.query(DBContracts.LehrerContract.TABLE_NAME, null, selektion, null, null, null, null, null)
+        val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+        val cursor = db.query(DBContracts.LehrerContract.TABLE_NAME, null, selection, null, null, null, null, null)
         if(cursor.moveToNext()) {
             cursor.close()
             return true
@@ -125,7 +125,8 @@ class DBManager(context: Context) {
      * @param kuerzel Das Kürzel des Lehrers, welcher entfernt werden soll
      */
     fun removeLehrerFromDB(kuerzel: String) {
-        db.delete(DBContracts.LehrerContract.TABLE_NAME, DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel, null)
+        val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+        db.delete(DBContracts.LehrerContract.TABLE_NAME, selection, null)
     }
 
     /**
@@ -156,7 +157,7 @@ class DBManager(context: Context) {
      * @return LehrerData: ein Objekt gefüllt mit den Daten des spezifischen Lehrers
      */
     fun getLehrerInformation(kuerzel: String) : LehrerData {
-        val selection = DBContracts.LehrerContract.COLUMN_KUERZEL + " = " + kuerzel
+        val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
         val cursor = db.query(DBContracts.LehrerContract.TABLE_NAME, null, selection, null, null, null, null, null)
         if(cursor.moveToNext()) {
              val result = LehrerData(
