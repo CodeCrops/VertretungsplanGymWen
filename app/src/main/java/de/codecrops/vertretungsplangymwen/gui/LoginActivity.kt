@@ -9,11 +9,11 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.login_activity)
+
+        login.setOnClickListener { login() }
     }
 
-    fun login() {
-        if(username.equals("") && password.equals("")) {
+    private fun login() {
 
-        }
     }
 }
