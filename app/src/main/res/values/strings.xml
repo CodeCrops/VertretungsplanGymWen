@@ -4,4 +4,7 @@
     <string name="login_username">Nutzername</string>
     <string name="login_password">Passwort</string>
     <string name="login">Anmelden</string>
+    <string name="channel_name">Vertretungsplan Update Channel</string>
+    <string name="channel_description">Der Channel für alle Vertretungsplan Updates und für
+        zeitliche Benachrichtigungen</string>
 </resources>
