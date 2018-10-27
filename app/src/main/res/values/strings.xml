@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Vertretungsplan Gym Wen</string>
+    <string name="app_icon">App Icon</string>
+    <string name="login_username">Nutzername</string>
+    <string name="login_password">Passwort</string>
+    <string name="login">Anmelden</string>
 </resources>
