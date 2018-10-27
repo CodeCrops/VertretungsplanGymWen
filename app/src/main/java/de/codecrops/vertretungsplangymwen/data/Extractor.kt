@@ -1,6 +1,5 @@
 package de.codecrops.vertretungsplangymwen.data
 
-import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -21,7 +20,7 @@ class Extractor(data: String) {
 
     var unauthorized = false
     lateinit var date: Date
-    val table: ArrayList<ArrayList<String>> = arrayListOf()
+    val table: ArrayList<VertretungData> = arrayListOf()
 
     init {
         /**
@@ -46,62 +45,48 @@ class Extractor(data: String) {
         ))
 
         //Schneidet die eigentliche Tabelle aus dem html Document String
-        val tableString = data.substring(data.indexOf
-        ("<table class=\"TabelleVertretungen\" cellpadding=\"2px\">")
-                + "<table class=\"TabelleVertretungen\" cellpadding=\"2px\">".length,
+        val tableString = data.substring(
+                data.indexOf("<table class=\"TabelleVertretungen\" cellpadding=\"2px\">"),
                 data.lastIndexOf("</table>"))
 
         //Erstellt eine Liste der Tabellenzeilen
         val lineList = tableString.split("</tr>") as ArrayList<String>
 
-        //Entfernt die letzte unnötige Zeile mit dem einzigen Inhalt: "</tr>"
-        lineList.removeAt(lineList.size -1)
+        //Entfernt die erste Zeile der Tabelle, die Definitionszeile
+        lineList.removeAt(0)
 
-        /*
-            Der Counter ist wichtig, damit Später die Spalten der Tabelle den
-            Zeilen zugeordnet werden können.
-             */
-        var count = 0
+        //Entfernt die letzte leere Zeile
+        lineList.removeAt(lineList.size-1)
 
-        //Diese for-Schleife geht jede einzelne Zeile der Tabelle durch
-        for (line: String in lineList) {
+        //Diese for-Schleife geht jede einzelne Spalte der Tabellenzeile durch
+        for(line: String in lineList) {
 
-            //Dies ist eine Liste der einzelnen Spalten der Tabelle in der Zeile "line"
-            val colonList = line.split("\n") as ArrayList<String>
+            //Erstellt eine Liste der Tabellenspalten
+            val colonList = line.split("</td>").toMutableList()
+            colonList.removeAt(colonList.size - 1)
 
-            //Dies entfernt die html Definition einer Tabellenspalte aus der Spaltenliste
-            colonList.remove("</tr>")
+            //Setzt die Werte, die für das VertretungData Objekt nötig sind
+            val klasse = colonList[0].substring(colonList[0].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "")
+            val stunde = colonList[1].substring(colonList[1].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "").toInt()
+            val vertreung = colonList[2].substring(colonList[2].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "")
+            val fach = colonList[3].substring(colonList[3].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "")
+            val raum = colonList[4].substring(colonList[4].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "")
+            val kommentar = colonList[5].substring(colonList[5].lastIndexOf(">"))
+                    .replace(">", "")
+                    .replace(" ", "")
 
-            //Dies entfernt die html Definition eines Tabellenanfangs aus der Spaltenliste
-            colonList.remove("<tr class=\"TitelZeileTabelleVertretungen\">")
-
-            //Dies fügt der "table" ein Objekt, das als Zeile der Tabelle anzusehen ist hinzu
-            table.add(ArrayList())
-
-            /*
-            Diese for-Schleife geht jede Spalte der Tabelle in der aktuellen Zeile der
-            überliegenden for-Schleife durch.
-             */
-            for (colon: String in colonList) {
-
-                /*
-                Dies schneidet den eigentlichen Wert aus der html Datei in der entsprechenden
-                Spalte und Zeile heraus.
-                 */
-                val value = colon.substring(colon.indexOf(">"), colon.lastIndexOf("<"))
-
-                /*
-                Dies fügt der zuvor eingefügen Zeile der "table" die entsprechenden Spalten
-                hinzu.
-                 */
-                table.get(count).add(value)
-            }
-
-            /*
-            Dies wechselt so zu sagen in die nächste Zeile der Tabelle, dies ist wichtig für
-            die for-Schleife, die die Spalten den Zeilen hinzufügt.
-             */
-            count++
+            //fügt das VertretungData Objelt der Tabelle hinzu
+            table.add(VertretungData(klasse, stunde, vertreung, fach, raum, kommentar))
         }
     }
 }
