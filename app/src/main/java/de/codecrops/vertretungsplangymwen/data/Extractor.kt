@@ -1,5 +1,6 @@
 package de.codecrops.vertretungsplangymwen.data
 
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
