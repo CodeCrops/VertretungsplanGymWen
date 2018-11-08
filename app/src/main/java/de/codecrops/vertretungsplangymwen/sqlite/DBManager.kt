@@ -32,7 +32,7 @@ class DBManager(context: Context) {
         ACHTUNG:
 
             - Die Parameter klasse, stunde und vertretung sind nicht nullable -> sie müssen übergeben werden!
-            - Die Paramter fach, raum und sonstiges sind nullable -> sie können weggelassen werden und sollten dies auch bei leeren Werten bitte werden! Kein "" anstatt null
+            - Die Paramter fach, raum und sonstiges sind nullable -> sie können weggelassen werden und sollten dies auch bei leeren Werten bitte! Kein "" anstatt null
          */
 
         //Erstellt ein ContentValues-Objekt und fügt die Daten hinzu
