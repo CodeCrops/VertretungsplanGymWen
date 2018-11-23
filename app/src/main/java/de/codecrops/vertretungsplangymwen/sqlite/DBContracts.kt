@@ -8,6 +8,7 @@ object DBContracts {
     const val CONTENT_AUTHORITY = "de.codecrops.vertretungsplangymwen"
     val BASE_CONTENT_URI = Uri.parse("content:// $CONTENT_AUTHORITY")
     const val PATH_SCHEDULE = PlanContract.TABLE_NAME
+    const val PATH_LEHRER = LehrerContract.TABLE_NAME
 
 
     //Inner class implements BaseColums
@@ -34,6 +35,9 @@ object DBContracts {
             const val COLUMN_FACH = "fach"
             const val COLUMN_RAUM = "raum"
             const val COLUMN_SONSTIGES = "sonstiges"
+
+            val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_SCHEDULE)
+
         }
     }
 
@@ -53,6 +57,8 @@ object DBContracts {
             const val COLUMN_VORNAME = "vorname"
             const val COLUMN_NACHNAME = "nachname"
             const val COLUMN_GESCHLECHT = "geschlecht"
+
+            val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_LEHRER)
         }
     }
 
