@@ -63,7 +63,7 @@ class DataProvider :  ContentProvider() {
         return cursor
     }
 
-    override fun insert(uri: Uri, values: ContentValues?): Uri? {
+    override fun insert(uri: Uri, values: ContentValues): Uri? {
         val match = sUriMatcher.match(uri)
         when(match) {
             LEHRER -> return insertLehrer(uri, values)
@@ -72,7 +72,24 @@ class DataProvider :  ContentProvider() {
         }
     }
 
-    private fun insertLehrer(uri: Uri, values: ContentValues?) : Uri? {
+    private fun insertLehrer(uri: Uri, values: ContentValues) : Uri? {
+        //Sanity-Check
+        var invalidData = false
+        //Lehrer-Kuerzel-Validation
+        val kuerzelValue = values.getAsString(values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL))
+        if(kuerzelValue.isNullOrBlank() || kuerzelValue.length != 3) {
+            invalidData = true
+        }
+        //Nachname-Kuerzel-Validation
+        val nachnameValue = values.getAsString(values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME))
+        if(nachnameValue.isNullOrBlank()) {
+            invalidData = true
+        }
+        //invalidData-Check
+        if(invalidData) {
+            throw java.lang.IllegalArgumentException("Failed to insert new Lehrer into DB! Invalid Values!")
+        }
+
         val db = mDBHelper.writableDatabase
         val id : Long = db.insert(DBContracts.LehrerContract.TABLE_NAME, null, values)
 
@@ -86,7 +103,29 @@ class DataProvider :  ContentProvider() {
         return ContentUris.withAppendedId(uri, id)
     }
 
-    private fun insertVertretungsplan(uri: Uri, values: ContentValues?) : Uri? {
+    private fun insertVertretungsplan(uri: Uri, values: ContentValues) : Uri? {
+        //Sanity-Check
+        var invalidData = false
+        //Klasse-Validation
+        val klasseValue = values.getAsString(values.getAsString(DBContracts.PlanContract.COLUMN_KLASSE))
+        if(klasseValue.isNullOrBlank()) {
+            invalidData = true
+        }
+        //Stunde-Validation
+        val stundeValue = values.getAsInteger(values.getAsString(DBContracts.PlanContract.COLUMN_STUNDE))
+        if(stundeValue == null || stundeValue <= 0 || stundeValue > 10 ) {
+            invalidData = true
+        }
+        //Vertretung-Validation
+        val vertretungValue = values.getAsString(values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG))
+        if(vertretungValue.isNullOrBlank() || vertretungValue.length != 3) {
+            invalidData = true
+        }
+        //invalidData-Check
+        if(invalidData) {
+            throw java.lang.IllegalArgumentException("Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!")
+        }
+
         val db = mDBHelper.writableDatabase
         val id : Long = db.insert(DBContracts.PlanContract.TABLE_NAME, null, values)
 
