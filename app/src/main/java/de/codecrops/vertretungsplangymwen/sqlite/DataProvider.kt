@@ -143,8 +143,58 @@ class DataProvider :  ContentProvider() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<String>?): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun update(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?): Int {
+        val match = sUriMatcher.match(uri)
+        when(match) {
+            LEHRER -> return updateLehrer(uri, values, selection, selectionArgs)
+            LEHRER_ID -> {
+                val localselection = DBContracts.LehrerContract._ID + "=?"
+                return updateLehrer(uri, values, localselection, selectionArgs)
+            }
+            VERTRETUNGSPLAN -> return updateVertretungsplan(uri, values, selection, selectionArgs)
+            VERTRETUNGSPLAN_ID -> {
+                val localselection = DBContracts.LehrerContract._ID + "=?"
+                return updateVertretungsplan(uri, values, localselection, selectionArgs)
+            }
+            else -> throw java.lang.IllegalArgumentException("Update is not supported for $uri")
+        }
+    }
+
+    private fun updateLehrer(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
+        //Sanity-Check
+        //Size-Check (Überprüfung, ob values überhaupt Daten enthält. Sorgt für bessere Performance)
+        if(values.size() == 0) return 0
+        //Kürzel-Check (Muss genau 3 Zeichen lang sein)
+        if(values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL).length != 3) {
+            System.err.print("[DataProvider] Lehrer-Kürzel muss genau 3 Zeichen lang sein!")
+            return 0
+        }
+        //Nachname-Check (Darf nicht leer oder null sein)
+        if(values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME).isNullOrBlank()) {
+            System.err.print("[DataProvider] Lehrer-Nachname darf nicht leer sein!")
+            return 0
+        }
+        //DB-Update
+        return mDBHelper.writableDatabase.update(DBContracts.LehrerContract.TABLE_NAME, values, selection, selectionArgs)
+    }
+
+    private fun updateVertretungsplan(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
+        //Sanity-Check
+        //Size-Check (Überprüfung, ob values überhaupt Daten enthält. Sorgt für bessere Performance)
+        if(values.size() == 0) return 0
+        //Klasse-Check entfällt, da es auch leere "Klassen" gibt
+        //Stunde-Check (Darf nicht 0 oder null sein)
+        if(values.getAsInteger(DBContracts.PlanContract.COLUMN_STUNDE).equals(0)) {
+            System.err.print("[DataProvider] Plan-Stunde darf nicht 0 sein!")
+            return 0
+        }
+        //Vertretung-Check (Darf nicht leer oder null sein)
+        if(values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG).isNullOrBlank()) {
+            System.err.print("[DataProvider] Plan-Vertretung darf nicht leer oder null sein!")
+            return 0
+        }
+        //DB-Update
+        return mDBHelper.writableDatabase.update(DBContracts.PlanContract.TABLE_NAME, values, selection, selectionArgs)
     }
 
     override fun getType(uri: Uri): String? {
