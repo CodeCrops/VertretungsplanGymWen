@@ -7,6 +7,7 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import java.lang.IllegalStateException
 
 class DataProvider :  ContentProvider() {
 
@@ -216,7 +217,14 @@ class DataProvider :  ContentProvider() {
     }
 
     override fun getType(uri: Uri): String? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val match = sUriMatcher.match(uri)
+        when(match) {
+            LEHRER -> return DBContracts.LehrerContract.CONTENT_LIST_TYPE
+            LEHRER_ID -> return DBContracts.LehrerContract.CONTENT_ITEM_TYPE
+            VERTRETUNGSPLAN -> return DBContracts.PlanContract.CONTENT_LIST_TYPE
+            VERTRETUNGSPLAN_ID -> return DBContracts.PlanContract.CONTENT_ITEM_TYPE
+            else -> throw IllegalStateException("Unknown URI $uri with match $match")
+        }
     }
 
 }
