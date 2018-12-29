@@ -140,7 +140,23 @@ class DataProvider :  ContentProvider() {
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val db = mDBHelper.writableDatabase
+        val match : Int = sUriMatcher.match(uri)
+        when(match) {
+            LEHRER -> return db.delete(DBContracts.LehrerContract.TABLE_NAME, selection, selectionArgs)
+            LEHRER_ID -> {
+                val localselection = DBContracts.LehrerContract._ID + "=?"
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return db.delete(DBContracts.LehrerContract.TABLE_NAME, localselection, localselectionArgs)
+            }
+            VERTRETUNGSPLAN -> return db.delete(DBContracts.PlanContract.TABLE_NAME, selection, selectionArgs)
+            VERTRETUNGSPLAN_ID -> {
+                val localselection = DBContracts.PlanContract._ID + "=?"
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return db.delete(DBContracts.PlanContract.TABLE_NAME, localselection, localselectionArgs)
+            }
+            else -> throw java.lang.IllegalArgumentException("Deletion is not supportet for $uri")
+        }
     }
 
     override fun update(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?): Int {
@@ -149,12 +165,14 @@ class DataProvider :  ContentProvider() {
             LEHRER -> return updateLehrer(uri, values, selection, selectionArgs)
             LEHRER_ID -> {
                 val localselection = DBContracts.LehrerContract._ID + "=?"
-                return updateLehrer(uri, values, localselection, selectionArgs)
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return updateLehrer(uri, values, localselection, localselectionArgs)
             }
             VERTRETUNGSPLAN -> return updateVertretungsplan(uri, values, selection, selectionArgs)
             VERTRETUNGSPLAN_ID -> {
                 val localselection = DBContracts.LehrerContract._ID + "=?"
-                return updateVertretungsplan(uri, values, localselection, selectionArgs)
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return updateVertretungsplan(uri, values, localselection, localselectionArgs)
             }
             else -> throw java.lang.IllegalArgumentException("Update is not supported for $uri")
         }
