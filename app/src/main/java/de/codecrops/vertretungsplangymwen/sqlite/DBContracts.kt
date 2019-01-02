@@ -7,7 +7,7 @@ import android.provider.BaseColumns
 object DBContracts {
 
     const val CONTENT_AUTHORITY = "de.codecrops.vertretungsplangymwen"
-    val BASE_CONTENT_URI = Uri.parse("content:// $CONTENT_AUTHORITY")
+    val BASE_CONTENT_URI = Uri.parse("content://$CONTENT_AUTHORITY")
     const val PATH_SCHEDULE = PlanContract.TABLE_NAME
     const val PATH_LEHRER = LehrerContract.TABLE_NAME
 

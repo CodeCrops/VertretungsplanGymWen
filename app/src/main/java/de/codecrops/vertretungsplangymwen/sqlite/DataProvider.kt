@@ -77,12 +77,12 @@ class DataProvider :  ContentProvider() {
         //Sanity-Check
         var invalidData = false
         //Lehrer-Kuerzel-Validation
-        val kuerzelValue = values.getAsString(values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL))
+        val kuerzelValue = values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL)
         if(kuerzelValue.isNullOrBlank() || kuerzelValue.length != 3) {
             invalidData = true
         }
         //Nachname-Kuerzel-Validation
-        val nachnameValue = values.getAsString(values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME))
+        val nachnameValue = values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME)
         if(nachnameValue.isNullOrBlank()) {
             invalidData = true
         }
@@ -108,17 +108,17 @@ class DataProvider :  ContentProvider() {
         //Sanity-Check
         var invalidData = false
         //Klasse-Validation
-        val klasseValue = values.getAsString(values.getAsString(DBContracts.PlanContract.COLUMN_KLASSE))
+        val klasseValue = values.getAsString(DBContracts.PlanContract.COLUMN_KLASSE)
         if(klasseValue.isNullOrBlank()) {
             invalidData = true
         }
         //Stunde-Validation
-        val stundeValue = values.getAsInteger(values.getAsString(DBContracts.PlanContract.COLUMN_STUNDE))
+        val stundeValue = values.getAsInteger(DBContracts.PlanContract.COLUMN_STUNDE)
         if(stundeValue == null || stundeValue <= 0 || stundeValue > 10 ) {
             invalidData = true
         }
         //Vertretung-Validation
-        val vertretungValue = values.getAsString(values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG))
+        val vertretungValue = values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG)
         if(vertretungValue.isNullOrBlank() || vertretungValue.length != 3) {
             invalidData = true
         }
@@ -181,36 +181,45 @@ class DataProvider :  ContentProvider() {
 
     private fun updateLehrer(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
         //Sanity-Check
-        //Size-Check (Überprüfung, ob values überhaupt Daten enthält. Sorgt für bessere Performance)
-        if(values.size() == 0) return 0
-        //Kürzel-Check (Muss genau 3 Zeichen lang sein)
-        if(values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL).length != 3) {
-            System.err.print("[DataProvider] Lehrer-Kürzel muss genau 3 Zeichen lang sein!")
-            return 0
+        //Überprüft, ob überhaupt ein Kürzel geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da altes Kürzel aus DB eh bestehen bleibt
+        if(values.containsKey(DBContracts.LehrerContract.COLUMN_KUERZEL)) {
+            //Kürzel-Check (Muss genau 3 Zeichen lang sein)
+            if(values.getAsString(DBContracts.LehrerContract.COLUMN_KUERZEL).length != 3) {
+                System.err.print("[DataProvider] Lehrer-Kürzel muss genau 3 Zeichen lang sein!")
+                return 0
+            }
         }
-        //Nachname-Check (Darf nicht leer oder null sein)
-        if(values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME).isNullOrBlank()) {
-            System.err.print("[DataProvider] Lehrer-Nachname darf nicht leer sein!")
-            return 0
+        //Überprüft, ob überhaupt ein Nachname geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da alter Nachname aus DB eh bestehen bleibt
+        if(values.containsKey(DBContracts.LehrerContract.COLUMN_NACHNAME)) {
+            //Nachname-Check (Darf nicht leer oder null sein)
+            if(values.getAsString(DBContracts.LehrerContract.COLUMN_NACHNAME).isNullOrBlank()) {
+                System.err.print("[DataProvider] Lehrer-Nachname darf nicht leer sein!")
+                return 0
+            }
         }
+
         //DB-Update
         return mDBHelper.writableDatabase.update(DBContracts.LehrerContract.TABLE_NAME, values, selection, selectionArgs)
     }
 
     private fun updateVertretungsplan(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
         //Sanity-Check
-        //Size-Check (Überprüfung, ob values überhaupt Daten enthält. Sorgt für bessere Performance)
-        if(values.size() == 0) return 0
         //Klasse-Check entfällt, da es auch leere "Klassen" gibt
-        //Stunde-Check (Darf nicht 0 oder null sein)
-        if(values.getAsInteger(DBContracts.PlanContract.COLUMN_STUNDE).equals(0)) {
-            System.err.print("[DataProvider] Plan-Stunde darf nicht 0 sein!")
-            return 0
+        //Überprüft, ob überhaupt eine Stunde geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da alte Stunde aus DB eh bestehen bleibt
+        if(values.containsKey(DBContracts.PlanContract.COLUMN_STUNDE)) {
+            //Stunde-Check (Darf nicht 0 oder null sein)
+            if(values.getAsInteger(DBContracts.PlanContract.COLUMN_STUNDE) == 0) {
+                System.err.print("[DataProvider] Plan-Stunde darf nicht 0 sein!")
+                return 0
+            }
         }
-        //Vertretung-Check (Darf nicht leer oder null sein)
-        if(values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG).isNullOrBlank()) {
-            System.err.print("[DataProvider] Plan-Vertretung darf nicht leer oder null sein!")
-            return 0
+        //Überprüft, ob überhaupt eine Vertretung geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da alte Vertretung aus DB eh bestehen bleibt
+        if(values.containsKey(DBContracts.PlanContract.COLUMN_VERTRETUNG)) {
+            //Vertretung-Check (Darf nicht leer oder null sein)
+            if(values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG).isNullOrBlank()) {
+                System.err.print("[DataProvider] Plan-Vertretung darf nicht leer oder null sein!")
+                return 0
+            }
         }
         //DB-Update
         return mDBHelper.writableDatabase.update(DBContracts.PlanContract.TABLE_NAME, values, selection, selectionArgs)
