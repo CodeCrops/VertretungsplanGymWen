@@ -119,7 +119,7 @@ class DataProvider :  ContentProvider() {
         }
         //Vertretung-Validation
         val vertretungValue = values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG)
-        if(vertretungValue.isNullOrBlank() || vertretungValue.length != 3) {
+        if(vertretungValue.isNullOrBlank()) {
             invalidData = true
         }
         //invalidData-Check
@@ -163,23 +163,23 @@ class DataProvider :  ContentProvider() {
     override fun update(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?): Int {
         val match = sUriMatcher.match(uri)
         when(match) {
-            LEHRER -> return updateLehrer(uri, values, selection, selectionArgs)
+            LEHRER -> return updateLehrer(values, selection, selectionArgs)
             LEHRER_ID -> {
                 val localselection = DBContracts.LehrerContract._ID + "=?"
                 val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
-                return updateLehrer(uri, values, localselection, localselectionArgs)
+                return updateLehrer(values, localselection, localselectionArgs)
             }
-            VERTRETUNGSPLAN -> return updateVertretungsplan(uri, values, selection, selectionArgs)
+            VERTRETUNGSPLAN -> return updateVertretungsplan(values, selection, selectionArgs)
             VERTRETUNGSPLAN_ID -> {
                 val localselection = DBContracts.LehrerContract._ID + "=?"
                 val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
-                return updateVertretungsplan(uri, values, localselection, localselectionArgs)
+                return updateVertretungsplan(values, localselection, localselectionArgs)
             }
             else -> throw java.lang.IllegalArgumentException("Update is not supported for $uri")
         }
     }
 
-    private fun updateLehrer(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
+    private fun updateLehrer(values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
         //Sanity-Check
         //Überprüft, ob überhaupt ein Kürzel geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da altes Kürzel aus DB eh bestehen bleibt
         if(values.containsKey(DBContracts.LehrerContract.COLUMN_KUERZEL)) {
@@ -202,7 +202,7 @@ class DataProvider :  ContentProvider() {
         return mDBHelper.writableDatabase.update(DBContracts.LehrerContract.TABLE_NAME, values, selection, selectionArgs)
     }
 
-    private fun updateVertretungsplan(uri: Uri, values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
+    private fun updateVertretungsplan(values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
         //Sanity-Check
         //Klasse-Check entfällt, da es auch leere "Klassen" gibt
         //Überprüft, ob überhaupt eine Stunde geupdatet werden soll. Wenn ja -> SanityCheck. Wenn nein -> nichts, da alte Stunde aus DB eh bestehen bleibt
