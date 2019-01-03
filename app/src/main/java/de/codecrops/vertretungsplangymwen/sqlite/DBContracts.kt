@@ -70,5 +70,4 @@ object DBContracts {
             val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_LEHRER)
         }
     }
-
 }

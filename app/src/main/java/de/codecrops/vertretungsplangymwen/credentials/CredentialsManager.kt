@@ -2,6 +2,7 @@ package de.codecrops.vertretungsplangymwen.credentials
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Base64
 
 
 const val SHARED_PREFERENCES_PATH = "de.codecrops.vertretungsplangymwen.HTTPCredentials"
@@ -55,7 +56,16 @@ class CredentialsManager {
             }
         }
 
-        //TODO: Add a method which returns the Base64Encoded Version of the Credentials
+        /**
+         * @param context Context of the Application - needed to get access to SharedPreferences
+         * @return Base64 encoded String - ready for Website-Login
+         */
+
+        fun convertToBase64(context: Context) : String {
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
+            var key = (sharedPref.getString(SHARED_PREFERENCES_USERNAME_KEY, "") + ":" + sharedPref.getString(SHARED_PREFERENCES_PASSWORD_KEY, ""))
+            return Base64.encodeToString(key.toByteArray(), 0).replace("\n", "")
+        }
 
     }
 
