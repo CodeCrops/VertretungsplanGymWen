@@ -35,6 +35,7 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
 
     }
 
+    @Suppress("DEPRECATION")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val vertretungData: VertretungData = getItem(position)!!
         lateinit var viewHolder: ViewHolder
@@ -56,20 +57,22 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             viewHolder = convertView.tag as ViewHolder
             view = convertView
         }
-        /*
+
         viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
         viewHolder.stunde!!.text = Utils.fromHtml(vertretungData.stunde.toString())
         viewHolder.vertretung!!.text = Utils.fromHtml(vertretungData.vertretung)
         viewHolder.fach!!.text = Utils.fromHtml(vertretungData.fach)
         viewHolder.raum!!.text = Utils.fromHtml(vertretungData.raum)
         viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
-        */
+
+        /*
         viewHolder.klasse!!.text = vertretungData.klasse
         viewHolder.stunde!!.text = vertretungData.stunde.toString()
         viewHolder.vertretung!!.text = vertretungData.vertretung
         viewHolder.fach!!.text = vertretungData.fach
         viewHolder.raum!!.text = vertretungData.raum
         viewHolder.kommentar!!.text = vertretungData.kommentar
+        */
         return view
     }
 }

@@ -55,7 +55,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
         lateinit var inputStream: InputStream
 
         //Username:Password TODO: automatisches Setzen der Werte durch Anmeldung
-        val userpasswort = ""
+        val userpasswort = "alle:hitzefrei?"
 
         //erstellt einen Authentication key aus Nutzername und Passwort mithilfe von Base64
         val encAutorization = Base64.encodeToString(userpasswort.toByteArray(), 0)
@@ -90,7 +90,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
 
     private fun readFromStream(inputStream: InputStream): String {
         val output = StringBuilder()
-        val inputStreamReader = InputStreamReader(inputStream, Charset.forName("UTF-8"))
+        val inputStreamReader = InputStreamReader(inputStream, "WINDOWS-1252")
         val reader = BufferedReader(inputStreamReader)
         var line = reader.readLine()
         while (line != null) {
