@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import android.util.Base64
 
 
-const val SHARED_PREFERENCES_PATH = "de.codecrops.vertretungsplangymwen.HTTPCredentials"
-const val SHARED_PREFERENCES_USERNAME_KEY = "HTTPUser"
-const val SHARED_PREFERENCES_PASSWORD_KEY = "HTTPPass"
+private const val SHARED_PREFERENCES_PATH = "de.codecrops.vertretungsplangymwen.CredentialsPREF"
+private const val SHARED_PREFERENCES_USERNAME_KEY = "HTTPUser"
+private const val SHARED_PREFERENCES_PASSWORD_KEY = "HTTPPass"
 
 class CredentialsManager {
     companion object {
