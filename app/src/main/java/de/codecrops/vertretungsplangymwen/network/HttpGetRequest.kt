@@ -55,7 +55,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
         lateinit var inputStream: InputStream
 
         //Username:Password TODO: automatisches Setzen der Werte durch Anmeldung
-        val userpasswort = "alle:hitzefrei?"
+        val userpasswort = ""
 
         //erstellt einen Authentication key aus Nutzername und Passwort mithilfe von Base64
         val encAutorization = Base64.encodeToString(userpasswort.toByteArray(), 0)
