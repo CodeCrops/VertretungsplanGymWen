@@ -1,13 +1,15 @@
 package de.codecrops.vertretungsplangymwen.sqlite
 
+import android.content.ContentResolver
 import android.net.Uri
 import android.provider.BaseColumns
 
 object DBContracts {
 
     const val CONTENT_AUTHORITY = "de.codecrops.vertretungsplangymwen"
-    val BASE_CONTENT_URI = Uri.parse("content:// $CONTENT_AUTHORITY")
+    val BASE_CONTENT_URI = Uri.parse("content://$CONTENT_AUTHORITY")
     const val PATH_SCHEDULE = PlanContract.TABLE_NAME
+    const val PATH_LEHRER = LehrerContract.TABLE_NAME
 
 
     //Inner class implements BaseColums
@@ -34,6 +36,13 @@ object DBContracts {
             const val COLUMN_FACH = "fach"
             const val COLUMN_RAUM = "raum"
             const val COLUMN_SONSTIGES = "sonstiges"
+
+            //"MIME"Types
+            val CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SCHEDULE
+            val CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SCHEDULE
+
+            val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_SCHEDULE)
+
         }
     }
 
@@ -53,7 +62,12 @@ object DBContracts {
             const val COLUMN_VORNAME = "vorname"
             const val COLUMN_NACHNAME = "nachname"
             const val COLUMN_GESCHLECHT = "geschlecht"
+
+            //"MIME"Types
+            val CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_LEHRER
+            val CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_LEHRER
+
+            val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_LEHRER)
         }
     }
-
 }
