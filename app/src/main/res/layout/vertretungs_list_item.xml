@@ -57,4 +57,5 @@
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vertretung" />
+
 </android.support.constraint.ConstraintLayout>

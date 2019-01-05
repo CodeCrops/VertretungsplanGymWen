@@ -65,14 +65,6 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
         viewHolder.raum!!.text = Utils.fromHtml(vertretungData.raum)
         viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
 
-        /*
-        viewHolder.klasse!!.text = vertretungData.klasse
-        viewHolder.stunde!!.text = vertretungData.stunde.toString()
-        viewHolder.vertretung!!.text = vertretungData.vertretung
-        viewHolder.fach!!.text = vertretungData.fach
-        viewHolder.raum!!.text = vertretungData.raum
-        viewHolder.kommentar!!.text = vertretungData.kommentar
-        */
         return view
     }
 }
