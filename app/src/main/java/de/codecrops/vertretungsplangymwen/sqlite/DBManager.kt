@@ -3,6 +3,7 @@ package de.codecrops.vertretungsplangymwen.sqlite
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import de.codecrops.vertretungsplangymwen.data.VertretungData
 
 class DBManager {
 
@@ -71,12 +72,12 @@ class DBManager {
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
          * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
-         * @return ArrayList<ScheduleEntry> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
+         * @return ArrayList<VertretungData> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
          */
-        fun getVertretungenByKlasse(context: Context, klasse: String): ArrayList<ScheduleEntry> {
+        fun getVertretungenByKlasse(context: Context, klasse: String): ArrayList<VertretungData> {
 
             //result wird vorbereitet
-            val result = ArrayList<ScheduleEntry>()
+            val result = ArrayList<VertretungData>()
 
             //cursor wird von DB geholt
             val cursor = getPlanCursorByKlasse(context, klasse)
@@ -84,7 +85,7 @@ class DBManager {
             //while schleife zum bearbeiten des Cursors
             while (cursor.moveToNext()) {
                 result.add( //füget result die neue Vertretungsstunde hinzu
-                        ScheduleEntry( //erstellt ein neues Objekt von ScheduleEntry
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
                                 cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
                                 cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
                                 cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung

@@ -1,13 +1,12 @@
 package de.codecrops.vertretungsplangymwen.credentials
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Base64
 
 
-private const val SHARED_PREFERENCES_PATH = "de.codecrops.vertretungsplangymwen.CredentialsPREF"
-private const val SHARED_PREFERENCES_USERNAME_KEY = "HTTPUser"
-private const val SHARED_PREFERENCES_PASSWORD_KEY = "HTTPPass"
+const val SHARED_PREFERENCES_CREDENTIALS_PATH = "de.codecrops.vertretungsplangymwen.CredentialsPREF"
+const val SHARED_PREFERENCES_CREDENTIALS_USERNAME_KEY = "HTTPUser"
+const val SHARED_PREFERENCES_CREDENTIALS_PASSWORD_KEY = "HTTPPass"
 
 class CredentialsManager {
     companion object {
@@ -16,10 +15,10 @@ class CredentialsManager {
          * @param context Context of the Application - needed to get access to SharedPreferences
          */
         fun setHTTPCredentials(context: Context, username: String, password: String) {
-            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_CREDENTIALS_PATH, Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
-                putString(SHARED_PREFERENCES_USERNAME_KEY, username)
-                putString(SHARED_PREFERENCES_PASSWORD_KEY, password)
+                putString(SHARED_PREFERENCES_CREDENTIALS_USERNAME_KEY, username)
+                putString(SHARED_PREFERENCES_CREDENTIALS_PASSWORD_KEY, password)
                 apply()
             }
         }
@@ -29,8 +28,8 @@ class CredentialsManager {
          * @return Username saved for the HTTPLogin
          */
         fun getHTTPUsername(context: Context) : String {
-            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
-            val user = sharedPref.getString(SHARED_PREFERENCES_USERNAME_KEY, "anonymous")
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_CREDENTIALS_PATH, Context.MODE_PRIVATE)
+            val user = sharedPref.getString(SHARED_PREFERENCES_CREDENTIALS_USERNAME_KEY, "anonymous")
             return user
         }
 
@@ -39,8 +38,8 @@ class CredentialsManager {
          * @return Password saved for the HTTPLogin
          */
         fun getHTTPPassword(context: Context) : String {
-            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
-            val pass = sharedPref.getString(SHARED_PREFERENCES_PASSWORD_KEY, "")
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_CREDENTIALS_PATH, Context.MODE_PRIVATE)
+            val pass = sharedPref.getString(SHARED_PREFERENCES_CREDENTIALS_PASSWORD_KEY, "")
             return pass
         }
 
@@ -48,10 +47,10 @@ class CredentialsManager {
          * @param context Context of the Application - needed to get access to SharedPreferences
          */
         fun deleteHTTPCredentials(context: Context)  {
-            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_CREDENTIALS_PATH, Context.MODE_PRIVATE)
             with(sharedPref.edit()) {
-                remove(SHARED_PREFERENCES_USERNAME_KEY)
-                remove(SHARED_PREFERENCES_PASSWORD_KEY)
+                remove(SHARED_PREFERENCES_CREDENTIALS_USERNAME_KEY)
+                remove(SHARED_PREFERENCES_CREDENTIALS_PASSWORD_KEY)
                 apply()
             }
         }
@@ -62,8 +61,8 @@ class CredentialsManager {
          */
 
         fun convertToBase64(context: Context) : String {
-            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_PATH, Context.MODE_PRIVATE)
-            var key = (sharedPref.getString(SHARED_PREFERENCES_USERNAME_KEY, "") + ":" + sharedPref.getString(SHARED_PREFERENCES_PASSWORD_KEY, ""))
+            val sharedPref = context.getSharedPreferences(SHARED_PREFERENCES_CREDENTIALS_PATH, Context.MODE_PRIVATE)
+            var key = (sharedPref.getString(SHARED_PREFERENCES_CREDENTIALS_USERNAME_KEY, "") + ":" + sharedPref.getString(SHARED_PREFERENCES_CREDENTIALS_PASSWORD_KEY, ""))
             return Base64.encodeToString(key.toByteArray(), 0).replace("\n", "")
         }
 
