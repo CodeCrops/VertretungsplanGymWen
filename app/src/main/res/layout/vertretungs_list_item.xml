@@ -7,53 +7,59 @@
 
     <TextView
         android:id="@+id/stunde"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="stunde"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/fach"
-        android:layout_width="58dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
+        android:text="fach"
         app:layout_constraintEnd_toStartOf="@+id/vertretung"
         app:layout_constraintStart_toEndOf="@+id/stunde"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/vertretung"
-        android:layout_width="58dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="vertretung"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/raum"
-        android:layout_width="58dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:text="raum"
         app:layout_constraintEnd_toStartOf="@+id/kommentar"
         app:layout_constraintStart_toEndOf="@+id/klasse"
         app:layout_constraintTop_toBottomOf="@+id/fach" />
 
     <TextView
         android:id="@+id/klasse"
-        android:layout_width="58dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:text="klasse"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stunde" />
 
     <TextView
         android:id="@+id/kommentar"
-        android:layout_width="55dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:text="kommentar"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/vertretung" />

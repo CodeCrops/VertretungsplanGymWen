@@ -15,15 +15,13 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ListView
-import de.codecrops.vertretungsplangymwen.R.id.website
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
-import de.codecrops.vertretungsplangymwen.data.DataPull
+import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
+import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -53,11 +51,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
 
-        val extractTable = DataPull.extractToday().table
+        val extractTable = HttpGetRequest.extractToday(this).table
         val adapter = VertretungsAdapter(extractTable, applicationContext)
 
-        val vertretungsList = vertretungs_list
-        vertretungsList.adapter = adapter
+        vertretungs_list.adapter = adapter
+
+        addOnItemClickListener()
     }
 
     override fun onBackPressed() {
@@ -135,5 +134,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     }
                 }
         )
+    }
+
+    private fun addOnItemClickListener() {
+        vertretungs_list.setOnItemClickListener { parent, view, position, id ->
+            val item = parent.getItemAtPosition(position) as VertretungData
+            val intent = Intent(this, VertretungsContentActivity::class.java)
+            intent.apply {
+                putExtra("klasse", item.klasse)
+                putExtra("stunde", item.stunde)
+                putExtra("vertretung", item.vertretung)
+                putExtra("fach", item.fach)
+                putExtra("raum", item.raum)
+                putExtra("kommentar", item.kommentar)
+            }
+            startActivity(intent)
+        }
     }
 }

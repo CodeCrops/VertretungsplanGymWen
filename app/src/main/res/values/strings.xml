@@ -10,4 +10,7 @@
     <string name="website">Webseite</string>
     <string name="open">Öffnen</string>
     <string name="close">Schließen</string>
+    <string name="vertretung">Vertretung</string>
+    <string name="action_settings">Settings</string>
+    <string name="entfällt">Entfällt!</string>
 </resources>

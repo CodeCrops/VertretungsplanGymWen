@@ -6,9 +6,11 @@ import android.view.animation.Animation
 import android.widget.TextView
 import android.R.attr.name
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.view.View
 import android.widget.ArrayAdapter
@@ -44,7 +46,7 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
         if(convertView == null) {
             viewHolder = ViewHolder()
             val inflater = LayoutInflater.from(context)
-            view = inflater.inflate(vertretungs_list_item, parent, false)
+            view = inflater.inflate(vertretungs_list_item, parent, false) as View
             viewHolder.klasse = view.klasse
             viewHolder.stunde = view.stunde
             viewHolder.vertretung = view.vertretung
@@ -58,11 +60,21 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             view = convertView
         }
 
-        viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
-        viewHolder.stunde!!.text = Utils.fromHtml(vertretungData.stunde.toString())
-        viewHolder.vertretung!!.text = Utils.fromHtml(vertretungData.vertretung)
-        viewHolder.fach!!.text = Utils.fromHtml(vertretungData.fach)
-        viewHolder.raum!!.text = Utils.fromHtml(vertretungData.raum)
+        var vertretung: String
+
+        if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
+            vertretung = context.resources.getString(R.string.entfällt)
+            view.setBackgroundColor(ContextCompat.getColor(context, R.color.entfallRed))
+                } else {
+            vertretung = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
+            view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        }
+
+        viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
+        viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}. Stunde"
+        viewHolder.vertretung!!.text = vertretung
+        viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
+        viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"
         viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
 
         return view

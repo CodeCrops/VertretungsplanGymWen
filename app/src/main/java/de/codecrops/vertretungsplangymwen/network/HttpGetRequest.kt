@@ -1,5 +1,6 @@
 package de.codecrops.vertretungsplangymwen.network
 
+import android.content.Context
 import android.os.AsyncTask
 import java.io.BufferedReader
 import java.io.IOException
@@ -11,6 +12,8 @@ import java.net.MalformedURLException
 import java.net.URL
 import java.nio.charset.Charset
 import android.util.Base64
+import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
+import de.codecrops.vertretungsplangymwen.data.Extractor
 
 /**
  * Diese Klasse bietet als AsyncTask eine asynchrone Methode um die html Datei der mitgegebenen URL
@@ -18,6 +21,29 @@ import android.util.Base64
  */
 
 class HttpGetRequest : AsyncTask<String, Void, String>() {
+    var userpassword: String = ""
+
+    companion object {
+        /**
+         * Gibt den Vertretungsplan für den heutigen Tag zurück.
+         * @return Extractor Objekt mit den Daten des heutigen Tages
+         */
+        fun extractToday(context: Context): Extractor {
+            val getRequest = HttpGetRequest()
+            getRequest.userpassword = CredentialsManager.convertToBase64(context)
+            return Extractor(getRequest.execute("http://gym-wen.de/vp/heute.htm").get())
+        }
+
+        /**
+         * Gibt den Vertretungsplan für den morgigen Tag zurück.
+         * @return Extractor Objekt mit den Daten des morgigen Tages
+         */
+        fun extractTomorrow(context: Context): Extractor {
+            val getRequest = HttpGetRequest()
+            getRequest.userpassword = CredentialsManager.convertToBase64(context)
+            return Extractor(getRequest.execute("http://gym-wen.de/vp/morgen.htm").get())
+        }
+    }
 
     /**
      * Diese Methode initialisiert den Download der Datei und gibt den fertigen String zurück
