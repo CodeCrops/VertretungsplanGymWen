@@ -1,5 +1,6 @@
 package de.codecrops.vertretungsplangymwen.gui
 
+import android.R.attr.layout_centerInParent
 import android.support.design.widget.CoordinatorLayout.Behavior.setTag
 import android.view.animation.AnimationUtils.loadAnimation
 import android.view.animation.Animation
@@ -7,6 +8,8 @@ import android.widget.TextView
 import android.R.attr.name
 import android.content.Context
 import android.graphics.Color
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.support.design.widget.Snackbar
@@ -64,14 +67,23 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
 
         if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
             vertretung = context.resources.getString(R.string.entfällt)
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.entfallRed))
-                } else {
+            //view.setBackgroundColor(ContextCompat.getColor(context, R.color.entfallRed))
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
+            viewHolder.raum!!.visibility = View.INVISIBLE
+            viewHolder.kommentar!!.visibility = View.INVISIBLE
+
+        } else {
             vertretung = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
             view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
         }
 
+        if(vertretungData.fach == "") {
+            viewHolder.fach!!.visibility = View.INVISIBLE
+        }
+
         viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
-        viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}. Stunde"
+        //viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}. Stunde"
+        viewHolder.stunde!!.text = Utils.fromHtml(vertretungData.stunde.toString())
         viewHolder.vertretung!!.text = vertretung
         viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
         viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"

@@ -10,8 +10,6 @@ import java.lang.StringBuilder
 import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
-import java.nio.charset.Charset
-import android.util.Base64
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.Extractor
 
@@ -21,7 +19,7 @@ import de.codecrops.vertretungsplangymwen.data.Extractor
  */
 
 class HttpGetRequest : AsyncTask<String, Void, String>() {
-    var userpassword: String = ""
+    var autKey: String = ""
 
     companion object {
         /**
@@ -30,7 +28,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
          */
         fun extractToday(context: Context): Extractor {
             val getRequest = HttpGetRequest()
-            getRequest.userpassword = CredentialsManager.convertToBase64(context)
+            getRequest.autKey = CredentialsManager.convertToBase64(context)
             return Extractor(getRequest.execute("http://gym-wen.de/vp/heute.htm").get())
         }
 
@@ -40,7 +38,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
          */
         fun extractTomorrow(context: Context): Extractor {
             val getRequest = HttpGetRequest()
-            getRequest.userpassword = CredentialsManager.convertToBase64(context)
+            getRequest.autKey = CredentialsManager.convertToBase64(context)
             return Extractor(getRequest.execute("http://gym-wen.de/vp/morgen.htm").get())
         }
     }
@@ -80,18 +78,11 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
         lateinit var  urlConnection: HttpURLConnection
         lateinit var inputStream: InputStream
 
-        //Username:Password TODO: automatisches Setzen der Werte durch Anmeldung
-        val userpasswort = ""
-
-        //erstellt einen Authentication key aus Nutzername und Passwort mithilfe von Base64
-        val encAutorization = Base64.encodeToString(userpasswort.toByteArray(), 0)
-                .replace("\n", "")
-
         try {
             urlConnection = url.openConnection() as HttpURLConnection
 
             //Setzt den Authentication Key für die Verbindung
-            urlConnection.setRequestProperty("Authorization", "Basic $encAutorization")
+            urlConnection.setRequestProperty("Authorization", "Basic $autKey")
             urlConnection.requestMethod = "GET"
             urlConnection.readTimeout = 20000
             urlConnection.connectTimeout = 20000

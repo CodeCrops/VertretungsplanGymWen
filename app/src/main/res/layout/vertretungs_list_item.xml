@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/stunde"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/ic_hour_background"
+        android:gravity="center"
         android:text="stunde"
+        android:textColor="@color/white"
+        android:textAlignment="center"
+        android:textSize="24sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -18,50 +27,54 @@
         android:id="@+id/fach"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
         android:text="fach"
-        app:layout_constraintEnd_toStartOf="@+id/vertretung"
-        app:layout_constraintStart_toEndOf="@+id/stunde"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/klasse"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/klasse" />
 
     <TextView
         android:id="@+id/vertretung"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:text="vertretung"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/raum"
+        app:layout_constraintStart_toEndOf="@+id/stunde"
+        app:layout_constraintTop_toTopOf="@+id/stunde" />
 
     <TextView
         android:id="@+id/raum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="16dp"
         android:text="raum"
-        app:layout_constraintEnd_toStartOf="@+id/kommentar"
-        app:layout_constraintStart_toEndOf="@+id/klasse"
-        app:layout_constraintTop_toBottomOf="@+id/fach" />
+        app:layout_constraintBottom_toBottomOf="@+id/stunde"
+        app:layout_constraintStart_toEndOf="@+id/stunde"
+        app:layout_constraintTop_toBottomOf="@+id/vertretung" />
 
     <TextView
         android:id="@+id/klasse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="klasse"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/stunde" />
+        app:layout_constraintBottom_toBottomOf="@+id/vertretung"
+        app:layout_constraintEnd_toStartOf="@+id/fach"
+        app:layout_constraintStart_toEndOf="@+id/vertretung"
+        app:layout_constraintTop_toTopOf="@+id/vertretung" />
 
     <TextView
         android:id="@+id/kommentar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="kommentar"
         android:textStyle="italic"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/vertretung" />
+        app:layout_constraintBottom_toBottomOf="@+id/raum"
+        app:layout_constraintStart_toStartOf="@+id/klasse"
+        app:layout_constraintTop_toTopOf="@+id/raum" />
 
 </android.support.constraint.ConstraintLayout>
