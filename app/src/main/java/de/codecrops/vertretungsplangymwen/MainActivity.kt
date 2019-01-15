@@ -19,6 +19,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
+import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
@@ -92,6 +93,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (item.itemId) {
             R.id.website -> {
                 val i = Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://gym-wen.de/vp/"))
+                startActivity(i)
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.logout -> {
+                CredentialsManager.deleteHTTPCredentials(this)
+                val i = Intent(this, LoginActivity::class.java)
                 startActivity(i)
                 drawer_layout.closeDrawer(GravityCompat.START)
             }

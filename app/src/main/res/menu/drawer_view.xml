@@ -6,5 +6,8 @@
         <item
             android:id="@+id/website"
             android:title="@string/website" />
+        <item
+            android:id="@+id/logout"
+            android:title="@string/logout" />
     </group>
 </menu>
