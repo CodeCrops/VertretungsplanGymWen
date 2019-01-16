@@ -7,18 +7,18 @@ import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 
-class PasswordCheck : AsyncTask<String, Void, Boolean>() {
+class HttpResponseCode : AsyncTask<String, Void, Int>() {
 
     companion object {
-        fun isCorrect(usernamepassword: String) : Boolean {
+        fun getResponseCode(usernamepassword: String) : Int {
             val up = usernamepassword
-            return PasswordCheck().execute(usernamepassword).get()
+            return HttpResponseCode().execute(usernamepassword).get()
         }
     }
 
-    override fun doInBackground(vararg params: String?): Boolean {
+    override fun doInBackground(vararg params: String?): Int {
         val url = createUrl("http://gym-wen.de/vp/heute.htm")
-        var result = false
+        var result = 0
         try {
             result = makeHttpRequest(url!!, params[0]!!)
         } catch (e: IOException) {
@@ -35,9 +35,9 @@ class PasswordCheck : AsyncTask<String, Void, Boolean>() {
         return null
     }
 
-    private fun makeHttpRequest(url: URL, pw: String): Boolean  {
+    private fun makeHttpRequest(url: URL, pw: String): Int  {
         lateinit var  urlConnection: HttpURLConnection
-        var unauthorized = false
+        var response = 0
 
         //erstellt einen Authentication key aus Nutzername und Passwort mithilfe von Base64
         val encAutorization = Base64.encodeToString(pw.toByteArray(), 0)
@@ -53,20 +53,16 @@ class PasswordCheck : AsyncTask<String, Void, Boolean>() {
             urlConnection.connectTimeout = 20000
             urlConnection.connect()
 
-            val lol = urlConnection.responseCode
-
-            if(urlConnection.responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-                unauthorized = true
-            }
+            response = urlConnection.responseCode
         } catch (e: IOException) {
 
         } finally {
             urlConnection.disconnect()
         }
-        return !unauthorized
+        return response
     }
 
-    override fun onPostExecute(result: Boolean) {
+    override fun onPostExecute(result: Int) {
         super.onPostExecute(result)
     }
 }

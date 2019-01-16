@@ -2,6 +2,7 @@ package de.codecrops.vertretungsplangymwen
 
 import android.text.Html
 import android.os.Build
+import android.support.v4.app.NotificationCompat
 import android.text.Spanned
 
 object Utils {
@@ -13,4 +14,6 @@ object Utils {
             Html.fromHtml(html)
         }
     }
+
+
 }

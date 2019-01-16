@@ -67,23 +67,31 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
 
         if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
             vertretung = context.resources.getString(R.string.entfällt)
-            //view.setBackgroundColor(ContextCompat.getColor(context, R.color.entfallRed))
             viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
             viewHolder.raum!!.visibility = View.INVISIBLE
             viewHolder.kommentar!!.visibility = View.INVISIBLE
 
         } else {
             vertretung = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
-            view.setBackgroundColor(ContextCompat.getColor(context, R.color.colorPrimary))
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background)
+            viewHolder.raum!!.visibility = View.VISIBLE
+            viewHolder.kommentar!!.visibility = View.VISIBLE
         }
 
         if(vertretungData.fach == "") {
             viewHolder.fach!!.visibility = View.INVISIBLE
+        } else {
+            viewHolder.fach!!.visibility = View.VISIBLE
+        }
+
+        if(vertretungData.klasse == "") {
+            viewHolder.klasse!!.visibility = View.INVISIBLE
+        } else {
+            viewHolder.klasse!!.visibility = View.VISIBLE
         }
 
         viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
-        //viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}. Stunde"
-        viewHolder.stunde!!.text = Utils.fromHtml(vertretungData.stunde.toString())
+        viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
         viewHolder.vertretung!!.text = vertretung
         viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
         viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"

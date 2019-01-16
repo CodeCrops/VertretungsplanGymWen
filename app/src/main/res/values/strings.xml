@@ -14,4 +14,8 @@
     <string name="action_settings">Settings</string>
     <string name="entfällt">Entfällt!</string>
     <string name="logout">Ausloggen</string>
+    <string name="wrong_credentials">Nutzername oder Passwort Falsch!</string>
+    <string name="title_activity_no_network">NoNetworkActivity</string>
+    <string name="service_not_available">Leider ist der Dienst zur Zeit nicht erreichbar! Überprüfe deine Internetverbindung und versuche es erneut!</string>
+    <string name="network_error">Netzwerkfehler!</string>
 </resources>

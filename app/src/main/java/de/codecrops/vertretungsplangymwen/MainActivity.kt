@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.app.NotificationCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -58,13 +59,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         vertretungs_list.adapter = adapter
 
         addOnItemClickListener()
+
     }
 
     override fun onBackPressed() {
         if(drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            finish()
         }
     }
 
@@ -99,8 +101,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.logout -> {
                 CredentialsManager.deleteHTTPCredentials(this)
                 val i = Intent(this, LoginActivity::class.java)
-                startActivity(i)
+                i.putExtra("logout", true)
+                finish()
                 drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
             }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
