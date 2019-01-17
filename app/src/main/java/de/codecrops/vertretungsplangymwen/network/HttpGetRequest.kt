@@ -14,12 +14,14 @@ import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.Extractor
 
 /**
+ * @author K1TR1K
  * Diese Klasse bietet als AsyncTask eine asynchrone Methode um die html Datei der mitgegebenen URL
  * als String zurückzugeben.
+ * @property autKey der Authentication Key, erstellt aus Nutzername und Passwort für den Download der Datei von der Website
  */
 
 class HttpGetRequest : AsyncTask<String, Void, String>() {
-    var autKey: String = ""
+    private var autKey: String = ""
 
     companion object {
         /**
@@ -58,7 +60,9 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
         return response
     }
 
-    //Erstellt eine URL aus dem URL-Adressen-String
+    /**
+     * Erstellt eine URL aus dem URL-Adressen-String
+     */
     private fun createUrl(stringUrl: String): URL? {
         try {
             return URL(stringUrl)

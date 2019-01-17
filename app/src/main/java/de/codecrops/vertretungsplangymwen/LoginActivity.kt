@@ -12,6 +12,11 @@ import de.codecrops.vertretungsplangymwen.network.HttpResponseCode
 import kotlinx.android.synthetic.main.activity_login.*
 import java.net.HttpURLConnection
 
+/**
+ * @author K1TR1K
+ * Die Start Activity. Hier gibt der Nutzer die Anmeldedaten ein, außer diese sind bereits im
+ * CredentialsManager vorhanden und es wird direkt zur MainActivity gesprungen.
+ */
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +24,8 @@ class LoginActivity : AppCompatActivity() {
         val cm = CredentialsManager
 
         if(HttpResponseCode.getResponseCode
-                ("${cm.getHTTPUsername(this)}:${cm.getHTTPPassword(this)}") == HttpURLConnection.HTTP_OK) {
+                ("${cm.getHTTPUsername(this)}:" +
+                        "${cm.getHTTPPassword(this)}") == HttpURLConnection.HTTP_OK) {
                     val intent = Intent(this, MainActivity::class.java)
                     finish()
                     startActivity(intent)
@@ -52,7 +58,9 @@ class LoginActivity : AppCompatActivity() {
                 s.show()
             }
             else -> {
-                val s = Snackbar.make(layout, getString(R.string.service_not_available), Snackbar.LENGTH_INDEFINITE)
+                val s = Snackbar.make(layout,
+                        getString(R.string.service_not_available),
+                        Snackbar.LENGTH_INDEFINITE)
                 val textView = s.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
                 textView.maxLines = 5
                 s.setAction("OK", View.OnClickListener { s.dismiss() })
