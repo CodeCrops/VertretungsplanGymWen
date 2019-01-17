@@ -15,29 +15,22 @@ import java.net.HttpURLConnection
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
         val cm = CredentialsManager
 
         if(HttpResponseCode.getResponseCode
                 ("${cm.getHTTPUsername(this)}:${cm.getHTTPPassword(this)}") == HttpURLConnection.HTTP_OK) {
                     val intent = Intent(this, MainActivity::class.java)
+                    finish()
                     startActivity(intent)
                 } else {
             cm.deleteHTTPCredentials(this)
         }
+
+        setContentView(R.layout.activity_login)
+
         setEnterListener()
         login.setOnClickListener { login() }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if(intent.extras!=null) {
-            if(intent.extras.containsKey("logout") && intent.extras.getBoolean("logout")) {
-                finish()
-                    intent.extras.remove("logout")
-                }
-        }
     }
 
     private fun login() {
