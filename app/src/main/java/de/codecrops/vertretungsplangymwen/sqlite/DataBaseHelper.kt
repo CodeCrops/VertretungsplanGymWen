@@ -11,7 +11,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     companion object {
         //Einstellungen
-        val DB_VERSION = 1
+        val DB_VERSION = 2
         val DB_NAME = "VertretungsPlanApp.db"
 
         //Konstante zur Erstellung des SCHEDULE TABLEs aus PlanContract
@@ -24,6 +24,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                         DBContracts.PlanContract.COLUMN_FACH + " TEXT, " +
                         DBContracts.PlanContract.COLUMN_RAUM + " TEXT, " +
                         DBContracts.PlanContract.COLUMN_SONSTIGES + " TEXT" +
+                        DBContracts.PlanContract.COLUMN_DATE + " TEXT" +
                         ")"
         private const val SQL_CREATE_LEHRER =
                 "CREATE TABLE IF NOT EXISTS " + DBContracts.LehrerContract.TABLE_NAME + " (" +
@@ -32,6 +33,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                         DBContracts.LehrerContract.COLUMN_NACHNAME + " TEXT NOT NULL, " +
                         DBContracts.LehrerContract.COLUMN_VORNAME + " TEXT, " +
                         DBContracts.LehrerContract.COLUMN_GESCHLECHT + " TEXT" +
+                        DBContracts.LehrerContract.COLUMN_DATE + " TEXT" +
                         ")"
 
 

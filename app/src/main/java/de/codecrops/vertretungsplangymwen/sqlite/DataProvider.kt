@@ -86,6 +86,11 @@ class DataProvider :  ContentProvider() {
         if(nachnameValue.isNullOrBlank()) {
             invalidData = true
         }
+        //Date-Validation
+        val dateValue = values.getAsString(DBContracts.LehrerContract.COLUMN_DATE)
+        if(dateValue.isNullOrBlank()) {
+            invalidData = true
+        }
         //invalidData-Check
         if(invalidData) {
             throw java.lang.IllegalArgumentException("Failed to insert new Lehrer into DB! Invalid Values!")
@@ -120,6 +125,11 @@ class DataProvider :  ContentProvider() {
         //Vertretung-Validation
         val vertretungValue = values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG)
         if(vertretungValue.isNullOrBlank()) {
+            invalidData = true
+        }
+        //Date-Validation
+        val dateValue = values.getAsString(DBContracts.PlanContract.COLUMN_DATE)
+        if(dateValue.isNullOrBlank()) {
             invalidData = true
         }
         //invalidData-Check

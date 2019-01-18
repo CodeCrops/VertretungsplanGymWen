@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import de.codecrops.vertretungsplangymwen.data.VertretungData
+import java.text.SimpleDateFormat
 
 class DBManager {
 
@@ -17,12 +18,13 @@ class DBManager {
          * @param fach Das Fach, welches anstelle des ursprünglichen Fachs unterrichtet wird (nur nötig, wenn es entfällt)
          * @param raum Der Raum, in welchem anstelle des ursprünglichen Raums unterrichtet wird (nicht nötig, wenn es entfällt)
          * @param sonstiges Sonstige Informationen
+         * @param datum Datum der Vertretungsstunde
          */
-        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?) {
+        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?, datum: SimpleDateFormat) {
             /*
             ACHTUNG:
 
-                - Die Parameter klasse, stunde und vertretung sind nicht nullable -> sie müssen übergeben werden!
+                - Die Parameter klasse, stunde und vertretung (&datum) sind nicht nullable -> sie müssen übergeben werden!
                 - Die Paramter fach, raum und sonstiges sind nullable -> sie können weggelassen werden und sollten dies auch bei leeren Werten bitte werden! Kein "" anstatt null
              */
 
@@ -34,6 +36,7 @@ class DBManager {
                 if(fach != null) put(DBContracts.PlanContract.COLUMN_FACH, fach)
                 if(raum != null) put(DBContracts.PlanContract.COLUMN_RAUM, raum)
                 if(sonstiges != null) put(DBContracts.PlanContract.COLUMN_SONSTIGES, sonstiges)
+                put(DBContracts.PlanContract.COLUMN_DATE, datum.toString())
             }
 
             //Erstellt eine neue Zeile in der DB mit den Daten von values
@@ -42,12 +45,13 @@ class DBManager {
 
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
+         * @param datum Datum des durchsuchten Tages
          * @return Cursor
          */
-        fun getPlanCursorByKlasse(context: Context, klasse: String): Cursor {
+        private fun getPlanCursorByKlasse(context: Context, klasse: String, datum: SimpleDateFormat): Cursor {
 
             //Erstellt die Selection (die WHERE-Clause)
-            val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse'"
+            val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse' AND ${DBContracts.PlanContract.COLUMN_DATE} = '${datum.toString()}'"
 
             //Erhalte den Cursor von der DB
             val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
@@ -59,10 +63,11 @@ class DBManager {
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
          * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
+         * @param datum Datum des Tages, welcher überprüft werder soll
          * @return Boolean, True : "Schüler hat Vertretung", False : "Schüler hat normal Unterricht"
          */
-        fun hasPupilVertretung(context: Context, klasse: String) : Boolean {
-            val cursor = getPlanCursorByKlasse(context, klasse)
+        fun hasPupilVertretung(context: Context, klasse: String, datum: SimpleDateFormat) : Boolean {
+            val cursor = getPlanCursorByKlasse(context, klasse, datum)
             if(cursor.moveToNext()) {
                 cursor.close()
                 return true
@@ -72,15 +77,16 @@ class DBManager {
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
          * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
+         * @param datum Datum des Tages, für welchen Vertretungen gefunden werden sollen
          * @return ArrayList<VertretungData> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
          */
-        fun getVertretungenByKlasse(context: Context, klasse: String): ArrayList<VertretungData> {
+        fun getVertretungenByKlasse(context: Context, klasse: String, datum: SimpleDateFormat): ArrayList<VertretungData> {
 
             //result wird vorbereitet
             val result = ArrayList<VertretungData>()
 
             //cursor wird von DB geholt
-            val cursor = getPlanCursorByKlasse(context, klasse)
+            val cursor = getPlanCursorByKlasse(context, klasse, datum)
 
             //while schleife zum bearbeiten des Cursors
             while (cursor.moveToNext()) {

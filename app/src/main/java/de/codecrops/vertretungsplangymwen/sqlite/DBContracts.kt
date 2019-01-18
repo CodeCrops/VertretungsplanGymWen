@@ -36,6 +36,7 @@ object DBContracts {
             const val COLUMN_FACH = "fach"
             const val COLUMN_RAUM = "raum"
             const val COLUMN_SONSTIGES = "sonstiges"
+            const val COLUMN_DATE = "datum"
 
             //"MIME"Types
             val CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SCHEDULE
@@ -62,6 +63,7 @@ object DBContracts {
             const val COLUMN_VORNAME = "vorname"
             const val COLUMN_NACHNAME = "nachname"
             const val COLUMN_GESCHLECHT = "geschlecht"
+            const val COLUMN_DATE = "datum"
 
             //"MIME"Types
             val CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_LEHRER

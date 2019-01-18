@@ -19,6 +19,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
+        
+        <provider
+            android:authorities=".sqlite.DataProvider"
+            android:name="de.codecrops.vertretungsplangymwen.sqlite.DataProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
