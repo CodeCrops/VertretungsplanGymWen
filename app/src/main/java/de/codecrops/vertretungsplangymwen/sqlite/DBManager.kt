@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import de.codecrops.vertretungsplangymwen.data.VertretungData
-import java.text.SimpleDateFormat
+import java.util.*
 
 class DBManager {
 
@@ -20,7 +20,7 @@ class DBManager {
          * @param sonstiges Sonstige Informationen
          * @param datum Datum der Vertretungsstunde
          */
-        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?, datum: SimpleDateFormat) {
+        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?, datum: Date) {
             /*
             ACHTUNG:
 
@@ -48,7 +48,7 @@ class DBManager {
          * @param datum Datum des durchsuchten Tages
          * @return Cursor
          */
-        private fun getPlanCursorByKlasse(context: Context, klasse: String, datum: SimpleDateFormat): Cursor {
+        private fun getPlanCursorByKlasse(context: Context, klasse: String, datum: Date): Cursor {
 
             //Erstellt die Selection (die WHERE-Clause)
             val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse' AND ${DBContracts.PlanContract.COLUMN_DATE} = '${datum.toString()}'"
@@ -66,7 +66,7 @@ class DBManager {
          * @param datum Datum des Tages, welcher überprüft werder soll
          * @return Boolean, True : "Schüler hat Vertretung", False : "Schüler hat normal Unterricht"
          */
-        fun hasPupilVertretung(context: Context, klasse: String, datum: SimpleDateFormat) : Boolean {
+        fun hasPupilVertretung(context: Context, klasse: String, datum: Date) : Boolean {
             val cursor = getPlanCursorByKlasse(context, klasse, datum)
             if(cursor.moveToNext()) {
                 cursor.close()
@@ -80,7 +80,7 @@ class DBManager {
          * @param datum Datum des Tages, für welchen Vertretungen gefunden werden sollen
          * @return ArrayList<VertretungData> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
          */
-        fun getVertretungenByKlasse(context: Context, klasse: String, datum: SimpleDateFormat): ArrayList<VertretungData> {
+        fun getVertretungenByKlasse(context: Context, klasse: String, datum: Date): ArrayList<VertretungData> {
 
             //result wird vorbereitet
             val result = ArrayList<VertretungData>()

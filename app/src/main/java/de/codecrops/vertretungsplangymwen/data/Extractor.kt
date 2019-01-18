@@ -44,10 +44,17 @@ class Extractor(data: String) {
         Dies erstellt zuerst ein "SimpleDateFormat" mit dem richtigen Format und
         formatiert dann den aus der html Datei geschnittenen String zu einem Date Objekt
          */
-        date = SimpleDateFormat("dd.MM.YYYY", Locale.GERMANY).parse(data.substring(
+        date = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY).parse(data.substring(
                 data.indexOf("</Title>") - 10,
                 data.indexOf("</Title>")
         ))
+
+        val l = data.substring(
+                data.indexOf("</Title>") - 10,
+                data.indexOf("</Title>")
+        )
+
+        val d = date
 
         //Schneidet die eigentliche Tabelle aus dem html Document String
         val tableString = data.substring(

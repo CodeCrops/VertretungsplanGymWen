@@ -28,4 +28,9 @@
     <string name="no_email_client">Es wurde kein Email-Client auf deinem Gerät gefunden!</string>
     <string name="report_issue">Problem melden</string>
     <string name="developer_mail">codecropsdev@gmail.com</string>
+    <string name="no_data">Auf dem Server sind keine Daten zum heutigen Tag vorhanden! Versuche es später erneut.</string>
+    <string name="today">Heute (gefiltert)</string>
+    <string name="tomorrow">Morgen (gefiltert)</string>
+    <string name="today_complete">Heute (komplett)</string>
+    <string name="tomorrow_complete">Morgen (komplett)</string>
 </resources>
