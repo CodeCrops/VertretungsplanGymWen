@@ -78,19 +78,22 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             viewHolder.kommentar!!.visibility = View.VISIBLE
         }
 
-        if(vertretungData.fach == "") {
+        if(vertretungData.fach.isEmpty()) {
             viewHolder.fach!!.visibility = View.INVISIBLE
         } else {
             viewHolder.fach!!.visibility = View.VISIBLE
         }
 
-        if(vertretungData.klasse == "") {
+        if(vertretungData.klasse.isEmpty()) {
             viewHolder.klasse!!.visibility = View.INVISIBLE
+        } else if(vertretungData.klasse.length > 3) {
+            viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
+            viewHolder.klasse!!.visibility = View.VISIBLE
         } else {
+            viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
             viewHolder.klasse!!.visibility = View.VISIBLE
         }
 
-        viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
         viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
         viewHolder.vertretung!!.text = vertretung
         viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"

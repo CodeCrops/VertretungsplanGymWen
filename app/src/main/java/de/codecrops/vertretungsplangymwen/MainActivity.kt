@@ -2,6 +2,8 @@ package de.codecrops.vertretungsplangymwen
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -25,6 +27,7 @@ import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.service.BackgroundJob
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -106,6 +109,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }
+            R.id.help -> {
+                val i = Intent(this, HelpActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
@@ -162,4 +170,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(intent)
         }
     }
+    /*
+    fun scheduleJob(v: View) {
+        val componentName = ComponentName(this, BackgroundJob::class.java)
+        val jobInfo = JobInfo.Builder(BackgroundJob.JOB_ID, componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+    }
+
+    fun chancelJob(v: View) {
+
+    }
+    */
 }
