@@ -3,6 +3,10 @@ package de.codecrops.vertretungsplangymwen.service
 import android.app.job.JobParameters
 import android.app.job.JobService
 
+/**
+ * @author K1TR1K
+ */
+
 class BackgroundJob : JobService() {
 
     companion object {

@@ -30,6 +30,10 @@ import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManag
 import de.codecrops.vertretungsplangymwen.service.BackgroundJob
 import kotlinx.android.synthetic.main.activity_main.*
 
+/**
+ * @author K1TR1K
+ */
+
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     val vertretungsNotification =
             de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager(this)

@@ -23,6 +23,9 @@ import de.codecrops.vertretungsplangymwen.Utils
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import kotlinx.android.synthetic.main.vertretungs_list_item.view.*
 
+/**
+ * @author K1TR1K
+ */
 
 class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
         ArrayAdapter<VertretungData>(context, vertretungs_list_item, data), View.OnClickListener {

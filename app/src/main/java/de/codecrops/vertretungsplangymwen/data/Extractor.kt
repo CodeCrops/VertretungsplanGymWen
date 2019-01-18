@@ -6,6 +6,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
+ * @author K1TR1K
  * Diese Klasse wandelt den html String in eine in der App nutzbare Form um und stellt
  * nützliche Methoden zur Filterung bereit.
  * @param data Dies ist der String der html Datei
