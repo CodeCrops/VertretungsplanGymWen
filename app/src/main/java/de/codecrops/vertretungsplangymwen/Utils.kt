@@ -5,6 +5,10 @@ import android.os.Build
 import android.support.v4.app.NotificationCompat
 import android.text.Spanned
 
+/**
+ * @author K1TR1K
+ */
+
 object Utils {
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): Spanned {

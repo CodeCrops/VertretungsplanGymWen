@@ -9,6 +9,10 @@ import android.widget.Toast
 
 import kotlinx.android.synthetic.main.activity_help.*
 
+/**
+ * @author K1TR1K
+ */
+
 class HelpActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +35,7 @@ class HelpActivity : AppCompatActivity() {
             } else {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.type = "message/rfc822"
-                //TODO: Email des Empfängers
-                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(""))
+                intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.developer_mail)))
                 intent.putExtra(Intent.EXTRA_SUBJECT, "${name.text} | ${subject.text}")
                 intent.putExtra(Intent.EXTRA_TEXT, description.text)
                 try {

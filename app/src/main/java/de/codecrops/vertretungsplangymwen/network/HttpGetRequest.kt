@@ -1,5 +1,9 @@
 package de.codecrops.vertretungsplangymwen.network
 
+/**
+ * @author K1TR1K
+ */
+
 import android.content.Context
 import android.os.AsyncTask
 import java.io.BufferedReader

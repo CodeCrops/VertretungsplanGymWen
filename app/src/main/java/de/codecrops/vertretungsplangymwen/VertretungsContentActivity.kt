@@ -8,6 +8,10 @@ import android.support.v7.widget.Toolbar
 import android.view.View
 import kotlinx.android.synthetic.main.activity_vertretungs_content.*
 
+/**
+ * @author K1TR1K
+ */
+
 class VertretungsContentActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
