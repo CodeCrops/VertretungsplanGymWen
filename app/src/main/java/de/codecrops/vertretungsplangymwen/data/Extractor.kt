@@ -20,6 +20,7 @@ import kotlin.collections.ArrayList
 class Extractor(data: String) {
 
     var unauthorized = false
+    var networkError = false
     lateinit var date: Date
     val table: ArrayList<VertretungData> = arrayListOf()
 
@@ -30,8 +31,10 @@ class Extractor(data: String) {
          */
         if(data.equals("401")) {
             unauthorized = true
-        } else {
+        } else if(data.length>3) {
             extract(data)
+        } else {
+            networkError = true
         }
     }
 

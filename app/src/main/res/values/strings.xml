@@ -10,4 +10,21 @@
     <string name="website">Webseite</string>
     <string name="open">Öffnen</string>
     <string name="close">Schließen</string>
+    <string name="vertretung">Vertretung</string>
+    <string name="action_settings">Settings</string>
+    <string name="entfällt">Entfällt!</string>
+    <string name="logout">Ausloggen</string>
+    <string name="wrong_credentials">Nutzername oder Passwort Falsch!</string>
+    <string name="title_activity_no_network">NoNetworkActivity</string>
+    <string name="service_not_available">Leider ist der Dienst zur Zeit nicht erreichbar! Überprüfe deine Internetverbindung und versuche es erneut!</string>
+    <string name="network_error">Netzwerkfehler!</string>
+    <string name="title_activity_help">HelpActivity</string>
+    <string name="name">Name</string>
+    <string name="subject">Betreff</string>
+    <string name="description">Beschreibung</string>
+    <string name="report_issue_description">Bitte beschreiben Sie das Problem möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr um das Problem herauszufinden. Danke für Ihre Hilfe!</string>
+    <string name="empty_text">Du musst alle Felder ausfüllen!</string>
+    <string name="send_email">Email senden</string>
+    <string name="no_email_client">Es wurde kein Email-Client auf deinem Gerät gefunden!</string>
+    <string name="report_issue">Problem melden</string>
 </resources>

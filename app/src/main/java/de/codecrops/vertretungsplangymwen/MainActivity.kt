@@ -2,6 +2,8 @@ package de.codecrops.vertretungsplangymwen
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -10,21 +12,22 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.app.NotificationCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
-import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ListView
-import de.codecrops.vertretungsplangymwen.R.id.website
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
-import de.codecrops.vertretungsplangymwen.data.DataPull
+import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
+import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
+import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.service.BackgroundJob
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -53,18 +56,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
 
-        val extractTable = DataPull.extractToday().table
+        val extractTable = HttpGetRequest.extractToday(this).table
         val adapter = VertretungsAdapter(extractTable, applicationContext)
 
-        val vertretungsList = vertretungs_list
-        vertretungsList.adapter = adapter
+        vertretungs_list.adapter = adapter
+
+        addOnItemClickListener()
+
     }
 
     override fun onBackPressed() {
         if(drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
-            super.onBackPressed()
+            finish()
         }
     }
 
@@ -95,6 +100,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val i = Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://gym-wen.de/vp/"))
                 startActivity(i)
                 drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.logout -> {
+                CredentialsManager.deleteHTTPCredentials(this)
+                val i = Intent(this, LoginActivity::class.java)
+                i.putExtra("logout", true)
+                finish()
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.help -> {
+                val i = Intent(this, HelpActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
             }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
@@ -136,4 +154,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
         )
     }
+
+    private fun addOnItemClickListener() {
+        vertretungs_list.setOnItemClickListener { parent, view, position, id ->
+            val item = parent.getItemAtPosition(position) as VertretungData
+            val intent = Intent(this, VertretungsContentActivity::class.java)
+            intent.apply {
+                putExtra("klasse", item.klasse)
+                putExtra("stunde", item.stunde)
+                putExtra("vertretung", item.vertretung)
+                putExtra("fach", item.fach)
+                putExtra("raum", item.raum)
+                putExtra("kommentar", item.kommentar)
+            }
+            startActivity(intent)
+        }
+    }
+    /*
+    fun scheduleJob(v: View) {
+        val componentName = ComponentName(this, BackgroundJob::class.java)
+        val jobInfo = JobInfo.Builder(BackgroundJob.JOB_ID, componentName)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                .setPersisted(true)
+    }
+
+    fun chancelJob(v: View) {
+
+    }
+    */
 }

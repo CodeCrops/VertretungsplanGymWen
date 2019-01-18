@@ -1,14 +1,19 @@
 package de.codecrops.vertretungsplangymwen.gui
 
+import android.R.attr.layout_centerInParent
 import android.support.design.widget.CoordinatorLayout.Behavior.setTag
 import android.view.animation.AnimationUtils.loadAnimation
 import android.view.animation.Animation
 import android.widget.TextView
 import android.R.attr.name
 import android.content.Context
+import android.graphics.Color
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.text.Html
 import android.view.View
 import android.widget.ArrayAdapter
@@ -44,7 +49,7 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
         if(convertView == null) {
             viewHolder = ViewHolder()
             val inflater = LayoutInflater.from(context)
-            view = inflater.inflate(vertretungs_list_item, parent, false)
+            view = inflater.inflate(vertretungs_list_item, parent, false) as View
             viewHolder.klasse = view.klasse
             viewHolder.stunde = view.stunde
             viewHolder.vertretung = view.vertretung
@@ -58,11 +63,41 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             view = convertView
         }
 
-        viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
-        viewHolder.stunde!!.text = Utils.fromHtml(vertretungData.stunde.toString())
-        viewHolder.vertretung!!.text = Utils.fromHtml(vertretungData.vertretung)
-        viewHolder.fach!!.text = Utils.fromHtml(vertretungData.fach)
-        viewHolder.raum!!.text = Utils.fromHtml(vertretungData.raum)
+        var vertretung: String
+
+        if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
+            vertretung = context.resources.getString(R.string.entfällt)
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
+            viewHolder.raum!!.visibility = View.INVISIBLE
+            viewHolder.kommentar!!.visibility = View.INVISIBLE
+
+        } else {
+            vertretung = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background)
+            viewHolder.raum!!.visibility = View.VISIBLE
+            viewHolder.kommentar!!.visibility = View.VISIBLE
+        }
+
+        if(vertretungData.fach.isEmpty()) {
+            viewHolder.fach!!.visibility = View.INVISIBLE
+        } else {
+            viewHolder.fach!!.visibility = View.VISIBLE
+        }
+
+        if(vertretungData.klasse.isEmpty()) {
+            viewHolder.klasse!!.visibility = View.INVISIBLE
+        } else if(vertretungData.klasse.length > 3) {
+            viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
+            viewHolder.klasse!!.visibility = View.VISIBLE
+        } else {
+            viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
+            viewHolder.klasse!!.visibility = View.VISIBLE
+        }
+
+        viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
+        viewHolder.vertretung!!.text = vertretung
+        viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
+        viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"
         viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
 
         return view
