@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="BackgroundRefreshMaster"
+        android:paddingTop="?android:attr/actionBarSize"
+        android:title="Hintergrundaktualisierung" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="BackgroundRefreshSmart"
+        android:title="Intelligente Aktualisierung verwenden" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="BackgroundRefreshAuto"
+        android:title="Automatische Aktualisierung verwenden" />
+    <PreferenceCategory android:title="automatische Aktualisierung ">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/settings_refresh_auto_interval_entries"
+            android:entryValues="@array/settings_refresh_auto_interval_values"
+            android:key="BackgroundRefreshAutoInterval"
+            android:title="Abhängig von Zeitpunkt" />
+    </PreferenceCategory>
+</PreferenceScreen>
