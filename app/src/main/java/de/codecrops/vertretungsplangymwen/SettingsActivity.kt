@@ -3,7 +3,7 @@ package de.codecrops.vertretungsplangymwen
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.ActionBar
-import kotlinx.android.synthetic.main.activity_help.*
+import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity() {
 
