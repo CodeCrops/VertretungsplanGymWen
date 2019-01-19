@@ -28,4 +28,7 @@
     <string name="no_email_client">Es wurde kein Email-Client auf deinem Gerät gefunden!</string>
     <string name="report_issue">Problem melden</string>
     <string name="developer_mail">codecropsdev@gmail.com</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

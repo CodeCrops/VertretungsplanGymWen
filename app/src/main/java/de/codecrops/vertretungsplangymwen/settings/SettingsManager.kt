@@ -23,6 +23,14 @@ const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_SOUND = "NotificationSound"
 class SettingsManager {
     companion object {
 
+        // >>>>>>>>>>> static Methods <<<<<<<<<<<
+        /**
+         * @return Name/Path of SettingsSP
+         */
+        fun getSettingsPath() : String {
+            return SHARED_PREFERENCES_SETTINGS_PATH
+        }
+
         // >>>>>>>>>> KLASSEN-Settings <<<<<<<<<<
 
         /**

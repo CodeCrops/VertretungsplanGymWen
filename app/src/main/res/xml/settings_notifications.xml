@@ -4,7 +4,6 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="NotificationMaster"
-        android:paddingTop="?android:attr/actionBarSize"
         android:title="Benachrichtigungen erhalten" />
     <PreferenceCategory android:title="Vibrationseinstellungen">
 

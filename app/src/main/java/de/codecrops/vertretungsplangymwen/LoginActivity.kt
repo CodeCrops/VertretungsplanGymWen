@@ -1,7 +1,9 @@
 package de.codecrops.vertretungsplangymwen
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
@@ -9,6 +11,7 @@ import android.view.View
 import android.widget.TextView
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.network.HttpResponseCode
+import de.codecrops.vertretungsplangymwen.settings.SettingsManager
 import kotlinx.android.synthetic.main.activity_login.*
 import java.net.HttpURLConnection
 
@@ -22,6 +25,17 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val cm = CredentialsManager
+
+        //test-stuff
+
+        SettingsManager.setNotificationSound(applicationContext, false)
+        PreferenceManager.setDefaultValues(this, SettingsManager.getSettingsPath(), Context.MODE_PRIVATE, R.xml.settings_notifications, false)
+
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+        return
+
+        //ende test-stuff
 
         if(HttpResponseCode.getResponseCode
                 ("${cm.getHTTPUsername(this)}:" +
