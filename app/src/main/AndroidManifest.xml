@@ -21,15 +21,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <provider
+            android:name=".sqlite.DataProvider"
             android:authorities=".sqlite.DataProvider"
-            android:name="de.codecrops.vertretungsplangymwen.sqlite.DataProvider"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity android:name=".MainActivity" />
         <activity android:name=".VertretungsContentActivity" />
-        <activity android:name=".ContactActivity" />
+        <activity android:name=".HelpActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
