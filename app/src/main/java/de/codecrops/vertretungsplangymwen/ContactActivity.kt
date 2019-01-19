@@ -53,7 +53,7 @@ class ContactActivity : AppCompatActivity() {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.type = "message/rfc822"
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.developer_mail)))
-                intent.putExtra(Intent.EXTRA_SUBJECT, "${name.text} | ${subject.text}")
+                intent.putExtra(Intent.EXTRA_SUBJECT, "${dropdown.selectedItem}: ${name.text} | ${subject.text}")
                 intent.putExtra(Intent.EXTRA_TEXT, description.text)
                 try {
                     startActivity(Intent.createChooser(intent, getString(R.string.send_email)))
