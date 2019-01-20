@@ -18,14 +18,17 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.sqlite.DBContracts
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -229,6 +232,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.help -> {
                 val i = Intent(this, ContactActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }

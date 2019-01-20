@@ -13,6 +13,7 @@ import android.widget.TextView
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.network.HttpResponseCode
 import de.codecrops.vertretungsplangymwen.settings.SettingsManager
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_login.*
 import java.net.HttpURLConnection
 
@@ -35,12 +36,16 @@ class LoginActivity : AppCompatActivity() {
 
         //test-stuff
 
+        /*
+
         SettingsManager.setNotificationSound(applicationContext, false)
         PreferenceManager.setDefaultValues(this, SettingsManager.getSettingsPath(), Context.MODE_PRIVATE, R.xml.settings_notifications, false)
 
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
         return
+
+        */
 
         //ende test-stuff
 

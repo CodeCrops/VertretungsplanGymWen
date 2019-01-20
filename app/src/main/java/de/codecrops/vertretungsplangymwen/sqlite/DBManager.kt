@@ -181,7 +181,7 @@ class DBManager {
          */
         fun isLehrerInDB(context: Context, kuerzel: String) : Boolean {
 
-            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '${kuerzel.toLowerCase()}'"
             val cursor = context.contentResolver.query(DBContracts.LehrerContract.CONTENT_URI, arrayOf("*"), selection, null, null)
             if(cursor.moveToNext()) {
                 cursor.close()
@@ -194,7 +194,7 @@ class DBManager {
          * @param kuerzel Das Kürzel des Lehrers, welcher entfernt werden soll
          */
         fun removeLehrerFromDB(context: Context, kuerzel: String) {
-            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '${kuerzel.toLowerCase()}'"
             context.contentResolver.delete(DBContracts.LehrerContract.CONTENT_URI, selection, null)
         }
 
@@ -218,7 +218,7 @@ class DBManager {
 
             //Erstellt ein ContentValues-Objekt und fügt die Daten hinzu
             val values = ContentValues().apply {
-                put(DBContracts.LehrerContract.COLUMN_KUERZEL, kuerzel)
+                put(DBContracts.LehrerContract.COLUMN_KUERZEL, kuerzel.toLowerCase())
                 put(DBContracts.LehrerContract.COLUMN_NACHNAME, nachname)
                 if(vorname != null) put(DBContracts.LehrerContract.COLUMN_VORNAME, vorname)
                 put(DBContracts.LehrerContract.COLUMN_GESCHLECHT, geschlecht)
