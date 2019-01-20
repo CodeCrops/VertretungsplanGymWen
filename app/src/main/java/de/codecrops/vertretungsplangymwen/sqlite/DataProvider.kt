@@ -28,7 +28,6 @@ class DataProvider :  ContentProvider() {
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_LEHRER + "/#", LEHRER_ID)
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_SCHEDULE, VERTRETUNGSPLAN)
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_SCHEDULE + "/#", VERTRETUNGSPLAN_ID)
-
     }
 
     override fun onCreate(): Boolean {
@@ -152,7 +151,7 @@ class DataProvider :  ContentProvider() {
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
         val db = mDBHelper.writableDatabase
-        val match : Int = sUriMatcher.match(uri)
+        val match = sUriMatcher.match(uri)
         when(match) {
             LEHRER -> return db.delete(DBContracts.LehrerContract.TABLE_NAME, selection, selectionArgs)
             LEHRER_ID -> {

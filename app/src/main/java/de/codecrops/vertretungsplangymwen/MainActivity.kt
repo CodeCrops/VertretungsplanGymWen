@@ -17,13 +17,17 @@ import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.sqlite.DBContracts
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
 
 /**
  * @author K1TR1K
@@ -62,6 +66,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         addOnItemClickListener()
 
+        //test stuff
+
+        //Toast.makeText(applicationContext, "${DBContracts.PlanContract.CONTENT_URI}", Toast.LENGTH_LONG).show()
+        DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
+        /*
+        DBManager.clearVertretungsDB(applicationContext)
+        DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
+        Toast.makeText(applicationContext, DBManager.getAllVertretungen(applicationContext, Calendar.getInstance().time).size, Toast.LENGTH_LONG).show()
+        */
     }
 
     override fun onBackPressed() {

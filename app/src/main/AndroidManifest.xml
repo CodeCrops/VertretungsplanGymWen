@@ -24,7 +24,7 @@
 
         <provider
             android:name=".sqlite.DataProvider"
-            android:authorities=".sqlite.DataProvider"
+            android:authorities="de.codecrops.vertretungsplangymwen"
             android:exported="false" />
 
         <activity android:name=".MainActivity" />
