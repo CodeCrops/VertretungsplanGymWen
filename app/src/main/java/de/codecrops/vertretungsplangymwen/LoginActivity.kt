@@ -3,6 +3,7 @@ package de.codecrops.vertretungsplangymwen
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
@@ -20,6 +21,12 @@ import java.net.HttpURLConnection
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        setSupportActionBar(toolbar)
+
+        val actionbar: ActionBar? = supportActionBar
+        actionbar?.setIcon(R.mipmap.ic_launcher_round)
 
         val cm = CredentialsManager
 
@@ -32,8 +39,6 @@ class LoginActivity : AppCompatActivity() {
                 } else {
             cm.deleteHTTPCredentials(this)
         }
-
-        setContentView(R.layout.activity_login)
 
         setEnterListener()
         login.setOnClickListener { login() }

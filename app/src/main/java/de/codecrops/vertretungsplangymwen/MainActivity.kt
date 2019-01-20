@@ -2,8 +2,6 @@ package de.codecrops.vertretungsplangymwen
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.job.JobInfo
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -11,27 +9,24 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
-import android.support.design.widget.Snackbar
-import android.support.v4.app.NotificationCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Toast
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.service.BackgroundJob
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -40,9 +35,6 @@ import java.util.*
  */
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
-    private enum class Day {
-        TODAY, TOMORROW
-    }
 
     val vertretungsNotification =
             de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager(this)
@@ -56,7 +48,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         nav_view.setNavigationItemSelectedListener(this)
 
-        val toolbar: Toolbar = toolbar
         setSupportActionBar(toolbar)
 
         val actionbar: ActionBar? = supportActionBar
@@ -64,6 +55,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
+
+        toolbar_title.text = getString(R.string.app_name)
 
         val aToggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
         drawer_layout.addDrawerListener(aToggle)
@@ -73,8 +66,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         addOnItemClickListener()
 
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+
+        val menu = nav_view.menu
+        if(day == "Sa." || day == "So.") {
+            menu.findItem(R.id.today).isVisible = false
+            menu.findItem(R.id.today_complete).isVisible = false
+        } else {
+            menu.findItem(R.id.today).isVisible = true
+            menu.findItem(R.id.today_complete).isVisible = true
+        }
     }
 
+    //TODO: Rewrite
     private fun setDataToday() {
         val currentDate = Date(Calendar.getInstance().timeInMillis)
         val extract = HttpGetRequest.extractToday(this)
@@ -95,6 +101,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    //TODO: Rewrite
     private fun setDataTomorrow() {
         val currentDate = Date(Calendar.getInstance().timeInMillis)
         val extract = HttpGetRequest.extractTomorrow(this)
@@ -120,91 +127,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun setCompleteDataToday() {
         val extract = HttpGetRequest.extractToday(this)
 
-        if(dateEqualsToday(extract.date)) {
+        if(Utils.dateEqualsToday(extract.date)) {
             for(v: VertretungData in extract.table) {
                 //DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
             }
             //TODO: Alles Bekommen
-            /*
-            val adapter = VertretungsAdapter(extractTable, applicationContext)
+
+            val adapter = VertretungsAdapter(extract.table, applicationContext)
             vertretungs_list.adapter = adapter
-             */
+
+            //adapter.notifyDataSetChanged()
+
+            //toolbar.title = Utils.formGermanDate(Calendar.getInstance())
+
+            vertretungs_list.visibility = View.VISIBLE
+            no_data.visibility = View.INVISIBLE
+        } else {
+            setCompleteDataNextDay()
+        }
+    }
+
+    private fun setCompleteDataNextDay() {
+        val extract = HttpGetRequest.extractTomorrow(this)
+        val nextDateReturn = Utils.dateEqualsNextDay(extract.date)
+
+        if(nextDateReturn.isNextDay) {
+            for(v: VertretungData in extract.table) {
+                //DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
+            }
+            //TODO: Alles Bekommen
 
             val adapter = VertretungsAdapter(extract.table, applicationContext)
             vertretungs_list.adapter = adapter
 
             /*
-            val adapter = vertretungs_list.adapter as ArrayAdapter<VertretungData>
-            adapter.clear()
-
-            for(i in extract.table) {
-                adapter.insert(i, adapter.count)
-            }
-
-            adapter.notifyDataSetChanged()
+            val calendar = Calendar.getInstance()
+            calendar.time = nextDateReturn.date
+            toolbar.title = Utils.formGermanDate(calendar)
+            Log.d("Main", Utils.formGermanDate(calendar))
             */
-            vertretungs_list.visibility = View.VISIBLE
-            no_data.visibility = View.INVISIBLE
-        } else {
-            setCompleteDataTomorrow()
-        }
-    }
+            val calendar = Calendar.getInstance()
+            calendar.time = nextDateReturn.date
+            val currentDate: Date = calendar.time
+            val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
 
-    private fun setCompleteDataTomorrow() {
-        val extract = HttpGetRequest.extractTomorrow(this)
-
-        if(dateEqualsTomorrow(extract.date)) {
-            for(v: VertretungData in extract.table) {
-                //DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
-            }
-            //TODO: Alles Bekommen
-            /*
-            val adapter = VertretungsAdapter(extractTable, applicationContext)
-            vertretungs_list.adapter = adapter
-             */
-
-            val adapter = vertretungs_list.adapter as ArrayAdapter<VertretungData>
-            adapter.clear()
-
-            for(i in extract.table) {
-                adapter.insert(i, adapter.count)
-            }
-
-            adapter.notifyDataSetChanged()
+            toolbar.header.text = "$day der ${Utils.formGermanDate(calendar)}"
 
             vertretungs_list.visibility = View.VISIBLE
             no_data.visibility = View.INVISIBLE
         } else {
             //Keine Daten vorhanden
+            header.text = getString(R.string.no_data)
             vertretungs_list.visibility = View.INVISIBLE
             no_data.visibility = View.VISIBLE
         }
-    }
-
-    private fun dateEqualsToday(d: Date) : Boolean {
-        val date = Calendar.getInstance()
-        date.time = d
-        val current = Calendar.getInstance()
-        if(date.get(Calendar.YEAR) == current.get(Calendar.YEAR) &&
-                date.get(Calendar.MONTH) == current.get(Calendar.MONTH) &&
-                date.get(Calendar.DAY_OF_MONTH) == current.get(Calendar.DAY_OF_MONTH)) {
-                    return true
-                }
-        return false
-    }
-
-    private fun dateEqualsTomorrow(d: Date) : Boolean {
-        val date = Calendar.getInstance()
-        date.time = d
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DATE, 1)
-
-        if(date.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) &&
-                date.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) &&
-                date.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)) {
-            return true
-        }
-        return false
     }
 
     override fun onBackPressed() {
@@ -251,7 +227,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }
-            R.id.help -> {
+            R.id.help-> {
                 val i = Intent(this, HelpActivity::class.java)
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
@@ -260,12 +236,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 setDataToday()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
-            R.id.tomorrow -> {
+            R.id.next_day -> {
                 setDataTomorrow()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
-            R.id.tomorrow_complete -> {
-                setCompleteDataTomorrow()
+            R.id.next_day_complete -> {
+                setCompleteDataNextDay()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.today_complete -> {

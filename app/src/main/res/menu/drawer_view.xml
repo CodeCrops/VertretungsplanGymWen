@@ -4,29 +4,29 @@
     tools:showIn="navigation_view">
     <item android:title="Gefiltert" >
         <menu>
-            <group>
+            <group android:checkableBehavior="none" >
                 <item
                     android:id="@+id/today"
                     android:title="@string/today" />
                 <item
-                    android:id="@+id/tomorrow"
-                    android:title="@string/tomorrow" />
+                    android:id="@+id/next_day"
+                    android:title="@string/next_day" />
             </group>
         </menu>
     </item>
     <item android:title="Komplett">
         <menu>
-            <group>
+            <group android:checkableBehavior="none" >
                 <item
                     android:id="@+id/today_complete"
                     android:title="@string/today_complete" />
                 <item
-                    android:id="@+id/tomorrow_complete"
-                    android:title="@string/tomorrow_complete" />
+                    android:id="@+id/next_day_complete"
+                    android:title="@string/next_day_complete" />
             </group>
         </menu>
     </item>
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="none">
         <item
             android:id="@+id/website"
             android:title="@string/website" />
