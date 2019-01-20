@@ -22,9 +22,9 @@
     <string name="name">Name</string>
     <string name="subject">Betreff</string>
     <string name="description">Beschreibung</string>
-    <string name="report_issue_description">Bitte beschreiben Sie das Problem möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr um das Problem herauszufinden. Danke für Ihre Hilfe!</string>
+    <string name="issue_description">Bitte beschreiben Sie das Problem möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr über das Problem herauszufinden. Danke für Ihre Hilfe!</string>
     <string name="empty_text">Du musst alle Felder ausfüllen!</string>
-    <string name="send_email">Email senden</string>
+    <string name="send_email">Email senden...</string>
     <string name="no_email_client">Es wurde kein Email-Client auf deinem Gerät gefunden!</string>
     <string name="report_issue">Problem melden</string>
     <string name="developer_mail">codecropsdev@gmail.com</string>
@@ -34,4 +34,7 @@
     <string name="today_complete">Heute</string>
     <string name="next_day_complete">Nächster Schultag</string>
     <string name="no_data">Keine Daten</string>
+    <string name="contact">Kontakt</string>
+    <string name="feature_description">Bitte beschreiben Sie das Feature möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr über das Feature zu erfahren.</string>
+    <string name="feedback_description">Wir freuen uns über jedes Feedback!</string>
 </resources>

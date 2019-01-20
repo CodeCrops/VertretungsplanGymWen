@@ -227,8 +227,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }
-            R.id.help-> {
-                val i = Intent(this, HelpActivity::class.java)
+            R.id.help -> {
+                val i = Intent(this, ContactActivity::class.java)
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }

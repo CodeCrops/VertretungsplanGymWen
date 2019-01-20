@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HelpActivity"
+    tools:context=".ContactActivity"
     android:id="@+id/parent_view"
     android:fitsSystemWindows="true">
 
@@ -30,6 +30,17 @@
         android:layout_height="match_parent"
         android:focusable="true">
 
+        <Spinner
+            android:id="@+id/dropdown"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <EditText
             android:id="@+id/name"
             android:layout_width="0dp"
@@ -41,8 +52,9 @@
             android:hint="@string/name"
             android:inputType="textPersonName"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/dropdown" />
 
         <EditText
             android:id="@+id/subject"
@@ -73,13 +85,13 @@
             app:layout_constraintTop_toBottomOf="@+id/subject" />
 
         <TextView
-            android:id="@+id/thanks"
+            android:id="@+id/text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/report_issue_description"
+            android:text="@string/issue_description"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/description" />
