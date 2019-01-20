@@ -31,4 +31,5 @@
     <string name="contact">Kontakt</string>
     <string name="feature_description">Bitte beschreiben Sie das Feature möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr über das Feature zu erfahren.</string>
     <string name="feedback_description">Wir freuen uns über jedes Feedback!</string>
+    <string name="settings">Einstellungen</string>
 </resources>

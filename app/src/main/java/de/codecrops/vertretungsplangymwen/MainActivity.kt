@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         //test stuff
 
         //Toast.makeText(applicationContext, "${DBContracts.PlanContract.CONTENT_URI}", Toast.LENGTH_LONG).show()
-        DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
+        //DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
         /*
         DBManager.clearVertretungsDB(applicationContext)
         DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
@@ -123,6 +123,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.help -> {
                 val i = Intent(this, ContactActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }
