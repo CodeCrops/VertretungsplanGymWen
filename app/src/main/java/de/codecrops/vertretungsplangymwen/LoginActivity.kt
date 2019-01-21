@@ -34,21 +34,6 @@ class LoginActivity : AppCompatActivity() {
 
         val cm = CredentialsManager
 
-        //test-stuff
-
-        /*
-
-        SettingsManager.setNotificationSound(applicationContext, false)
-        PreferenceManager.setDefaultValues(this, SettingsManager.getSettingsPath(), Context.MODE_PRIVATE, R.xml.settings_notifications, false)
-
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
-        return
-
-        */
-
-        //ende test-stuff
-
         if(HttpResponseCode.getResponseCode
                 ("${cm.getHTTPUsername(this)}:" +
                         "${cm.getHTTPPassword(this)}") == HttpURLConnection.HTTP_OK) {

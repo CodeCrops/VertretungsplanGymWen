@@ -3,8 +3,8 @@ package de.codecrops.vertretungsplangymwen.sqlite
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import de.codecrops.vertretungsplangymwen.data.LehrerData
 import de.codecrops.vertretungsplangymwen.data.VertretungData
-import java.text.SimpleDateFormat
 import java.util.*
 
 class DBManager {
@@ -24,7 +24,6 @@ class DBManager {
         fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?, datum: Date) {
             /*
             ACHTUNG:
-
                 - Die Parameter klasse, stunde und vertretung (&datum) sind nicht nullable -> sie müssen übergeben werden!
                 - Die Paramter fach, raum und sonstiges sind nullable -> sie können weggelassen werden und sollten dies auch bei leeren Werten bitte werden! Kein "" anstatt null
              */
@@ -228,7 +227,7 @@ class DBManager {
             if(isLehrerInDB(context, kuerzel)) {
                 updateLehrerInDB(context, values)
                 return
-            //ist noch nicht vorhanden
+                //ist noch nicht vorhanden
             } else {
                 context.contentResolver.insert(DBContracts.LehrerContract.CONTENT_URI, values)
             }

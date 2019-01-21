@@ -43,7 +43,6 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
 
     }
 
-    @Suppress("DEPRECATION")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val vertretungData: VertretungData = getItem(position)!!
         lateinit var viewHolder: ViewHolder
@@ -66,16 +65,16 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             view = convertView
         }
 
-        var vertretung: String
-
         if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
-            vertretung = context.resources.getString(R.string.entfällt)
+            //TODO: TEST OB RICHTIG ANGEZEIGT
+            viewHolder.vertretung!!.text = context.resources.getString(R.string.entfällt)
             viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
             viewHolder.raum!!.visibility = View.INVISIBLE
             viewHolder.kommentar!!.visibility = View.INVISIBLE
 
         } else {
-            vertretung = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
+            //TODO: TEST OB RICHTIG ANGEZEIGT
+            viewHolder.vertretung!!.text = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
             viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background)
             viewHolder.raum!!.visibility = View.VISIBLE
             viewHolder.kommentar!!.visibility = View.VISIBLE
@@ -98,7 +97,7 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
         }
 
         viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
-        viewHolder.vertretung!!.text = vertretung
+        //viewHolder.vertretung!!.text = vertretung
         viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
         viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"
         viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
