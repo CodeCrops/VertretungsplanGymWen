@@ -10,6 +10,7 @@ object DBContracts {
     val BASE_CONTENT_URI = Uri.parse("content://$CONTENT_AUTHORITY")
     const val PATH_SCHEDULE = PlanContract.TABLE_NAME
     const val PATH_LEHRER = LehrerContract.TABLE_NAME
+    const val PATH_PREFERENCES = PreferencesContract.TABLE_NAME
 
 
     //Inner class implements BaseColums
@@ -71,5 +72,29 @@ object DBContracts {
 
             val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_LEHRER)
         }
+    }
+
+    //Inner class implements BaseColumns
+    class PreferencesContract : BaseColumns {
+        companion object {
+
+            /*
+            ACHTUNG: Bei Änderungen hier, muss im DBHelper die Version erhöht werden
+                     Dadurch wird die gesamte DB geflusht und für den neuen Contract aufgebaut.
+             */
+
+            const val TABLE_NAME = "preferencedClasses"
+            const val _ID = BaseColumns._ID
+            const val COLUMN_LISTID = "listID"
+            const val COLUMN_KURS = "kurs"
+            const val COLUMN_TYPEOFKURS = "type"
+
+            //"MIME"Types
+            val CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PREFERENCES
+            val CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_PREFERENCES
+
+            val CONTENT_URI : Uri = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PREFERENCES)
+        }
+
     }
 }
