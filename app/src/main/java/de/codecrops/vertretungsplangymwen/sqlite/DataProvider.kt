@@ -114,26 +114,26 @@ class DataProvider :  ContentProvider() {
         //Klasse-Validation
         val klasseValue = values.getAsString(DBContracts.PlanContract.COLUMN_KLASSE)
         if(klasseValue.isNullOrBlank()) {
-            invalidData = true
+            //invalidData = true
         }
         //Stunde-Validation
         val stundeValue = values.getAsInteger(DBContracts.PlanContract.COLUMN_STUNDE)
         if(stundeValue == null || stundeValue <= 0 || stundeValue > 10 ) {
-            invalidData = true
+            //invalidData = true
         }
         //Vertretung-Validation
         val vertretungValue = values.getAsString(DBContracts.PlanContract.COLUMN_VERTRETUNG)
         if(vertretungValue.isNullOrBlank()) {
-            invalidData = true
+            //invalidData = true
         }
         //Date-Validation
         val dateValue = values.getAsString(DBContracts.PlanContract.COLUMN_DATE)
         if(dateValue.isNullOrBlank()) {
-            invalidData = true
+            //invalidData = true
         }
         //invalidData-Check
         if(invalidData) {
-            throw java.lang.IllegalArgumentException("Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!")
+            //throw java.lang.IllegalArgumentException("Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!") as Throwable
         }
 
         val db = mDBHelper.writableDatabase

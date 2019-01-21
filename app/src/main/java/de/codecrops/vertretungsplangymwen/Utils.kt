@@ -58,6 +58,11 @@ object Utils {
                 dt.add(Calendar.DATE, -1)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
             }
+            else -> {
+                val dt = date
+                dt.add(Calendar.DATE, -1)
+                if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
+            }
         }
         return NextDateReturn(d, false)
     }

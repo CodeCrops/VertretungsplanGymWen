@@ -97,12 +97,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             setFilteredData(Calendar.getInstance().time)
             setHeaderToday()
-            vertretungsOption = VertretungsOption.TODAY_FILTERED
             vertretungs_list.visibility = View.VISIBLE
             no_data.visibility = View.INVISIBLE
         } else {
             setDataNextDay()
         }
+        vertretungsOption = VertretungsOption.TODAY_FILTERED
     }
 
     private fun setDataNextDay() {
@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             setFilteredData(nextDateReturn.date)
             setHeaderNextDay(nextDateReturn.date)
-            vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
             vertretungs_list.visibility = View.VISIBLE
             no_data.visibility = View.INVISIBLE
         } else {
@@ -124,6 +123,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             vertretungs_list.visibility = View.INVISIBLE
             no_data.visibility = View.VISIBLE
         }
+        vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
     }
 
     private fun setCompleteDataToday() {
@@ -135,12 +135,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             setCompleteData(Calendar.getInstance().time)
             setHeaderToday()
-            vertretungsOption = VertretungsOption.TODAY
             vertretungs_list.visibility = View.VISIBLE
             no_data.visibility = View.INVISIBLE
         } else {
             setCompleteDataNextDay()
         }
+        vertretungsOption = VertretungsOption.TODAY
     }
 
     private fun setCompleteDataNextDay() {
@@ -149,11 +149,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if(nextDateReturn.isNextDay) {
             DBManager.clearVertretungsDB(this)
             for(v: VertretungData in extract.table) {
-                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
+                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
             }
             setCompleteData(nextDateReturn.date)
             setHeaderNextDay(nextDateReturn.date)
-            vertretungsOption = VertretungsOption.NEXT_DAY
             vertretungs_list.visibility = View.VISIBLE
             no_data.visibility = View.INVISIBLE
         } else {
@@ -162,6 +161,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             vertretungs_list.visibility = View.INVISIBLE
             no_data.visibility = View.VISIBLE
         }
+        vertretungsOption = VertretungsOption.NEXT_DAY
     }
 
     private fun setFilteredData(date: Date) {
@@ -169,12 +169,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val list = DBManager.getVertretungenByKlasse(this, "1m21", date)
         val adapter = VertretungsAdapter(list, this)
         vertretungs_list.adapter = adapter
+
+        if(list.isEmpty()) {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+        } else {
+            vertretungs_list.visibility = View.VISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+        }
     }
 
     private fun setCompleteData(date: Date) {
         val list = DBManager.getAllVertretungen(this, date)
         val adapter = VertretungsAdapter(list, this)
         vertretungs_list.adapter = adapter
+        vertretungs_list.visibility = View.VISIBLE
+        no_vertretung.visibility = View.INVISIBLE
     }
 
     private fun setHeaderToday() {
