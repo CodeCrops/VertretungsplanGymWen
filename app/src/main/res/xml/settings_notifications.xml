@@ -4,20 +4,20 @@
     <SwitchPreference
         android:id="@+id/swNotificationMaster"
         android:defaultValue="true"
-        android:key="NotificationMaster"
-        android:title="Benachrichtigungen erhalten" />
+        android:key="@string/shared_preferences_settings_notifications_master"
+        android:title="@string/settings_notification_master_title" />
     <PreferenceCategory android:title="Vibrationseinstellungen">
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="NotificationVibration"
-            android:title="Vibration verwenden" />
+            android:key="@string/shared_preferences_settings_notifications_vibration"
+            android:title="@string/settings_notification_use_vibration" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Ton-Einstellungen">
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="NotificationSound"
-            android:title="Ton verwenden" />
+            android:key="@string/shared_preferences_settings_notification_sound"
+            android:title="@string/settings_notification_use_sound" />
     </PreferenceCategory>
 </PreferenceScreen>

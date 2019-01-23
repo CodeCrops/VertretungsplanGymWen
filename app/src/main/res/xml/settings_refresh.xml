@@ -3,26 +3,25 @@
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="BackgroundRefreshMaster"
-        android:title="Hintergrundaktualisierung" />
+        android:key="@string/shared_preferences_settings_background_refresh_master"
+        android:title="@string/settings_refresh_master_title" />
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="BackgroundRefreshSmart"
+        android:key="@string/shared_preferences_settings_background_refresh_smart"
         android:summary="Aktualisiert die Daten intelligent"
-        android:title="SmartModus" />
+        android:title="@string/settings_refresh_smartmode_title" />
     <CheckBoxPreference
         android:defaultValue="false"
-        android:key="BackgroundRefreshAuto"
-        android:summary="Ermöglicht es die Intervalle anzupassen"
-        android:title="AutomatikModus" />
-    <PreferenceCategory android:title="erweiterte Einstellungen">
-
-        <ListPreference
-            android:defaultValue="1"
-            android:summary="%s"
-            android:entries="@array/settings_refresh_auto_interval_entries"
-            android:entryValues="@array/settings_refresh_auto_interval_values"
-            android:key="BackgroundRefreshAutoInterval"
-            android:title="Abhängig von Zeitpunkt" />
-    </PreferenceCategory>
+        android:key="@string/shared_preferences_settings_background_refresh_auto"
+        android:summary="Basiert auf Intervallen und Uhrzeiten"
+        android:title="@string/settings_refresh_automode_title" />
+    <ListPreference
+        android:defaultValue="1"
+        android:entries="@array/settings_refresh_auto_interval_entries"
+        android:entryValues="@array/settings_refresh_auto_interval_values"
+        android:key="@string/shared_preferences_settings_background_refresh_auto_interval"
+        android:summary="%s"
+        android:title="@string/settings_refresh_auto_interval_title" />
+    <Preference
+        android:title="Uhrzeit-Aktualisierung"/>
 </PreferenceScreen>

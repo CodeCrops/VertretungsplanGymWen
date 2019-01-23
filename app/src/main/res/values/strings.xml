@@ -60,4 +60,11 @@
     <string name="shared_preferences_settings_notifications_master">NotificationMaster</string>
     <string name="shared_preferences_settings_notifications_vibration">NotificationVibration</string>
     <string name="shared_preferences_settings_notification_sound">NotificationSound</string>
+    <string name="settings_notification_master_title">Benachrichtigungen erhalten</string>
+    <string name="settings_notification_use_vibration">Vibration verwenden</string>
+    <string name="settings_notification_use_sound">Ton verwenden</string>
+    <string name="settings_refresh_master_title">Hintergrundaktualisierung</string>
+    <string name="settings_refresh_smartmode_title">SmartModus</string>
+    <string name="settings_refresh_automode_title">AutomatikModus</string>
+    <string name="settings_refresh_auto_interval_title">Pause zwischen Aktualisierungen:</string>
 </resources>

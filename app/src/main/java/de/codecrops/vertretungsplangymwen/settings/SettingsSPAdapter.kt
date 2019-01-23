@@ -3,6 +3,7 @@ package de.codecrops.vertretungsplangymwen.settings
 import android.content.Context
 import android.support.v7.preference.PreferenceDataStore
 import android.util.Log
+import de.codecrops.vertretungsplangymwen.R
 
 /*
 Klasse, welche im PreferenceManager als CustomDataStore benutzt wird
@@ -13,7 +14,7 @@ class SettingsSPAdapter(context: Context) : PreferenceDataStore() {
     private val LOG_TAG = this.javaClass.simpleName
 
     val sm = SettingsManager
-    val sp = context.getSharedPreferences(sm.SHARED_PREFERENCES_SETTINGS_PATH, Context.MODE_PRIVATE)
+    val sp = context.getSharedPreferences(context.resources.getString(R.string.shared_preferences_settings_path), Context.MODE_PRIVATE)
 
     override fun getBoolean(key: String?, defValue: Boolean): Boolean {
         Log.i(LOG_TAG, "Boolean-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getBoolean(key, defValue)}")
