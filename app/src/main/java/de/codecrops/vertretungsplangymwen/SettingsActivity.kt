@@ -2,9 +2,12 @@ package de.codecrops.vertretungsplangymwen
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.app.ActionBar
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.view.MenuItem
+import android.view.View
 import de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsHeadersFragment
 import kotlinx.android.synthetic.main.activity_settings.*
 
@@ -16,7 +19,7 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
         setContentView(R.layout.activity_settings)
         supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment, SettingsHeadersFragment())
+                .replace(R.id.fragment_container, SettingsHeadersFragment())
                 .commit()
 
         setSupportActionBar(toolbar)
@@ -26,30 +29,36 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             setTitle("Einstellungen")
+            //Sollte dafür sorgen, dass der ZurückButton in der Actionbar auch die onBackPressed() triggert... geht aber irgendwie nicht :(
+            //TODO: Fix
+            fun onSupportNavigateUp() : Boolean {
+                onBackPressed()
+                return true
+            }
         }
 
         toolbar.setNavigationOnClickListener { super.onBackPressed() }
     }
 
     override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
-        /*
-        //Instantiate the new Fragment
-        val args = pref.extras
-        val fragment = supportFragmentManager.fragmentFactory.instantiate(
-                classLoader,
-                pref.fragment,
-                args)
-        fragment.arguments = args
-        fragment.setTargetFragment(caller, 0)
-        //Replace the existing Fragment with the new one
-        supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment, fragment)
+
+        supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragment_container, (Class.forName(pref.fragment).newInstance() as Fragment))
                 .addToBackStack(null)
                 .commit()
-        return true
-        */
+
+        when(pref.fragment) {
+            "de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsRefreshFragment" -> supportActionBar!!.title = "Hintergrundaktualisierung"
+            "de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsNotificationFragment" -> supportActionBar!!.title = "Benachrichtigungen"
+        }
 
 
         return true
+    }
+
+    override fun onBackPressed() {
+        supportActionBar!!.setTitle("Einstellungen")
+        super.onBackPressed()
     }
 }
