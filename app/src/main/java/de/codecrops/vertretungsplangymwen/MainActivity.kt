@@ -2,6 +2,9 @@ package de.codecrops.vertretungsplangymwen
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.job.JobInfo
+import android.app.job.JobScheduler
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -14,6 +17,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -24,6 +28,7 @@ import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.service.BackgroundJob
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -81,6 +86,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         Utils.fillDatabase(this)
         update()
+        scheduleJob()
     }
 
     private fun update() {
@@ -327,16 +333,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             s.show()
         }
     }
-    /*
-    fun scheduleJob(v: View) {
+
+    fun scheduleJob() {
         val componentName = ComponentName(this, BackgroundJob::class.java)
         val jobInfo = JobInfo.Builder(BackgroundJob.JOB_ID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
+                .setPeriodic(60 * 60 * 1000)
+                .build()
+
+        val scheduler: JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        val resultCode = scheduler.schedule(jobInfo)
+        if(resultCode == JobScheduler.RESULT_SUCCESS) {
+        }
     }
 
-    fun chancelJob(v: View) {
-
+    fun chancelJob() {
+        val scheduler: JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+        scheduler.cancel(BackgroundJob.JOB_ID)
     }
-    */
+
 }
