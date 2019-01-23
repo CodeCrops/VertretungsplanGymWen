@@ -21,14 +21,8 @@
     </android.support.design.widget.AppBarLayout>
 
     <fragment
-        android:id="@+id/refreshFragment"
-        android:name="de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsRefreshFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <fragment
-        android:id="@+id/notificationFragment"
-        android:name="de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsNotificationFragment"
+        android:id="@+id/fragment"
+        android:name="de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsHeadersFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
