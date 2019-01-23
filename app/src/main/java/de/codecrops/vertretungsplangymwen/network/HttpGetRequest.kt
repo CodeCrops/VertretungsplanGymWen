@@ -6,6 +6,8 @@ package de.codecrops.vertretungsplangymwen.network
 
 import android.content.Context
 import android.os.AsyncTask
+import android.util.Base64
+import android.util.Log
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStream
@@ -16,6 +18,7 @@ import java.net.MalformedURLException
 import java.net.URL
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.Extractor
+import de.codecrops.vertretungsplangymwen.data.HttpReturnData
 
 /**
  * @author K1TR1K
@@ -24,8 +27,9 @@ import de.codecrops.vertretungsplangymwen.data.Extractor
  * @property autKey der Authentication Key, erstellt aus Nutzername und Passwort für den Download der Datei von der Website
  */
 
-class HttpGetRequest : AsyncTask<String, Void, String>() {
+class HttpGetRequest : AsyncTask<String, Void, HttpReturnData>() {
     private var autKey: String = ""
+    private var passwordCheck: Boolean = false
 
     companion object {
         /**
@@ -34,6 +38,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
          */
         fun extractToday(context: Context): Extractor {
             val getRequest = HttpGetRequest()
+            getRequest.passwordCheck = false
             getRequest.autKey = CredentialsManager.convertToBase64(context)
             return Extractor(getRequest.execute("http://gym-wen.de/vp/heute.htm").get())
         }
@@ -44,8 +49,23 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
          */
         fun extractTomorrow(context: Context): Extractor {
             val getRequest = HttpGetRequest()
+            getRequest.passwordCheck = false
             getRequest.autKey = CredentialsManager.convertToBase64(context)
             return Extractor(getRequest.execute("http://gym-wen.de/vp/morgen.htm").get())
+        }
+
+        fun getResponseCodeForPasswordCheck(usernamePassword: String): Int {
+            val getRequest = HttpGetRequest()
+            getRequest.passwordCheck = true
+            getRequest.autKey = Base64.encodeToString(usernamePassword.toByteArray(), 0).replace("\n", "")
+            return getRequest.execute("http://gym-wen.de/vp/heute.htm").get().responseCode
+        }
+
+        fun getResponseCodeForPasswordCheck(context: Context) : Int {
+            val getRequest = HttpGetRequest()
+            getRequest.passwordCheck = true
+            getRequest.autKey = CredentialsManager.convertToBase64(context)
+            return getRequest.execute("http://gym-wen.de/vp/heute.htm").get().responseCode
         }
     }
 
@@ -54,9 +74,9 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
      * @param params Ein String Array, das als erstes Element die Ziel-URL enthalten muss
      * @return der String der html Datei
      */
-    override fun doInBackground(vararg params: String?): String {
+    override fun doInBackground(vararg params: String?): HttpReturnData {
         val url = createUrl(params[0]!!)
-        var response = ""
+        lateinit var response: HttpReturnData
         try {
             response = makeHttpRequest(url!!)
         } catch (e: IOException) {
@@ -81,10 +101,11 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
      * @param url Die URL der zu herunterladenden html Datei
      * @return Der String der html Datei
      */
-    private fun makeHttpRequest(url: URL): String  {
-        var response = ""
+    private fun makeHttpRequest(url: URL): HttpReturnData  {
+        var dataResponse: String? = null
+        var responseCodeResponse = 0
         lateinit var  urlConnection: HttpURLConnection
-        lateinit var inputStream: InputStream
+        var inputStream: InputStream? = null
 
         try {
             urlConnection = url.openConnection() as HttpURLConnection
@@ -96,19 +117,18 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
             urlConnection.connectTimeout = 20000
             urlConnection.connect()
 
-            if(urlConnection.responseCode == HttpURLConnection.HTTP_OK) {
+            if(urlConnection.responseCode == HttpURLConnection.HTTP_OK && !passwordCheck) {
                 inputStream = urlConnection.inputStream
-                response = readFromStream(inputStream)
-            } else {
-                return urlConnection.responseCode.toString()
+                dataResponse = readFromStream(inputStream)
             }
-        } catch (e: IOException) {
 
+            responseCodeResponse = urlConnection.responseCode
+        } catch (e: IOException) {
         } finally {
             urlConnection.disconnect()
-            inputStream.close()
+            inputStream?.close()
         }
-        return response
+        return HttpReturnData(responseCodeResponse, dataResponse)
     }
 
     private fun readFromStream(inputStream: InputStream): String {
@@ -123,7 +143,7 @@ class HttpGetRequest : AsyncTask<String, Void, String>() {
         return output.toString()
     }
 
-    override fun onPostExecute(result: String) {
+    override fun onPostExecute(result: HttpReturnData) {
         super.onPostExecute(result)
     }
 }

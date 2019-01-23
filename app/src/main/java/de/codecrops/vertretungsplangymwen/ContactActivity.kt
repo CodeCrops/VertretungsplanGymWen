@@ -26,11 +26,11 @@ class ContactActivity : AppCompatActivity() {
         setContentView(R.layout.activity_contact)
         setSupportActionBar(toolbar)
 
-        val content = arrayOf("Problem melden", "Feature anfragen", "Feedback geben")
+        val content = arrayOf(getString(R.string.report_issue), getString(R.string.feature_request), getString(R.string.feedback))
         val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, content)
-        dropdown.adapter = adapter
+        grade_dropdown.adapter = adapter
 
-        dropdown.onItemSelectedListener = object : OnItemSelectedListener {
+        grade_dropdown.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parentView: AdapterView<*>, selectedItemView: View, position: Int, id: Long) {
                 addSpinnerListener(position)
             }
@@ -53,7 +53,7 @@ class ContactActivity : AppCompatActivity() {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.type = "message/rfc822"
                 intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.developer_mail)))
-                intent.putExtra(Intent.EXTRA_SUBJECT, "${dropdown.selectedItem}: ${name.text} | ${subject.text}")
+                intent.putExtra(Intent.EXTRA_SUBJECT, "${grade_dropdown.selectedItem}: ${name.text} | ${subject.text}")
                 intent.putExtra(Intent.EXTRA_TEXT, description.text)
                 try {
                     startActivity(Intent.createChooser(intent, getString(R.string.send_email)))

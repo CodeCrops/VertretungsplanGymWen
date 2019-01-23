@@ -28,8 +28,26 @@
     <string name="no_email_client">Es wurde kein Email-Client auf deinem Gerät gefunden!</string>
     <string name="report_issue">Problem melden</string>
     <string name="developer_mail">codecropsdev@gmail.com</string>
+    <string name="no_data_description">Auf dem Server sind keine Daten zum heutigen Tag vorhanden! Versuche es später erneut.</string>
+    <string name="today">Heute</string>
+    <string name="next_day">Nächster Schultag</string>
+    <string name="today_complete">Heute</string>
+    <string name="next_day_complete">Nächster Schultag</string>
+    <string name="no_data">Keine Daten</string>
     <string name="contact">Kontakt</string>
     <string name="feature_description">Bitte beschreiben Sie das Feature möglichst genau! Ihre Anfrage wird als Email versendet. Es ist möglich, dass wir Sie über die Email erneut kontaktieren um mehr über das Feature zu erfahren.</string>
     <string name="feedback_description">Wir freuen uns über jedes Feedback!</string>
+    <string name="feature_request">Feature anfragen</string>
+    <string name="feedback">Feedback geben</string>
+    <string name="info">Info</string>
+    <string name="info_text">Diese App wurde durch CodeCrops von Luca Preibsch und Yannik Schmidt entwickelt. ... !</string>
     <string name="settings">Einstellungen</string>
+    <string name="twitter_text">Besuche uns auf Twitter!</string>
+    <string name="klasse">Klasse</string>
+    <string name="choose_grade">Wähle deine Stufe</string>
+    <string name="choose_course">Wähle deine Kurse</string>
+    <string name="choose_klasse">Wähle deine Klasse</string>
+    <string name="course">Kursname</string>
+    <string name="no_vertretung">Leider gibt es heute keine Vertretungen für deine eingetragenen Kurse.</string>
+    <string name="old_data">Der Dienst ist zurzeit nicht erreichbar! Die Daten sind möglicherweise veraltet.</string>
 </resources>

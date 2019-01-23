@@ -1,18 +1,15 @@
 package de.codecrops.vertretungsplangymwen
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
+import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
 import android.widget.TextView
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
-import de.codecrops.vertretungsplangymwen.network.HttpResponseCode
-import de.codecrops.vertretungsplangymwen.settings.SettingsManager
-import de.codecrops.vertretungsplangymwen.sqlite.DBManager
+import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import kotlinx.android.synthetic.main.activity_login.*
 import java.net.HttpURLConnection
 
@@ -24,35 +21,35 @@ import java.net.HttpURLConnection
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        setSupportActionBar(toolbar)
+
+        val actionbar: ActionBar? = supportActionBar
+        actionbar?.setIcon(R.mipmap.ic_launcher_round)
 
         val cm = CredentialsManager
+        val responseCode = HttpGetRequest.getResponseCodeForPasswordCheck("${cm.getHTTPUsername(this)}:${cm.getHTTPPassword(this)}")
 
-        //test-stuff
-
-        /*
-
-        SettingsManager.setNotificationSound(applicationContext, false)
-        PreferenceManager.setDefaultValues(this, SettingsManager.getSettingsPath(), Context.MODE_PRIVATE, R.xml.settings_notifications, false)
-
-        val intent = Intent(this, SettingsActivity::class.java)
-        startActivity(intent)
-        return
-
-        */
-
-        //ende test-stuff
-
-        if(HttpResponseCode.getResponseCode
-                ("${cm.getHTTPUsername(this)}:" +
-                        "${cm.getHTTPPassword(this)}") == HttpURLConnection.HTTP_OK) {
+        when(responseCode) {
+            HttpURLConnection.HTTP_OK -> {
+                val intent = Intent(this, MainActivity::class.java)
+                finish()
+                startActivity(intent)
+            }
+            HttpURLConnection.HTTP_UNAUTHORIZED -> {
+                cm.deleteHTTPCredentials(this)
+            }
+            else -> {
+                if(!cm.getHTTPUsername(this).isNullOrEmpty() && !cm.getHTTPPassword(this).isNullOrEmpty()) {
                     val intent = Intent(this, MainActivity::class.java)
                     finish()
                     startActivity(intent)
                 } else {
-            cm.deleteHTTPCredentials(this)
+                    cm.deleteHTTPCredentials(this)
+                }
+            }
         }
-
-        setContentView(R.layout.activity_login)
 
         setEnterListener()
         login.setOnClickListener { login() }
@@ -61,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
     private fun login() {
         val name = username.text
         val pw = password.text
-        val responseCode = HttpResponseCode.getResponseCode("$name:$pw")
+        val responseCode = HttpGetRequest.getResponseCodeForPasswordCheck("$name:$pw")
         when (responseCode) {
             HttpURLConnection.HTTP_OK -> {
                 //richtiges Passwort
@@ -73,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
             HttpURLConnection.HTTP_UNAUTHORIZED -> {
                 //falsches Passwort
                 val s = Snackbar.make(layout, getString(R.string.wrong_credentials), Snackbar.LENGTH_LONG)
-                s.setAction("OK", View.OnClickListener { s.dismiss() })
+                s.setAction("OK", { s.dismiss() })
                 s.show()
             }
             else -> {
@@ -82,7 +79,7 @@ class LoginActivity : AppCompatActivity() {
                         Snackbar.LENGTH_INDEFINITE)
                 val textView = s.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
                 textView.maxLines = 5
-                s.setAction("OK", View.OnClickListener { s.dismiss() })
+                s.setAction("OK", { s.dismiss() })
                 s.show()
             }
         }

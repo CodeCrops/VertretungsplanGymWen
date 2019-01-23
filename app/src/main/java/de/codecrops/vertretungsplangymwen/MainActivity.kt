@@ -9,31 +9,41 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import android.widget.TextView
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.sqlite.DBContracts
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlinx.android.synthetic.main.header_layout.*
+import java.net.HttpURLConnection
+import java.text.SimpleDateFormat
+import kotlin.collections.ArrayList
 
 /**
  * @author K1TR1K
  */
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    private enum class VertretungsOption {
+        TODAY_COMPLETE, TODAY_FILTERED, NEXT_DAY_COMPLETE, NEXT_DAY_FILTERED
+    }
+
+    private lateinit var vertretungsOption: VertretungsOption
+
     val vertretungsNotification =
             de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager(this)
 
@@ -41,12 +51,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(activity_main)
         createNotificationChannel()
-        setNavigationViewListener()
-        addDrawerListener()
 
-        nav_view.setNavigationItemSelectedListener(this)
-
-        val toolbar: Toolbar = toolbar
         setSupportActionBar(toolbar)
 
         val actionbar: ActionBar? = supportActionBar
@@ -59,22 +64,119 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
 
-        val extractTable = HttpGetRequest.extractToday(this).table
-        val adapter = VertretungsAdapter(extractTable, applicationContext)
+        vertretungsOption = VertretungsOption.TODAY_COMPLETE
 
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+        val menu = nav_view.menu
+        if(day == "Sa." || day == "So.") {
+            menu.findItem(R.id.today).isVisible = false
+            menu.findItem(R.id.today_complete).isVisible = false
+        } else {
+            menu.findItem(R.id.today).isVisible = true
+            menu.findItem(R.id.today_complete).isVisible = true
+        }
+        addListeners()
+
+        Utils.fillDatabase(this)
+        update()
+    }
+
+    private fun update() {
+        if(HttpGetRequest.getResponseCodeForPasswordCheck(this) == HttpURLConnection.HTTP_OK) {
+            no_internet_icon.visibility = View.INVISIBLE
+        } else {
+            no_internet_icon.visibility = View.VISIBLE
+        }
+        when(vertretungsOption) {
+            VertretungsOption.TODAY_FILTERED -> {
+                setListData(Calendar.getInstance().time, true)
+                setHeaderToday()
+            }
+            VertretungsOption.TODAY_COMPLETE -> {
+                setListData(Calendar.getInstance().time, false)
+                setHeaderToday()
+            }
+            VertretungsOption.NEXT_DAY_FILTERED -> {
+                val date = loadNextDayFromDatabase(true)
+                setHeaderNextDay(date)
+            }
+            VertretungsOption.NEXT_DAY_COMPLETE -> {
+                val date = loadNextDayFromDatabase(false)
+                setHeaderNextDay(date)
+            }
+        }
+    }
+
+    private fun setHeaderToday() {
+        val calendar = Calendar.getInstance()
+        val currentDate: Date = calendar.time
+        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
+    }
+
+    private fun setHeaderNextDay(date: Date) {
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(date.time)
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
+    }
+
+    private fun addListeners() {
+        setNavigationViewListener()
+        addDrawerListener()
+        nav_view.setNavigationItemSelectedListener(this)
+        addOnItemClickListener()
+        addOnFabClickListener()
+        addOnNoInternetIconClickListener()
+    }
+
+    //WICHTIG
+    private fun loadNextDayFromDatabase(filtered: Boolean) : Date {
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+        when(day) {
+            Utils.DAY_FRIDAY -> {
+                currentCalendar.add(Calendar.DATE, 3)
+            }
+            Utils.DAY_SATURDAY -> {
+                currentCalendar.add(Calendar.DATE, 2)
+            }
+            Utils.DAY_SUNDAY -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+            else -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+        }
+        setListData(currentCalendar.time, filtered)
+        return currentCalendar.time
+    }
+
+    //WICHTIG
+    private fun setListData(date: Date, filtered: Boolean) {
+        //TODO: Klassen aus DB bekommen
+        var list: ArrayList<VertretungData>
+        if(filtered) {
+            list = DBManager.getVertretungenByKlasse(this, "1m21", date)
+        } else {
+            list = DBManager.getAllVertretungen(this, date)
+        }
+        val adapter = VertretungsAdapter(list, this)
         vertretungs_list.adapter = adapter
 
-        addOnItemClickListener()
-
-        //test stuff
-
-        //Toast.makeText(applicationContext, "${DBContracts.PlanContract.CONTENT_URI}", Toast.LENGTH_LONG).show()
-        //DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
-        /*
-        DBManager.clearVertretungsDB(applicationContext)
-        DBManager.addVertretungsstunde(applicationContext, "10b", 3, "PFA", "Informatik", "203", null, Calendar.getInstance().time)
-        Toast.makeText(applicationContext, DBManager.getAllVertretungen(applicationContext, Calendar.getInstance().time).size, Toast.LENGTH_LONG).show()
-        */
+        if(list.isEmpty()) {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+        } else {
+            vertretungs_list.visibility = View.VISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+            no_data.visibility = View.INVISIBLE
+        }
     }
 
     override fun onBackPressed() {
@@ -131,6 +233,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
             }
+            R.id.today -> {
+                vertretungsOption = VertretungsOption.TODAY_FILTERED
+                update()
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.next_day -> {
+                vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
+                update()
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.next_day_complete -> {
+                vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
+                update()
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.today_complete -> {
+                vertretungsOption = VertretungsOption.TODAY_COMPLETE
+                update()
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.info_activity -> {
+                val intent = Intent(this, InfoActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(intent)
+            }
+            R.id.klassenview -> {
+                val intent = Intent(this, KlasseActivity::class.java)
+                startActivity(intent)
+            }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
@@ -151,23 +282,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addDrawerListener() {
+        //TODO: FIX, wenn man zu schnell öffnet und schließt
         drawer_layout.addDrawerListener(
                 object : DrawerLayout.DrawerListener {
-                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-
-                    }
-
-                    override fun onDrawerOpened(drawerView: View) {
-
-                    }
-
-                    override fun onDrawerClosed(drawerView: View) {
-
-                    }
-
-                    override fun onDrawerStateChanged(newState: Int) {
-
-                    }
+                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+                    override fun onDrawerOpened(drawerView: View) {}
+                    override fun onDrawerClosed(drawerView: View) {}
+                    override fun onDrawerStateChanged(newState: Int) {}
                 }
         )
     }
@@ -185,6 +306,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 putExtra("kommentar", item.kommentar)
             }
             startActivity(intent)
+        }
+    }
+
+    private fun addOnFabClickListener() {
+        fab.setOnClickListener {
+            Utils.fillDatabase(this)
+            update()
+        }
+    }
+
+    private fun addOnNoInternetIconClickListener() {
+        no_internet_icon.setOnClickListener {
+            val s = Snackbar.make(drawer_layout,
+                    getString(R.string.old_data),
+                    Snackbar.LENGTH_INDEFINITE)
+            val textView = s.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
+            textView.maxLines = 5
+            s.setAction("OK", { s.dismiss() })
+            s.show()
         }
     }
     /*
