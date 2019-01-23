@@ -23,16 +23,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".VertretungsContentActivity" />
+        <activity android:name=".ContactActivity" />
+        <activity android:name=".SettingsActivity" />
 
         <provider
             android:name=".sqlite.DataProvider"
             android:authorities="de.codecrops.vertretungsplangymwen"
             android:exported="false" />
-
-        <activity android:name=".MainActivity" />
-        <activity android:name=".VertretungsContentActivity" />
-        <activity android:name=".ContactActivity" />
-        <activity android:name=".SettingsActivity" />
+        
+        <service android:name=".service.BackgroundJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        
     </application>
 
 </manifest>
