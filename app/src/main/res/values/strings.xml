@@ -49,4 +49,5 @@
     <string name="choose_klasse">Wähle deine Klasse</string>
     <string name="course">Kursname</string>
     <string name="no_vertretung">Leider gibt es heute keine Vertretungen für deine eingetragenen Kurse.</string>
+    <string name="old_data">Der Dienst ist zurzeit nicht erreichbar! Die Daten sind möglicherweise veraltet.</string>
 </resources>

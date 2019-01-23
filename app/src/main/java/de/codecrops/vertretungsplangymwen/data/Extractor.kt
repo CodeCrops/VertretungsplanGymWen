@@ -1,6 +1,7 @@
 package de.codecrops.vertretungsplangymwen.data
 
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
+import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -18,7 +19,7 @@ import kotlin.collections.ArrayList
  * @property date Dies ist das Datum, das in der html Datei als aktueller Stand genannt wird.
  */
 
-class Extractor(data: String) {
+class Extractor(data: HttpReturnData) {
 
     var unauthorized = false
     var networkError = false
@@ -30,12 +31,14 @@ class Extractor(data: String) {
          * Überprüft, ob der ResponseCode 401 ist, was bedeuten würde, dass Nutzername oder
          * Passwort falsch ist.
          */
-        if(data.equals("401")) {
-            unauthorized = true
-        } else if(data.length>3) {
-            extract(data)
-        } else {
-            networkError = true
+        when(data.responseCode) {
+            HttpURLConnection.HTTP_UNAUTHORIZED -> unauthorized = true
+            HttpURLConnection.HTTP_OK -> {
+                if(data.data != null) {
+                    extract(data.data)
+                } else networkError = true
+            }
+            else -> networkError = true
         }
     }
 

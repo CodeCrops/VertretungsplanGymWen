@@ -9,6 +9,7 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -16,20 +17,18 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import android.widget.TextView
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.sqlite.DBContracts
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.header_layout.*
 import java.text.SimpleDateFormat
-import java.util.*
 
 /**
  * @author K1TR1K
@@ -63,8 +62,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             setHomeAsUpIndicator(R.drawable.ic_menu)
         }
 
-        toolbar_title.text = getString(R.string.app_name)
-
         val aToggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
@@ -73,6 +70,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         addOnItemClickListener()
         addOnFabClickListener()
+        addOnNoInternetIconClickListener()
 
         val currentCalendar = Calendar.getInstance()
         val currentDate: Date = currentCalendar.time
@@ -89,79 +87,160 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setDataToday() {
-        val extract = HttpGetRequest.extractToday(this)
-        if(Utils.dateEqualsToday(extract.date)) {
-            DBManager.clearVertretungsDB(this)
-            for(v: VertretungData in extract.table) {
-                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
-            }
-            setFilteredData(Calendar.getInstance().time)
-            setHeaderToday()
-            vertretungs_list.visibility = View.VISIBLE
-            no_data.visibility = View.INVISIBLE
-        } else {
-            setDataNextDay()
-        }
+        addTodayToDatabase(true)
+        addNextDayToDatabase(false)
+        setFilteredData(Calendar.getInstance().time)
+        setHeaderToday()
         vertretungsOption = VertretungsOption.TODAY_FILTERED
     }
 
     private fun setDataNextDay() {
-        val extract = HttpGetRequest.extractTomorrow(this)
-        val nextDateReturn = Utils.dateEqualsNextDay(extract.date)
-        if(nextDateReturn.isNextDay) {
-            DBManager.clearVertretungsDB(this)
-            for(v: VertretungData in extract.table) {
-                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
-            }
-            setFilteredData(nextDateReturn.date)
-            setHeaderNextDay(nextDateReturn.date)
-            vertretungs_list.visibility = View.VISIBLE
+        val date = addNextDayToDatabase(true)
+        addTodayToDatabase(false)
+        if(date!=null) {
+            setFilteredData(date)
+            setHeaderNextDay(date)
             no_data.visibility = View.INVISIBLE
+            no_internet_icon.visibility = View.INVISIBLE
         } else {
-            //Keine Daten vorhanden
-            header.text = getString(R.string.no_data)
-            vertretungs_list.visibility = View.INVISIBLE
-            no_data.visibility = View.VISIBLE
+            val currentCalendar = Calendar.getInstance()
+            val currentDate: Date = currentCalendar.time
+            val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+            when(day) {
+                "Fr." -> {
+                    checkDatabaseForEntriesFiltered(3)
+                }
+                "Sa." -> {
+                    checkDatabaseForEntriesFiltered(2)
+                }
+                "So." -> {
+                    checkDatabaseForEntriesFiltered(1)
+                }
+                else -> {
+                    checkDatabaseForEntriesFiltered(1)
+                }
+            }
         }
         vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
     }
 
     private fun setCompleteDataToday() {
-        val extract = HttpGetRequest.extractToday(this)
-        if(Utils.dateEqualsToday(extract.date)) {
-            DBManager.clearVertretungsDB(this)
-            for(v: VertretungData in extract.table) {
-                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
-            }
-            setCompleteData(Calendar.getInstance().time)
-            setHeaderToday()
-            vertretungs_list.visibility = View.VISIBLE
-            no_data.visibility = View.INVISIBLE
-        } else {
-            setCompleteDataNextDay()
-        }
+        addTodayToDatabase(true)
+        addNextDayToDatabase(false)
+        setCompleteData(Calendar.getInstance().time)
+        setHeaderToday()
         vertretungsOption = VertretungsOption.TODAY
     }
 
     private fun setCompleteDataNextDay() {
-        val extract = HttpGetRequest.extractTomorrow(this)
-        val nextDateReturn = Utils.dateEqualsNextDay(extract.date)
-        if(nextDateReturn.isNextDay) {
-            DBManager.clearVertretungsDB(this)
-            for(v: VertretungData in extract.table) {
-                DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
-            }
-            setCompleteData(nextDateReturn.date)
-            setHeaderNextDay(nextDateReturn.date)
-            vertretungs_list.visibility = View.VISIBLE
+        val date = addNextDayToDatabase(true)
+        addTodayToDatabase(false)
+        if(date!=null) {
+            setCompleteData(date)
+            setHeaderNextDay(date)
             no_data.visibility = View.INVISIBLE
+            no_internet_icon.visibility = View.INVISIBLE
         } else {
-            //Keine Daten vorhanden
-            header.text = getString(R.string.no_data)
-            vertretungs_list.visibility = View.INVISIBLE
-            no_data.visibility = View.VISIBLE
+            val currentCalendar = Calendar.getInstance()
+            val currentDate: Date = currentCalendar.time
+            val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+            when(day) {
+                "Fr." -> {
+                    checkDatabaseForEntries(3)
+                }
+                "Sa." -> {
+                    checkDatabaseForEntries(2)
+                }
+                "So." -> {
+                    checkDatabaseForEntries(1)
+                }
+                else -> {
+                    checkDatabaseForEntries(1)
+                }
+            }
         }
         vertretungsOption = VertretungsOption.NEXT_DAY
+    }
+
+    private fun checkDatabaseForEntriesFiltered(daysToSkip: Int) {
+        val c = Calendar.getInstance()
+        c.add(Calendar.DATE, daysToSkip)
+        //TODO: nach klasse filtern mit dp
+        if(!DBManager.getVertretungenByKlasse(this, "1m21", c.time).isEmpty()) {
+            setFilteredData(c.time)
+            setHeaderNextDay(c.time)
+            no_internet_icon.visibility = View.VISIBLE
+            vertretungs_list.visibility = View.VISIBLE
+            no_data.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+        } else {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+            header.text = getString(R.string.no_data)
+            header_icon.setImageResource(R.drawable.ic_error_black)
+        }
+    }
+
+    private fun checkDatabaseForEntries(daysToSkip: Int) {
+        val c = Calendar.getInstance()
+        c.add(Calendar.DATE, daysToSkip)
+        if(!DBManager.getAllVertretungen(this, c.time).isEmpty()) {
+            setCompleteData(c.time)
+            setHeaderNextDay(c.time)
+            no_internet_icon.visibility = View.VISIBLE
+            vertretungs_list.visibility = View.VISIBLE
+            no_data.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+        } else {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+            header.text = getString(R.string.no_data)
+            header_icon.setImageResource(R.drawable.ic_error_black)
+        }
+    }
+
+    private fun addTodayToDatabase(clear: Boolean) {
+        val extract = HttpGetRequest.extractToday(this)
+        if(!(extract.unauthorized || extract.networkError)) {
+            if(Utils.dateEqualsToday(extract.date)) {
+                if(clear)   DBManager.clearVertretungsDB(this)
+                for(v: VertretungData in extract.table) {
+                    DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
+                }
+                no_internet_icon.visibility = View.INVISIBLE
+            } else {
+                setDataNextDay()
+            }
+        }
+        no_internet_icon.visibility = View.VISIBLE
+    }
+
+    private fun addNextDayToDatabase(clear: Boolean) : Date? {
+        val extract = HttpGetRequest.extractTomorrow(this)
+        if(!(extract.unauthorized || extract.networkError)) {
+            val nextDateReturn = Utils.dateEqualsNextDay(extract.date)
+            if (nextDateReturn.isNextDay) {
+                if(clear)   DBManager.clearVertretungsDB(this)
+                for (v: VertretungData in extract.table) {
+                    DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
+                }
+                no_internet_icon.visibility = View.INVISIBLE
+            } else {
+                setNoData()
+            }
+            return nextDateReturn.date
+        }
+        no_internet_icon.visibility = View.VISIBLE
+        return null
+    }
+
+
+    private fun setNoData() {
+        //Keine Daten vorhanden
+        header.text = getString(R.string.no_data)
+        header_icon.setImageResource(R.drawable.ic_error_black)
+        vertretungs_list.visibility = View.INVISIBLE
+        no_data.visibility = View.VISIBLE
     }
 
     private fun setFilteredData(date: Date) {
@@ -183,15 +262,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val list = DBManager.getAllVertretungen(this, date)
         val adapter = VertretungsAdapter(list, this)
         vertretungs_list.adapter = adapter
-        vertretungs_list.visibility = View.VISIBLE
-        no_vertretung.visibility = View.INVISIBLE
+
+        if(list.isEmpty()) {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+        } else {
+            vertretungs_list.visibility = View.VISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+        }
     }
 
     private fun setHeaderToday() {
         val calendar = Calendar.getInstance()
         val currentDate: Date = calendar.time
         val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
-        toolbar.header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
     }
 
     private fun setHeaderNextDay(nextDateReturnDate: Date) {
@@ -199,7 +285,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         calendar.time = nextDateReturnDate
         val currentDate: Date = calendar.time
         val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
-        toolbar.header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
     }
 
     override fun onBackPressed() {
@@ -301,23 +388,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addDrawerListener() {
+        //TODO: FIX, wenn man zu schnell öffnet und schließt
         drawer_layout.addDrawerListener(
                 object : DrawerLayout.DrawerListener {
-                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-
-                    }
-
-                    override fun onDrawerOpened(drawerView: View) {
-
-                    }
-
-                    override fun onDrawerClosed(drawerView: View) {
-
-                    }
-
-                    override fun onDrawerStateChanged(newState: Int) {
-
-                    }
+                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+                    override fun onDrawerOpened(drawerView: View) {}
+                    override fun onDrawerClosed(drawerView: View) {}
+                    override fun onDrawerStateChanged(newState: Int) {}
                 }
         )
     }
@@ -346,6 +423,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 VertretungsOption.TODAY -> setCompleteDataToday()
                 VertretungsOption.NEXT_DAY -> setCompleteDataNextDay()
             }
+        }
+    }
+
+    private fun addOnNoInternetIconClickListener() {
+        no_internet_icon.setOnClickListener {
+            val s = Snackbar.make(drawer_layout,
+                    getString(R.string.old_data),
+                    Snackbar.LENGTH_INDEFINITE)
+            val textView = s.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
+            textView.maxLines = 5
+            s.setAction("OK", { s.dismiss() })
+            s.show()
         }
     }
     /*
