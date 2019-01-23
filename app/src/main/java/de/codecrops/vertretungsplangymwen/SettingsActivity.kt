@@ -50,7 +50,6 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
         */
 
 
-
         return true
     }
 }
