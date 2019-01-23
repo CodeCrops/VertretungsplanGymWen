@@ -3,25 +3,25 @@ package de.codecrops.vertretungsplangymwen.settings
 import android.content.Context
 import java.util.regex.Pattern
 
-const val SHARED_PREFERENCES_SETTINGS_PATH = "de.codecrops.vertretungsplangymwen.SettingsPREF"
-
-//Classes and Courses of the User (used in FAB..)
-const val SHARED_PREFERENCES_SETTINGS_KLASSEN = "AttendedClasses"
-
-//Background-Refresh-Settings
-const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_MASTER = "BackgroundRefreshMaster"
-const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_SMART = "BackgroundRefreshSmart"
-const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO = "BackgroundRefreshAuto"
-const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_INTERVAL = "BackgroundRefreshAutoInterval"
-const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK = "BackgroundRefreshAutoClock"
-
-//Notification-Settings
-const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_MASTER = "NotificationMaster"
-const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_VIBRATION = "NotificationVibration"
-const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_SOUND = "NotificationSound"
 
 class SettingsManager {
     companion object {
+        const val SHARED_PREFERENCES_SETTINGS_PATH = "de.codecrops.vertretungsplangymwen.SettingsPREF"
+
+        //Classes and Courses of the User (used in FAB..)
+        const val SHARED_PREFERENCES_SETTINGS_KLASSEN = "AttendedClasses"
+
+        //Background-Refresh-Settings
+        const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_MASTER = "BackgroundRefreshMaster"
+        const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_SMART = "BackgroundRefreshSmart"
+        const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO = "BackgroundRefreshAuto"
+        const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_INTERVAL = "BackgroundRefreshAutoInterval"
+        const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK = "BackgroundRefreshAutoClock"
+
+        //Notification-Settings
+        const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_MASTER = "NotificationMaster"
+        const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_VIBRATION = "NotificationVibration"
+        const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_SOUND = "NotificationSound"
 
         // >>>>>>>>>>> static Methods <<<<<<<<<<<
         /**

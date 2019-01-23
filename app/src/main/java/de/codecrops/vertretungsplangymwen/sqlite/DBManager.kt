@@ -275,5 +275,53 @@ class DBManager {
 
             context.contentResolver.delete(DBContracts.PlanContract.CONTENT_URI, selection, null)
         }
+
+        /**
+         * @context Context of App
+         * @courseName Name des Kurses, welcher hinzugefügt werden soll (zB. 6b oder 1m2)
+         * @type Typ des Kurses (zB PREFERENCETYPE.REGULÄR = normale stunde)
+         */
+        fun addPreference(context: Context, courseName: String, type: PREFERENCETYPE) {
+            val values = ContentValues().apply {
+                put(DBContracts.PreferencesContract.COLUMN_KURS, courseName)
+                put(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS, type.id)
+            }
+            context.contentResolver.insert(DBContracts.PreferencesContract.CONTENT_URI, values)
+        }
+
+        /**
+         * @context Context of App
+         * @courseName Name des Kurses, welcher gelöscht werden soll (zB. 6b oder 1m2)
+         */
+        fun deletePreference(context: Context, courseName: String) {
+            //Selektion
+            val selection = "${DBContracts.PreferencesContract.COLUMN_KURS} = '$courseName'"
+
+            context.contentResolver.delete(DBContracts.PreferencesContract.CONTENT_URI, selection, null)
+        }
+
+        /**
+         * @param context Context of App
+         * @return ArrayList<PreferenceData> mit allen Kursen/Klassen, welche der Nutzer eingetragen hat
+         */
+        fun getAllPreferences(context: Context) : ArrayList<PreferencesData> {
+            //result wird vorbereitet
+            val result = ArrayList<PreferencesData>()
+
+            //Cursor mit Daten aus DB
+            val cursor = context.contentResolver.query(DBContracts.PreferencesContract.CONTENT_URI, arrayOf("*"), null, null, null)
+
+            //Umwandeln in PreferenceData und einfügen in result
+            while(cursor.moveToNext()) {
+                result.add(
+                        PreferencesData(
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PreferencesContract.COLUMN_KURS)),
+                                PREFERENCETYPE.byID(cursor.getInt(cursor.getColumnIndex(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS)))
+                        )
+                )
+            }
+            cursor.close()
+            return result
+        }
     }
 }
