@@ -5,7 +5,7 @@ import android.support.v7.preference.PreferenceDataStore
 import android.util.Log
 
 /*
-Klasse, welche im PreferenceManager als CustomDataStore
+Klasse, welche im PreferenceManager als CustomDataStore benutzt wird
  */
 
 class SettingsSPAdapter(context: Context) : PreferenceDataStore() {
