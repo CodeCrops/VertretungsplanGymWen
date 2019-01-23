@@ -78,9 +78,11 @@ object Utils {
     }
 
     fun fillDatabase(context: Context) {
-        DBManager.clearVertretungsDB(context)
         //Heute
         val extractToday = HttpGetRequest.extractToday(context)
+        if(!(extractToday.unauthorized || extractToday.networkError)) {
+            DBManager.clearVertretungsDB(context)
+        }
         if(!(extractToday.unauthorized || extractToday.networkError)) {
             if(Utils.dateEqualsToday(extractToday.date)) {
                 for(v: VertretungData in extractToday.table) {
