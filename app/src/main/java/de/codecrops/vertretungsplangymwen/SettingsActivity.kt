@@ -13,11 +13,6 @@ class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //Setting SP-Adapter as StandardValues for PreferenceManager
-        SettingsManager.setNotificationMaster(applicationContext, false)
-        PreferenceManager.setDefaultValues(applicationContext, SettingsManager.SHARED_PREFERENCES_SETTINGS_PATH, Context.MODE_PRIVATE, R.xml.settings_notifications, false)
-
-
         setContentView(R.layout.activity_settings)
 
         setSupportActionBar(toolbar)
