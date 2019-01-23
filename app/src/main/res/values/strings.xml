@@ -50,4 +50,14 @@
     <string name="course">Kursname</string>
     <string name="no_vertretung">Leider gibt es heute keine Vertretungen für deine eingetragenen Kurse.</string>
     <string name="old_data">Der Dienst ist zurzeit nicht erreichbar! Die Daten sind möglicherweise veraltet.</string>
+    <string name="shared_preferences_settings_path">de.codecrops.vertretungsplangymwen.SettingsPREF</string>
+    <string name="shared_preferences_settings_klassen">AttendedClasses</string>
+    <string name="shared_preferences_settings_background_refresh_master">BackgroundRefreshMaster</string>
+    <string name="shared_preferences_settings_background_refresh_smart">BackgroundRefreshSmart</string>
+    <string name="shared_preferences_settings_background_refresh_auto">BackgroundRefreshAuto</string>
+    <string name="shared_preferences_settings_background_refresh_auto_interval">BackgroundRefreshAutoInterval</string>
+    <string name="shared_preferences_settings_background_refresh_auto_clock">BackgroundRefreshAutoClock</string>
+    <string name="shared_preferences_settings_notifications_master">NotificationMaster</string>
+    <string name="shared_preferences_settings_notifications_vibration">NotificationVibration</string>
+    <string name="shared_preferences_settings_notification_sound">NotificationSound</string>
 </resources>
