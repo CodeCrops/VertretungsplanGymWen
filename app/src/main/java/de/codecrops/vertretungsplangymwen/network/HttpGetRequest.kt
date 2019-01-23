@@ -60,6 +60,13 @@ class HttpGetRequest : AsyncTask<String, Void, HttpReturnData>() {
             getRequest.autKey = Base64.encodeToString(usernamePassword.toByteArray(), 0).replace("\n", "")
             return getRequest.execute("http://gym-wen.de/vp/heute.htm").get().responseCode
         }
+
+        fun getResponseCodeForPasswordCheck(context: Context) : Int {
+            val getRequest = HttpGetRequest()
+            getRequest.passwordCheck = true
+            getRequest.autKey = CredentialsManager.convertToBase64(context)
+            return getRequest.execute("http://gym-wen.de/vp/heute.htm").get().responseCode
+        }
     }
 
     /**

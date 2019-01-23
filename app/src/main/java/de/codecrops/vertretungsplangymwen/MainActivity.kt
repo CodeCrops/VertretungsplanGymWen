@@ -28,7 +28,9 @@ import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlinx.android.synthetic.main.header_layout.*
+import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
+import kotlin.collections.ArrayList
 
 /**
  * @author K1TR1K
@@ -37,7 +39,7 @@ import java.text.SimpleDateFormat
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private enum class VertretungsOption {
-        TODAY, TODAY_FILTERED, NEXT_DAY, NEXT_DAY_FILTERED
+        TODAY_COMPLETE, TODAY_FILTERED, NEXT_DAY_COMPLETE, NEXT_DAY_FILTERED
     }
 
     private lateinit var vertretungsOption: VertretungsOption
@@ -49,10 +51,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(activity_main)
         createNotificationChannel()
-        setNavigationViewListener()
-        addDrawerListener()
-
-        nav_view.setNavigationItemSelectedListener(this)
 
         setSupportActionBar(toolbar)
 
@@ -66,16 +64,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
 
-        setCompleteDataToday()
-
-        addOnItemClickListener()
-        addOnFabClickListener()
-        addOnNoInternetIconClickListener()
+        vertretungsOption = VertretungsOption.TODAY_COMPLETE
 
         val currentCalendar = Calendar.getInstance()
         val currentDate: Date = currentCalendar.time
         val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
-
         val menu = nav_view.menu
         if(day == "Sa." || day == "So.") {
             menu.findItem(R.id.today).isVisible = false
@@ -84,191 +77,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             menu.findItem(R.id.today).isVisible = true
             menu.findItem(R.id.today_complete).isVisible = true
         }
+        addListeners()
+
+        Utils.fillDatabase(this)
+        update()
     }
 
-    private fun setDataToday() {
-        addTodayToDatabase(true)
-        addNextDayToDatabase(false)
-        setFilteredData(Calendar.getInstance().time)
-        setHeaderToday()
-        vertretungsOption = VertretungsOption.TODAY_FILTERED
-    }
-
-    private fun setDataNextDay() {
-        val date = addNextDayToDatabase(true)
-        addTodayToDatabase(false)
-        if(date!=null) {
-            setFilteredData(date)
-            setHeaderNextDay(date)
-            no_data.visibility = View.INVISIBLE
+    private fun update() {
+        if(HttpGetRequest.getResponseCodeForPasswordCheck(this) == HttpURLConnection.HTTP_OK) {
             no_internet_icon.visibility = View.INVISIBLE
         } else {
-            val currentCalendar = Calendar.getInstance()
-            val currentDate: Date = currentCalendar.time
-            val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
-            when(day) {
-                "Fr." -> {
-                    checkDatabaseForEntriesFiltered(3)
-                }
-                "Sa." -> {
-                    checkDatabaseForEntriesFiltered(2)
-                }
-                "So." -> {
-                    checkDatabaseForEntriesFiltered(1)
-                }
-                else -> {
-                    checkDatabaseForEntriesFiltered(1)
-                }
-            }
-        }
-        vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
-    }
-
-    private fun setCompleteDataToday() {
-        addTodayToDatabase(true)
-        addNextDayToDatabase(false)
-        setCompleteData(Calendar.getInstance().time)
-        setHeaderToday()
-        vertretungsOption = VertretungsOption.TODAY
-    }
-
-    private fun setCompleteDataNextDay() {
-        val date = addNextDayToDatabase(true)
-        addTodayToDatabase(false)
-        if(date!=null) {
-            setCompleteData(date)
-            setHeaderNextDay(date)
-            no_data.visibility = View.INVISIBLE
-            no_internet_icon.visibility = View.INVISIBLE
-        } else {
-            val currentCalendar = Calendar.getInstance()
-            val currentDate: Date = currentCalendar.time
-            val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
-            when(day) {
-                "Fr." -> {
-                    checkDatabaseForEntries(3)
-                }
-                "Sa." -> {
-                    checkDatabaseForEntries(2)
-                }
-                "So." -> {
-                    checkDatabaseForEntries(1)
-                }
-                else -> {
-                    checkDatabaseForEntries(1)
-                }
-            }
-        }
-        vertretungsOption = VertretungsOption.NEXT_DAY
-    }
-
-    private fun checkDatabaseForEntriesFiltered(daysToSkip: Int) {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DATE, daysToSkip)
-        //TODO: nach klasse filtern mit dp
-        if(!DBManager.getVertretungenByKlasse(this, "1m21", c.time).isEmpty()) {
-            setFilteredData(c.time)
-            setHeaderNextDay(c.time)
             no_internet_icon.visibility = View.VISIBLE
-            vertretungs_list.visibility = View.VISIBLE
-            no_data.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.INVISIBLE
-        } else {
-            vertretungs_list.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.VISIBLE
-            header.text = getString(R.string.no_data)
-            header_icon.setImageResource(R.drawable.ic_error_black)
         }
-    }
-
-    private fun checkDatabaseForEntries(daysToSkip: Int) {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DATE, daysToSkip)
-        if(!DBManager.getAllVertretungen(this, c.time).isEmpty()) {
-            setCompleteData(c.time)
-            setHeaderNextDay(c.time)
-            no_internet_icon.visibility = View.VISIBLE
-            vertretungs_list.visibility = View.VISIBLE
-            no_data.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.INVISIBLE
-        } else {
-            vertretungs_list.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.VISIBLE
-            header.text = getString(R.string.no_data)
-            header_icon.setImageResource(R.drawable.ic_error_black)
-        }
-    }
-
-    private fun addTodayToDatabase(clear: Boolean) {
-        val extract = HttpGetRequest.extractToday(this)
-        if(!(extract.unauthorized || extract.networkError)) {
-            if(Utils.dateEqualsToday(extract.date)) {
-                if(clear)   DBManager.clearVertretungsDB(this)
-                for(v: VertretungData in extract.table) {
-                    DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extract.date)
-                }
-                no_internet_icon.visibility = View.INVISIBLE
-            } else {
-                setDataNextDay()
+        when(vertretungsOption) {
+            VertretungsOption.TODAY_FILTERED -> {
+                setListData(Calendar.getInstance().time, true)
+                setHeaderToday()
             }
-        }
-        no_internet_icon.visibility = View.VISIBLE
-    }
-
-    private fun addNextDayToDatabase(clear: Boolean) : Date? {
-        val extract = HttpGetRequest.extractTomorrow(this)
-        if(!(extract.unauthorized || extract.networkError)) {
-            val nextDateReturn = Utils.dateEqualsNextDay(extract.date)
-            if (nextDateReturn.isNextDay) {
-                if(clear)   DBManager.clearVertretungsDB(this)
-                for (v: VertretungData in extract.table) {
-                    DBManager.addVertretungsstunde(this, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
-                }
-                no_internet_icon.visibility = View.INVISIBLE
-            } else {
-                setNoData()
+            VertretungsOption.TODAY_COMPLETE -> {
+                setListData(Calendar.getInstance().time, false)
+                setHeaderToday()
             }
-            return nextDateReturn.date
-        }
-        no_internet_icon.visibility = View.VISIBLE
-        return null
-    }
-
-
-    private fun setNoData() {
-        //Keine Daten vorhanden
-        header.text = getString(R.string.no_data)
-        header_icon.setImageResource(R.drawable.ic_error_black)
-        vertretungs_list.visibility = View.INVISIBLE
-        no_data.visibility = View.VISIBLE
-    }
-
-    private fun setFilteredData(date: Date) {
-        //TODO: Klassen aus DB bekommen
-        val list = DBManager.getVertretungenByKlasse(this, "1m21", date)
-        val adapter = VertretungsAdapter(list, this)
-        vertretungs_list.adapter = adapter
-
-        if(list.isEmpty()) {
-            vertretungs_list.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.VISIBLE
-        } else {
-            vertretungs_list.visibility = View.VISIBLE
-            no_vertretung.visibility = View.INVISIBLE
-        }
-    }
-
-    private fun setCompleteData(date: Date) {
-        val list = DBManager.getAllVertretungen(this, date)
-        val adapter = VertretungsAdapter(list, this)
-        vertretungs_list.adapter = adapter
-
-        if(list.isEmpty()) {
-            vertretungs_list.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.VISIBLE
-        } else {
-            vertretungs_list.visibility = View.VISIBLE
-            no_vertretung.visibility = View.INVISIBLE
+            VertretungsOption.NEXT_DAY_FILTERED -> {
+                val date = loadNextDayFromDatabase(true)
+                setHeaderNextDay(date)
+            }
+            VertretungsOption.NEXT_DAY_COMPLETE -> {
+                val date = loadNextDayFromDatabase(false)
+                setHeaderNextDay(date)
+            }
         }
     }
 
@@ -280,13 +117,66 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         header_icon.setImageResource(R.drawable.ic_date_black)
     }
 
-    private fun setHeaderNextDay(nextDateReturnDate: Date) {
+    private fun setHeaderNextDay(date: Date) {
         val calendar = Calendar.getInstance()
-        calendar.time = nextDateReturnDate
-        val currentDate: Date = calendar.time
-        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
+        calendar.time = date
+        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(date.time)
         header.text = "$day der ${Utils.formGermanDate(calendar)}"
         header_icon.setImageResource(R.drawable.ic_date_black)
+    }
+
+    private fun addListeners() {
+        setNavigationViewListener()
+        addDrawerListener()
+        nav_view.setNavigationItemSelectedListener(this)
+        addOnItemClickListener()
+        addOnFabClickListener()
+        addOnNoInternetIconClickListener()
+    }
+
+    //WICHTIG
+    private fun loadNextDayFromDatabase(filtered: Boolean) : Date {
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+        when(day) {
+            Utils.DAY_FRIDAY -> {
+                currentCalendar.add(Calendar.DATE, 3)
+            }
+            Utils.DAY_SATURDAY -> {
+                currentCalendar.add(Calendar.DATE, 2)
+            }
+            Utils.DAY_SUNDAY -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+            else -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+        }
+        setListData(currentCalendar.time, filtered)
+        return currentCalendar.time
+    }
+
+    //WICHTIG
+    private fun setListData(date: Date, filtered: Boolean) {
+        //TODO: Klassen aus DB bekommen
+        var list: ArrayList<VertretungData>
+        if(filtered) {
+            list = DBManager.getVertretungenByKlasse(this, "1m21", date)
+        } else {
+            list = DBManager.getAllVertretungen(this, date)
+        }
+        val adapter = VertretungsAdapter(list, this)
+        vertretungs_list.adapter = adapter
+
+        if(list.isEmpty()) {
+            vertretungs_list.visibility = View.INVISIBLE
+            no_vertretung.visibility = View.VISIBLE
+        } else {
+            vertretungs_list.visibility = View.VISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+            no_data.visibility = View.INVISIBLE
+        }
     }
 
     override fun onBackPressed() {
@@ -344,19 +234,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(i)
             }
             R.id.today -> {
-                setDataToday()
+                vertretungsOption = VertretungsOption.TODAY_FILTERED
+                update()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.next_day -> {
-                setDataNextDay()
+                vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
+                update()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.next_day_complete -> {
-                setCompleteDataNextDay()
+                vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
+                update()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.today_complete -> {
-                setCompleteDataToday()
+                vertretungsOption = VertretungsOption.TODAY_COMPLETE
+                update()
                 drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.info_activity -> {
@@ -417,12 +311,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun addOnFabClickListener() {
         fab.setOnClickListener {
-            when(vertretungsOption) {
-                VertretungsOption.TODAY_FILTERED -> setDataToday()
-                VertretungsOption.NEXT_DAY_FILTERED -> setDataNextDay()
-                VertretungsOption.TODAY -> setCompleteDataToday()
-                VertretungsOption.NEXT_DAY -> setCompleteDataNextDay()
-            }
+            Utils.fillDatabase(this)
+            update()
         }
     }
 

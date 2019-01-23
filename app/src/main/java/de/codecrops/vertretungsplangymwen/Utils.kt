@@ -1,19 +1,25 @@
 package de.codecrops.vertretungsplangymwen
 
+import android.content.Context
 import android.text.Html
 import android.os.Build
 import android.text.Spanned
-import android.util.Log
+import android.view.View
 import de.codecrops.vertretungsplangymwen.data.NextDateReturn
-import java.lang.StringBuilder
+import de.codecrops.vertretungsplangymwen.data.VertretungData
+import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * @author K1TR1K
  */
-
 object Utils {
+    const val DAY_SUNDAY = "So."
+    const val DAY_SATURDAY = "Sa."
+    const val DAY_FRIDAY = "Fr."
+
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): Spanned {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -43,17 +49,17 @@ object Utils {
         val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
 
         when(day) {
-            "Fr." -> {
+            DAY_FRIDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -3)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
             }
-            "Sa." -> {
+            DAY_SATURDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -2)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
             }
-            "So." -> {
+            DAY_SUNDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -1)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
@@ -69,5 +75,30 @@ object Utils {
 
     fun formGermanDate(c: Calendar) : String {
         return "${c.get(Calendar.DAY_OF_MONTH)}.${c.get(Calendar.MONTH)+1}.${c.get(Calendar.YEAR)}"
+    }
+
+    fun fillDatabase(context: Context) {
+        DBManager.clearVertretungsDB(context)
+        //Heute
+        val extractToday = HttpGetRequest.extractToday(context)
+        if(!(extractToday.unauthorized || extractToday.networkError)) {
+            if(Utils.dateEqualsToday(extractToday.date)) {
+                for(v: VertretungData in extractToday.table) {
+                    DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extractToday.date)
+                }
+            }
+        }
+
+        //Nächster Tag
+        val extractNextDay = HttpGetRequest.extractTomorrow(context)
+        if(!(extractNextDay.unauthorized || extractNextDay.networkError)) {
+            val nextDateReturn = Utils.dateEqualsNextDay(extractNextDay.date)
+            if (nextDateReturn.isNextDay) {
+                for (v: VertretungData in extractNextDay.table) {
+                    DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
+                }
+            }
+        }
+
     }
 }
