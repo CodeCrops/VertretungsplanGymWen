@@ -43,7 +43,7 @@
     <string name="info_text">Diese App wurde durch CodeCrops von Luca Preibsch und Yannik Schmidt entwickelt. ... !</string>
     <string name="settings">Einstellungen</string>
     <string name="twitter_text">Besuche uns auf Twitter!</string>
-    <string name="klasse">Klasse</string>
+    <string name="klasse">Klassenfilter</string>
     <string name="choose_grade">Wähle deine Stufe</string>
     <string name="choose_course">Wähle deine Kurse</string>
     <string name="choose_klasse">Wähle deine Klasse</string>

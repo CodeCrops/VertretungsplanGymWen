@@ -264,10 +264,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(intent)
             }
-            R.id.klassenview -> {
-                val intent = Intent(this, KlasseActivity::class.java)
-                startActivity(intent)
-            }
         }
         drawer_layout.closeDrawer(GravityCompat.START)
         return true

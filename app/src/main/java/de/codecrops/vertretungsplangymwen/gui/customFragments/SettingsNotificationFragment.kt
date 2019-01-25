@@ -3,14 +3,20 @@ package de.codecrops.vertretungsplangymwen.gui.customFragments
 
 import android.os.Bundle
 import android.support.v14.preference.SwitchPreference
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.util.Log
 import de.codecrops.vertretungsplangymwen.R
 import de.codecrops.vertretungsplangymwen.settings.SettingsSPAdapter
+import java.lang.Exception
 
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
+
+private lateinit var lastActionBarTitle: String
+private val LOG_TAG = "SettingsNotFr"
 
 class SettingsNotificationFragment : PreferenceFragmentCompat() {
 
@@ -32,6 +38,36 @@ class SettingsNotificationFragment : PreferenceFragmentCompat() {
 
             true
         }*/
+    }
+
+    override fun onStart() {
+        //Speichert den Titel der Actionbar ab, bevor dieser geändert wird
+        try {
+            val act : AppCompatActivity = activity as AppCompatActivity
+            lastActionBarTitle = act.supportActionBar!!.title.toString()
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Speichern des Titels der letzten Actionbar fehlgeschlagen!")
+        }
+
+        //Setzt den Titel der Actionbar, um auf das Fragment zu passen
+        try {
+            val act : AppCompatActivity = activity as AppCompatActivity
+            //act.supportActionBar!!.setIcon(R.drawable.ic_baseline_notifications_24px)
+            act.supportActionBar!!.title = "Benachrichtigungen"
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Setzen des Titels der  Actionbar fehlgeschlagen!")
+        }
+        super.onStart()
+    }
+
+    override fun onPause() {
+        try {
+            val act : AppCompatActivity = activity as AppCompatActivity
+            act.supportActionBar!!.title = lastActionBarTitle
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Zurücksetzen des Titels der letzten Actionbar fehlgeschlagen!")
+        }
+        super.onPause()
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {

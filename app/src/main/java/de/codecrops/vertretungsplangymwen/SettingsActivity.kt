@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.ActionBar
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsHeadersFragment
@@ -29,12 +31,6 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
             setTitle("Einstellungen")
-            //Sollte dafür sorgen, dass der ZurückButton in der Actionbar auch die onBackPressed() triggert... geht aber irgendwie nicht :(
-            //TODO: Fix
-            fun onSupportNavigateUp() : Boolean {
-                onBackPressed()
-                return true
-            }
         }
 
         toolbar.setNavigationOnClickListener { super.onBackPressed() }
@@ -48,12 +44,20 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
                 .addToBackStack(null)
                 .commit()
 
+        /* Ausgelagert in Fragments onStart() und onPause()
         when(pref.fragment) {
             "de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsRefreshFragment" -> supportActionBar!!.title = "Hintergrundaktualisierung"
             "de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsNotificationFragment" -> supportActionBar!!.title = "Benachrichtigungen"
+            "de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsHeadersFragment" -> supportActionBar!!.title = "Einstellungen"
         }
+        */
 
 
+        return true
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
         return true
     }
 

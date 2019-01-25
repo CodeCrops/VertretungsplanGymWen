@@ -42,8 +42,5 @@
         <item
             android:id="@+id/info_activity"
             android:title="@string/info" />
-        <item
-            android:id="@+id/klassenview"
-            android:title="Klassen Einstellung" />
     </group>
 </menu>
