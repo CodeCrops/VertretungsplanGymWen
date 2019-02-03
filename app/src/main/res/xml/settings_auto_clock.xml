@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:defaultValue="13:00"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Time Preference 1"
+        android:key="edit_text_preference_1"
+        android:inputType="time"
+        android:summary="Setting a time preference using a EditTextPreference"
+        android:dialogMessage="Set a time!"/>
+    <de.codecrops.vertretungsplangymwen.settings.customPreferences.TimePickerPreference
+        android:defaultValue="13"
+        android:title="Time Preference 2"
+        android:key="custom_preference"
+        android:summary="Setting a time preference using a TimePicker view"
+        android:dialogMessage="Set a Time!"/>
+</PreferenceScreen>
