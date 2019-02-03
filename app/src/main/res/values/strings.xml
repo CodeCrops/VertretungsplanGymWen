@@ -67,4 +67,5 @@
     <string name="settings_refresh_smartmode_title">SmartModus</string>
     <string name="settings_refresh_automode_title">AutomatikModus</string>
     <string name="settings_refresh_auto_interval_title">Pause zwischen Aktualisierungen:</string>
+    <string name="course_already_in_database">Dieser Kurs befindet sich bereits in der Datenbank!</string>
 </resources>

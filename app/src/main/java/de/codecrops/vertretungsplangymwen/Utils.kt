@@ -4,8 +4,6 @@ import android.content.Context
 import android.text.Html
 import android.os.Build
 import android.text.Spanned
-import android.util.Log
-import android.view.View
 import de.codecrops.vertretungsplangymwen.data.NextDateReturn
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
@@ -17,9 +15,11 @@ import java.util.*
  * @author K1TR1K
  */
 object Utils {
-    const val DAY_SUNDAY = "So."
-    const val DAY_SATURDAY = "Sa."
-    const val DAY_FRIDAY = "Fr."
+    object DAY {
+        const val SUNDAY = "So."
+        const val SATURDAY = "Sa."
+        const val FRIDAY = "Fr."
+    }
 
     @Suppress("DEPRECATION")
     fun fromHtml(html: String): Spanned {
@@ -50,17 +50,17 @@ object Utils {
         val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
 
         when(day) {
-            DAY_FRIDAY -> {
+            DAY.FRIDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -3)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
             }
-            DAY_SATURDAY -> {
+            DAY.SATURDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -2)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)
             }
-            DAY_SUNDAY -> {
+            DAY.SUNDAY -> {
                 val dt = date
                 dt.add(Calendar.DATE, -1)
                 if(dateEqualsToday(dt.time)) return NextDateReturn(d, true)

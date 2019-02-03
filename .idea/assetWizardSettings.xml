@@ -139,7 +139,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/device/ic_signal_cellular_connected_no_internet_0_bar_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_delete_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -149,9 +149,7 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
-                            <entry key="color" value="ff0000" />
-                            <entry key="outputName" value="ic_baseline_settings_20px" />
+                            <entry key="outputName" value="ic_delete_black" />
                             <entry key="sourceFile" value="C:\Users\Yannik\Downloads\baseline-settings-20px.svg" />
                           </map>
                         </option>

@@ -300,6 +300,11 @@ class DBManager {
             context.contentResolver.delete(DBContracts.PreferencesContract.CONTENT_URI, selection, null)
         }
 
+        //TODO: Kommentieren
+        fun clearPreference(context: Context) {
+            context.contentResolver.delete(DBContracts.PreferencesContract.CONTENT_URI, null, null)
+        }
+
         /**
          * @param context Context of App
          * @return ArrayList<PreferenceData> mit allen Kursen/Klassen, welche der Nutzer eingetragen hat

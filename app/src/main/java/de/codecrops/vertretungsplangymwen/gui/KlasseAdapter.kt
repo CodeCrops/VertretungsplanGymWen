@@ -1,7 +1,6 @@
 package de.codecrops.vertretungsplangymwen.gui
 
 import android.content.Context
-import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
@@ -9,18 +8,24 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import de.codecrops.vertretungsplangymwen.KlasseActivity
+import de.codecrops.vertretungsplangymwen.R
 import de.codecrops.vertretungsplangymwen.R.layout.klasse_list_item
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
+import de.codecrops.vertretungsplangymwen.sqlite.PREFERENCETYPE
 import kotlinx.android.synthetic.main.klasse_list_item.view.*
 
-class KlasseAdapter(private val klasseActivity: KlasseActivity, data: ArrayList<String?>, context: Context) : ArrayAdapter<String?>(context, klasse_list_item, data) {
+class KlasseAdapter(private val klasseActivity: KlasseActivity, data: ArrayList<String>, context: Context) : ArrayAdapter<String>(context, klasse_list_item, data) {
 
     private class ViewHolder {
-        internal var course: EditText? = null
+        internal var course: TextView? = null
     }
 
+    //TODO: ADD BUTTON NUR BEIM LETZTEN ITEM, ITEM WIRD LEER UND NEUES Hinzugefügt wenn add button gedrückt wird
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val data: String? = getItem(position)
+        val data: String = getItem(position)
         lateinit var viewHolder: KlasseAdapter.ViewHolder
         lateinit var view: View
 
@@ -28,7 +33,7 @@ class KlasseAdapter(private val klasseActivity: KlasseActivity, data: ArrayList<
             viewHolder = ViewHolder()
             val inflater = LayoutInflater.from(context)
             view = inflater.inflate(klasse_list_item, parent, false) as View
-            viewHolder.course = view.course_editText
+            viewHolder.course = view.course
             view.tag = viewHolder
         } else {
             viewHolder = convertView.tag as ViewHolder
@@ -37,23 +42,14 @@ class KlasseAdapter(private val klasseActivity: KlasseActivity, data: ArrayList<
 
         addOnClickListeners(view, viewHolder)
 
-        if(data != null) {
-            viewHolder.course!!.text = SpannableStringBuilder(data)
-        }
+        viewHolder.course!!.text = SpannableStringBuilder(data)
+
         return view
     }
 
     private fun addOnClickListeners(view: View?, viewHolder: ViewHolder) {
-        view!!.checkButton.setOnClickListener {
-            //TODO: In Datenbank schreiben
-        }
-        view!!.addButton.setOnClickListener {
-            if(viewHolder.course!!.text != null) {
-                if(!viewHolder.course!!.text.isEmpty()) {
-                    klasseActivity.addItem()
-                    view!!.addButton.visibility = View.INVISIBLE
-                }
-            }
+        view!!.checkOrDeleteButton.setOnClickListener {
+            klasseActivity.removeItem(view.course.text.toString())
         }
     }
 }

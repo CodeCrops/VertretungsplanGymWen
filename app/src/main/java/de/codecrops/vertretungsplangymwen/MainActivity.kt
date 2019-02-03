@@ -17,7 +17,6 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -69,24 +68,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawer_layout.addDrawerListener(aToggle)
         aToggle.syncState()
 
-        vertretungsOption = VertretungsOption.TODAY_COMPLETE
-
         val currentCalendar = Calendar.getInstance()
         val currentDate: Date = currentCalendar.time
         val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
         val menu = nav_view.menu
-        if(day == "Sa." || day == "So.") {
+        if(day == Utils.DAY.SATURDAY || day == Utils.DAY.SUNDAY) {
             menu.findItem(R.id.today).isVisible = false
             menu.findItem(R.id.today_complete).isVisible = false
+            vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
         } else {
             menu.findItem(R.id.today).isVisible = true
             menu.findItem(R.id.today_complete).isVisible = true
+            vertretungsOption = VertretungsOption.TODAY_COMPLETE
         }
         addListeners()
 
         Utils.fillDatabase(this)
         update()
-        scheduleJob()
+        //scheduleJob()
     }
 
     private fun update() {
@@ -146,13 +145,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val currentDate: Date = currentCalendar.time
         val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
         when(day) {
-            Utils.DAY_FRIDAY -> {
+            Utils.DAY.FRIDAY -> {
                 currentCalendar.add(Calendar.DATE, 3)
             }
-            Utils.DAY_SATURDAY -> {
+            Utils.DAY.SATURDAY -> {
                 currentCalendar.add(Calendar.DATE, 2)
             }
-            Utils.DAY_SUNDAY -> {
+            Utils.DAY.SUNDAY -> {
                 currentCalendar.add(Calendar.DATE, 1)
             }
             else -> {
@@ -165,10 +164,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     //WICHTIG
     private fun setListData(date: Date, filtered: Boolean) {
-        //TODO: Klassen aus DB bekommen
-        var list: ArrayList<VertretungData>
+        var list: ArrayList<VertretungData> = arrayListOf()
         if(filtered) {
-            list = DBManager.getVertretungenByKlasse(this, "1m21", date)
+            for(p in DBManager.getAllPreferences(this)) {
+                for(vertretungData in DBManager.getVertretungenByKlasse(this, p.course, date)) {
+                    list.add(vertretungData)
+                }
+            }
         } else {
             list = DBManager.getAllVertretungen(this, date)
         }
@@ -330,7 +332,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    fun scheduleJob() {
+    private fun scheduleJob() {
         val componentName = ComponentName(this, BackgroundJob::class.java)
         val jobInfo = JobInfo.Builder(BackgroundJob.JOB_ID, componentName)
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)

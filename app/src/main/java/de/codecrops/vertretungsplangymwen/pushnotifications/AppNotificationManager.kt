@@ -28,12 +28,11 @@ class AppNotificationManager(val context: Context) {
     }
 
     //Baut aus einem Vertretungsobjekt eine passende Benachrichtigung
-    fun build() {
+    private fun build() {
         for (v in list) {
             notifyList.add(NotificationCompat.Builder(context, DEFAULT_CHANNEL_ID)
-                    //TODO: Icon ersetzen
-                    .setSmallIcon(R.drawable.notification_template_icon_bg)
-                    .setContentTitle("${v.stunde} ${v.vertretung}")
+                    .setSmallIcon(de.codecrops.vertretungsplangymwen.R.mipmap.ic_launcher_round)
+                    .setContentTitle("${v.stunde}. Stunde ${v.vertretung}")
                     .setContentText(v.toString())
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setGroup(DEFAULT_GROUP_ID)
@@ -47,10 +46,10 @@ class AppNotificationManager(val context: Context) {
                 .setSmallIcon(R.drawable.notification_template_icon_bg)
                 //build summary info into InboxStyle template
                 .setStyle(NotificationCompat.InboxStyle()
-                        .addLine("Alex Faarborg Check this out")
-                        .addLine("Jeff Chang Launch Party")
-                        .setBigContentTitle("2 new messages")
-                        .setSummaryText("janedoe@example.com"))
+                        .addLine(list[0].toString())
+                        .addLine(list[1].toString())
+                        .setBigContentTitle("${notifyList.size}. Vertretungen")
+                        .setSummaryText("VertretungsplanGymWen"))
                 //specify which group this notification belongs to
                 .setGroup(DEFAULT_GROUP_ID)
                 //set this notification as the summary for the group
@@ -60,14 +59,17 @@ class AppNotificationManager(val context: Context) {
 
     //zeigt die Benachrichtigungen aus "notifyList"
     fun show() {
+        val notificationManagerCompat = NotificationManagerCompat.from(context)
+        notificationManagerCompat.cancelAll()
+        build()
         var count = 1
         for (n in notifyList) {
-            with(NotificationManagerCompat.from(context)) {
+            with(notificationManagerCompat) {
                 notify(count, n.build())
             }
             count++
         }
-        with(NotificationManagerCompat.from(context)) {
+        with(notificationManagerCompat) {
             notify(SUMMARY_ID, summaryNotification)
         }
     }
