@@ -16,7 +16,7 @@
         android:gravity="center"
         android:text="stunde"
         android:textAlignment="center"
-        android:textColor="@color/white"
+        android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,7 +25,7 @@
 
     <TextView
         android:id="@+id/fach"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:text="fach"
@@ -35,7 +35,7 @@
 
     <TextView
         android:id="@+id/vertretung"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="vertretung"
@@ -47,7 +47,7 @@
 
     <TextView
         android:id="@+id/raum"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="raum"
@@ -57,11 +57,13 @@
 
     <TextView
         android:id="@+id/klasse"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:text="klasse"
+        android:ellipsize="end"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@+id/vertretung"
         app:layout_constraintEnd_toStartOf="@+id/fach"
         app:layout_constraintStart_toEndOf="@+id/vertretung"
@@ -69,11 +71,15 @@
 
     <TextView
         android:id="@+id/kommentar"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="kommentar"
         android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/raum"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/klasse"
         app:layout_constraintTop_toTopOf="@+id/raum" />
 

@@ -2,14 +2,11 @@ package de.codecrops.vertretungsplangymwen.service
 
 import android.app.job.JobParameters
 import android.app.job.JobService
-import android.util.Log
 import de.codecrops.vertretungsplangymwen.Utils
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.sqlite.DBManager
-import java.util.*
 
 
-class BackgroundJob : JobService() {
+class NewVertretungService : JobService() {
 
     companion object {
         const val JOB_ID = 0
@@ -30,20 +27,13 @@ class BackgroundJob : JobService() {
     private fun doBackgroundWork(params: JobParameters) {
         Thread {
             if(!jobCancelled) {
-                var empty = true
-                Utils.fillDatabase(this)
-                val notificationManager = AppNotificationManager(this)
-                for(p in DBManager.getAllPreferences(this)) {
-                    val list = DBManager.getVertretungenByKlasse(this, p.course, Calendar.getInstance().time)
-                    if(!list.isEmpty()) {
-                        for(vertretungData in list) {
-                            notificationManager.add(vertretungData)
-                        }
-                        empty = false
-                    }
+                val list = Utils.checkForNewFilteredVertretung(this)
+                val notifyManager = AppNotificationManager(this)
+                notifyManager.isNew = true
+                if(!list.isEmpty()) {
+                    notifyManager.set(list.size)
+                    notifyManager.show()
                 }
-                if(!empty)  notificationManager.show()
-
                 //boolean true für rescedule
                 jobFinished(params, false)
             }

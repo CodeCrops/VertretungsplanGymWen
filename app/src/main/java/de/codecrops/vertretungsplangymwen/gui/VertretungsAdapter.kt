@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.vertretungs_list_item.view.*
  */
 
 class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
-        ArrayAdapter<VertretungData>(context, vertretungs_list_item, data), View.OnClickListener {
+        ArrayAdapter<VertretungData>(context, vertretungs_list_item, data!!), View.OnClickListener {
 
     private class ViewHolder {
         internal var klasse: TextView? = null
@@ -65,9 +65,9 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
             view = convertView
         }
 
-        if(vertretungData.vertretung.contains("entfällt") || vertretungData.vertretung.equals("Entfällt!")) {
+        if(vertretungData.vertretung.contains("entfällt")) {
             //TODO: TEST OB RICHTIG ANGEZEIGT
-            viewHolder.vertretung!!.text = context.resources.getString(R.string.entfällt)
+            viewHolder.vertretung!!.text = Utils.fromHtml(vertretungData.vertretung)
             viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
             viewHolder.raum!!.visibility = View.INVISIBLE
             viewHolder.kommentar!!.visibility = View.INVISIBLE
@@ -88,19 +88,15 @@ class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
 
         if(vertretungData.klasse.isEmpty()) {
             viewHolder.klasse!!.visibility = View.INVISIBLE
-        } else if(vertretungData.klasse.length > 3) {
-            viewHolder.klasse!!.text = Utils.fromHtml(vertretungData.klasse)
-            viewHolder.klasse!!.visibility = View.VISIBLE
         } else {
             viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
             viewHolder.klasse!!.visibility = View.VISIBLE
         }
 
         viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
-        //viewHolder.vertretung!!.text = vertretung
         viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
         viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"
-        viewHolder.kommentar!!.text = Utils.fromHtml(vertretungData.kommentar)
+        viewHolder.kommentar!!.text = "Kommentar: ${Utils.fromHtml(vertretungData.kommentar)}"
 
         return view
     }

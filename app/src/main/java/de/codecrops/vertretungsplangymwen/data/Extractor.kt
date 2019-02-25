@@ -14,8 +14,7 @@ import kotlin.collections.ArrayList
  * @constructor Der Konstruktor wandelt den im Parameter data mitgegebenen String in
  *              eine ArrayList mit Zeilen und Spalten um.
  * @property table Dies ist die Tabelle, die aus dem data String erstellt wurde.
- *           Sie besteht aus einer ArrayList, die als Zeilen der Tabelle anzusehen ist und
- *           einer weiteren ArrayList in jedem ersten Array, das als Spalten anzusehen ist.
+ *           Sie besteht aus einer ArrayList gefüllt mir VertretungData Objekten.
  * @property date Dies ist das Datum, das in der html Datei als aktueller Stand genannt wird.
  */
 
@@ -52,13 +51,6 @@ class Extractor(data: HttpReturnData) {
                 data.indexOf("</Title>")
         ))
 
-        val l = data.substring(
-                data.indexOf("</Title>") - 10,
-                data.indexOf("</Title>")
-        )
-
-        val d = date
-
         //Schneidet die eigentliche Tabelle aus dem html Document String
         val tableString = data.substring(
                 data.indexOf("<table class=\"TabelleVertretungen\" cellpadding=\"2px\">"),
@@ -87,18 +79,16 @@ class Extractor(data: HttpReturnData) {
             val stunde = colonList[1].substring(colonList[1].lastIndexOf(">"))
                     .replace(">", "")
                     .replace(" ", "").toInt()
-            val vertreung = colonList[2].substring(colonList[2].lastIndexOf(">"))
+            val fach = colonList[2].substring(colonList[2].lastIndexOf(">"))
                     .replace(">", "")
                     .replace(" ", "")
-            val fach = colonList[3].substring(colonList[3].lastIndexOf(">"))
+            val vertreung = colonList[3].substring(colonList[3].lastIndexOf(">"))
                     .replace(">", "")
-                    .replace(" ", "")
             val raum = colonList[4].substring(colonList[4].lastIndexOf(">"))
                     .replace(">", "")
                     .replace(" ", "")
             val kommentar = colonList[5].substring(colonList[5].lastIndexOf(">"))
                     .replace(">", "")
-                    .replace(" ", "")
 
             //fügt das VertretungData Objelt der Tabelle hinzu
             table.add(VertretungData(klasse, stunde, vertreung, fach, raum, kommentar))

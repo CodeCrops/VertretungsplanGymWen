@@ -22,9 +22,10 @@ class VertretungsContentActivity : AppCompatActivity() {
         fach.text = b.getString("fach")
         raum.text = b.getString("raum")
 
-        if(b.getString("vertretung").contains("entfällt")) {
+        if(b.getString("vertretung").contains("entfällt") || b.getString("vertretung").contains("Entfällt")) {
             vertretung.text = resources.getString(R.string.entfällt)
-            app_bar.setBackgroundColor(ContextCompat.getColor(this, R.color.entfallRed))
+            app_bar.setBackgroundColor(ContextCompat.getColor(this, R.color.colorRed))
+            Utils.setStatusBarColor(ContextCompat.getColor(this, R.color.colorRedDark), this)
         } else {
             vertretung.text = b.getString("vertretung")
         }

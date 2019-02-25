@@ -10,6 +10,13 @@ import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
+import android.R
+import android.app.Activity
+import android.support.v4.content.ContextCompat
+import android.view.WindowManager
+
+
 
 /**
  * @author K1TR1K
@@ -103,5 +110,61 @@ object Utils {
             }
         }
 
+    }
+
+    fun addToDatabase(context: Context, list: ArrayList<VertretungData>) {
+        for(v: VertretungData in list) {
+            DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, Calendar.getInstance().time)
+        }
+    }
+
+    fun checkForNewFilteredVertretung(context: Context) : ArrayList<VertretungData> {
+        val today = Calendar.getInstance()
+        val localList: ArrayList<VertretungData> = arrayListOf()
+        val preferences = DBManager.getAllPreferences(context)
+        for(p in preferences) {
+            localList.addAll(DBManager.getVertretungenByKlasse(context, p.course, today.time))
+        }
+
+        var extract = HttpGetRequest.extractToday(context)
+        if(!extract.unauthorized && !extract.networkError) {
+            if(extract.date != today.time) {
+                extract = HttpGetRequest.extractTomorrow(context)
+                if(extract.date != today.time) {
+                    return arrayListOf()
+                }
+            }
+        } else {
+            return arrayListOf()
+        }
+
+        val onlineList: ArrayList<VertretungData> = arrayListOf()
+        for(vertretungData in extract.table) {
+            for(p in preferences) {
+                if(vertretungData.klasse.toLowerCase() == p.course.toLowerCase()) {
+                    onlineList.add(vertretungData)
+                    break
+                }
+            }
+        }
+
+        for(vertretungData in localList) {
+            if(onlineList.contains(vertretungData)) {
+                onlineList.remove(vertretungData)
+            }
+        }
+
+        addToDatabase(context, onlineList)
+        return onlineList
+    }
+
+    fun setStatusBarColor(color: Int, activity: Activity) {
+        val window = activity.getWindow()
+
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+        window.statusBarColor = color
     }
 }

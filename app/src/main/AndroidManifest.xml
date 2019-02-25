@@ -33,9 +33,10 @@
             android:authorities="de.codecrops.vertretungsplangymwen"
             android:exported="false" />
         
-        <service android:name=".service.BackgroundJob"
+        <service android:name=".service.NewVertretungService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-        
+        <service android:name=".service.AllVertretungService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

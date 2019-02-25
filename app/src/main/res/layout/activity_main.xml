@@ -17,8 +17,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+            android:elevation="4dp">
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
@@ -99,13 +98,12 @@
                 android:layout_height="144dp"
                 android:layout_gravity="bottom|end"
                 android:layout_margin="@dimen/fab_margin"
+                android:theme="@style/AppFloatingButton"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:srcCompat="@drawable/ic_refresh_white" />
 
         </android.support.constraint.ConstraintLayout>
-
-        <!-- Kontainer für die Inhalte des Drawers -->
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
@@ -113,6 +111,5 @@
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
             app:menu="@menu/drawer_view" />
-
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

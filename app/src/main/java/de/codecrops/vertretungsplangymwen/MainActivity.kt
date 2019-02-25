@@ -27,7 +27,9 @@ import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.service.BackgroundJob
+import de.codecrops.vertretungsplangymwen.service.AllVertretungService
+import de.codecrops.vertretungsplangymwen.service.NewVertretungService
+import de.codecrops.vertretungsplangymwen.service.ScheduleManager
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
@@ -47,9 +49,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private lateinit var vertretungsOption: VertretungsOption
-
-    val vertretungsNotification =
-            de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -85,7 +84,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         Utils.fillDatabase(this)
         update()
-        //scheduleJob()
+
+        ScheduleManager.scheduleAllVertretungJob(this, 15)
     }
 
     private fun update() {
@@ -167,9 +167,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         var list: ArrayList<VertretungData> = arrayListOf()
         if(filtered) {
             for(p in DBManager.getAllPreferences(this)) {
-                for(vertretungData in DBManager.getVertretungenByKlasse(this, p.course, date)) {
-                    list.add(vertretungData)
-                }
+                list.addAll(DBManager.getVertretungenByKlasse(this, p.course, date))
             }
         } else {
             list = DBManager.getAllVertretungen(this, date)
@@ -286,7 +284,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addDrawerListener() {
-        //TODO: FIX, wenn man zu schnell öffnet und schließt
         drawer_layout.addDrawerListener(
                 object : DrawerLayout.DrawerListener {
                     override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
@@ -331,24 +328,4 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             s.show()
         }
     }
-
-    private fun scheduleJob() {
-        val componentName = ComponentName(this, BackgroundJob::class.java)
-        val jobInfo = JobInfo.Builder(BackgroundJob.JOB_ID, componentName)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                .setPersisted(true)
-                .setPeriodic(60 * 60 * 1000)
-                .build()
-
-        val scheduler: JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        val resultCode = scheduler.schedule(jobInfo)
-        if(resultCode == JobScheduler.RESULT_SUCCESS) {
-        }
-    }
-
-    fun chancelJob() {
-        val scheduler: JobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
-        scheduler.cancel(BackgroundJob.JOB_ID)
-    }
-
 }
