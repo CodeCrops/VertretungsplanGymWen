@@ -1,6 +1,7 @@
 package de.codecrops.vertretungsplangymwen.settings
 
 import android.content.Context
+import android.util.Log
 import de.codecrops.vertretungsplangymwen.R
 import java.util.regex.Pattern
 
@@ -20,6 +21,8 @@ const val SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK = R.string.s
 const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_MASTER = R.string.shared_preferences_settings_notifications_master
 const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_VIBRATION = R.string.shared_preferences_settings_notifications_vibration
 const val SHARED_PREFERENCES_SETTINGS_NOTIFICATIONS_SOUND = R.string.shared_preferences_settings_notification_sound
+
+private val LOG_TAG = "SettingsManager"
 
 class SettingsManager() {
     companion object {
@@ -206,7 +209,9 @@ class SettingsManager() {
          * @return String Value indicating the Value of the BR-Auto-Clock in ClockFormat out of TimePicker.toString()
          */
         fun getBackgroundRefreshAutoClock(context: Context) : String {
-            return context.getSharedPreferences(getIDString(context,SHARED_PREFERENCES_SETTINGS_PATH), Context.MODE_PRIVATE).getString(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK), "")
+            val result = context.getSharedPreferences(getIDString(context,SHARED_PREFERENCES_SETTINGS_PATH), Context.MODE_PRIVATE).getString(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK), "")
+            Log.i(LOG_TAG, "Answered request for BackgroundRefreshAutoClock with '$result'")
+            return result
         }
 
         /**
@@ -218,6 +223,7 @@ class SettingsManager() {
                 putString(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK), newValue)
                 apply()
             }
+            Log.i(LOG_TAG, "Updated BackgroundRefreshAutoClock with value '$newValue'")
         }
 
         /**
@@ -227,6 +233,74 @@ class SettingsManager() {
             with(context.getSharedPreferences(getIDString(context,SHARED_PREFERENCES_SETTINGS_PATH), Context.MODE_PRIVATE).edit()) {
                 remove(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_CLOCK))
                 apply()
+            }
+        }
+
+        /**
+         * @param context Context of App
+         * @param hour Hour of Date to be deleted
+         * @param min Minute of Date to be deleted
+         */
+
+        fun removeTimeFromSetting(context: Context, hour: Int, min: Int) : Boolean {
+            val clockstring = SettingsManager.getBackgroundRefreshAutoClock(context)
+            if(clockstring.isNullOrBlank()) {
+                return false
+            }
+            val splittedStrings : List<String> = clockstring.split("//")
+            val correctedStrings = splittedStrings.drop(0)
+            var newStrings : String = ""
+            var found = false
+            //-> search for entry
+            for(item in correctedStrings) {
+                var list = item.split(":")
+                if(list[0].toInt() == hour && list[1].toInt() == min) {
+                    //ist gefunden -> nicht weiter hinzufügen (verfällt einfach)
+                    found = true
+                } else {
+                    if(newStrings.isNullOrBlank()) {
+                        newStrings = item
+                    } else {
+                        newStrings = newStrings +  "//" + item
+                    }
+                }
+            }
+            if(found) {
+                setBackgroundRefreshAutoClock(context, newStrings)
+                return true
+            } else {
+                return false
+            }
+        }
+
+        fun removeTimeFromSettings(context: Context, time: String) : Boolean {
+            val clockstring = SettingsManager.getBackgroundRefreshAutoClock(context)
+            if(clockstring.isNullOrBlank()) {
+                return false
+            }
+            val splittedStrings : List<String> = clockstring.split("//")
+            val correctedStrings = splittedStrings.drop(0)
+            var newStrings : String = ""
+            var found = false
+
+            //-> search for entry
+            for(item in correctedStrings) {
+                if(item == time) {
+                    //gefunden, nicht weiter behandeln
+                    found = true
+                } else {
+                    if(newStrings.isNullOrBlank()) {
+                        newStrings = item
+                    } else {
+                        newStrings = newStrings +  "//" + item
+                    }
+                }
+            }
+            if(found) {
+                setBackgroundRefreshAutoClock(context, newStrings)
+                return true
+            } else {
+                return false
             }
         }
 

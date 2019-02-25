@@ -1,11 +1,14 @@
 package de.codecrops.vertretungsplangymwen.gui.customFragments
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v14.preference.PreferenceFragment
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.util.Log
+import de.codecrops.vertretungsplangymwen.ClockSettingsActivity
 import de.codecrops.vertretungsplangymwen.R
 import de.codecrops.vertretungsplangymwen.settings.SettingsSPAdapter
 import java.lang.Exception
@@ -24,7 +27,16 @@ class SettingsRefreshFragment : PreferenceFragmentCompat() {
         preferenceManager.preferenceDataStore = SettingsSPAdapter(context!!)
         //Setzen des Inhalts
         setPreferencesFromResource(R.xml.settings_refresh, rootKey)
-        //Registrieren des onPreferenceChangeListeners
+
+        //Registrieren eines onClickListeners für die ClockSettingsActivity (da ein spezielles Intent programmiert werden muss)
+        val clocksettings = findPreference("clocksettings")
+        clocksettings.onPreferenceClickListener = Preference.OnPreferenceClickListener {
+            val intent = Intent(context, ClockSettingsActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+            startActivity(intent)
+
+            true
+        }
     }
 
     override fun onStart() {

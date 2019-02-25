@@ -23,5 +23,7 @@
         android:summary="%s"
         android:title="@string/settings_refresh_auto_interval_title" />
     <Preference
-        android:title="Uhrzeit-Aktualisierung"/>
+        android:title="Uhrzeit-Aktualisierung"
+        android:key="clocksettings">
+</Preference>
 </PreferenceScreen>
