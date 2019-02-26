@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
@@ -44,7 +45,7 @@ import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    private enum class VertretungsOption {
+    enum class VertretungsOption {
         TODAY_COMPLETE, TODAY_FILTERED, NEXT_DAY_COMPLETE, NEXT_DAY_FILTERED
     }
 
@@ -82,10 +83,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         addListeners()
 
+        swipe_refresh_layout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorPrimary), ContextCompat.getColor(this, R.color.colorAccent))
+
         Utils.fillDatabase(this)
         update()
 
         ScheduleManager.scheduleAllVertretungJob(this, 15)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        update()
     }
 
     private fun update() {
@@ -137,6 +145,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         addOnItemClickListener()
         addOnFabClickListener()
         addOnNoInternetIconClickListener()
+        setPullToRefreshListener()
     }
 
     //WICHTIG
@@ -177,7 +186,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if(list.isEmpty()) {
             vertretungs_list.visibility = View.INVISIBLE
-            no_vertretung.visibility = View.VISIBLE
+            if(filtered) {
+                no_vertretung.visibility = View.VISIBLE
+                no_data.visibility = View.INVISIBLE
+            } else {
+                no_vertretung.visibility = View.INVISIBLE
+                no_data.visibility = View.VISIBLE
+            }
         } else {
             vertretungs_list.visibility = View.VISIBLE
             no_vertretung.visibility = View.INVISIBLE
@@ -190,6 +205,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             drawer_layout.closeDrawer(GravityCompat.START)
         } else {
             finish()
+        }
+    }
+
+    private fun setPullToRefreshListener() {
+        swipe_refresh_layout.setOnRefreshListener {
+            Thread {
+                Utils.fillDatabase(this)
+                runOnUiThread {
+                    update()
+                    swipe_refresh_layout.isRefreshing = false
+                }
+            }.start()
         }
     }
 
@@ -240,24 +267,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(i)
             }
             R.id.today -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
                 vertretungsOption = VertretungsOption.TODAY_FILTERED
                 update()
-                drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.next_day -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
                 vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
                 update()
-                drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.next_day_complete -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
                 vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
                 update()
-                drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.today_complete -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
                 vertretungsOption = VertretungsOption.TODAY_COMPLETE
                 update()
-                drawer_layout.closeDrawer(GravityCompat.START)
             }
             R.id.info_activity -> {
                 val intent = Intent(this, InfoActivity::class.java)
@@ -312,8 +339,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun addOnFabClickListener() {
         fab.setOnClickListener {
-            Utils.fillDatabase(this)
-            update()
+            Thread {
+                runOnUiThread { swipe_refresh_layout.isRefreshing = true }
+                Utils.fillDatabase(this)
+                runOnUiThread {
+                    update()
+                    swipe_refresh_layout.isRefreshing = false
+                }
+            }.start()
         }
     }
 

@@ -22,7 +22,7 @@ class KlasseAdapter(private val klasseActivity: KlasseActivity, data: ArrayList<
         internal var course: TextView? = null
     }
 
-    //TODO: ADD BUTTON NUR BEIM LETZTEN ITEM, ITEM WIRD LEER UND NEUES Hinzugefügt wenn set button gedrückt wird
+    //TODO: ADD BUTTON NUR BEIM LETZTEN ITEM, ITEM WIRD LEER UND NEUES Hinzugefügt wenn setVertretungCount button gedrückt wird
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val data: String = getItem(position)
