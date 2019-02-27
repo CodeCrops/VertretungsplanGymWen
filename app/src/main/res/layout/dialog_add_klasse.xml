@@ -34,7 +34,9 @@
         android:layout_marginBottom="8dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@android:string/ok"
+        android:textColor="@color/colorAccent"
         android:textSize="14dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -48,7 +50,9 @@
         android:layout_marginBottom="8dp"
         android:backgroundTint="@android:color/transparent"
         android:text="@android:string/cancel"
+        android:textColor="@color/colorAccent"
         android:textSize="14dp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/ok"
         app:layout_constraintHorizontal_bias="1.0"

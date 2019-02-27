@@ -3,6 +3,7 @@ package de.codecrops.vertretungsplangymwen
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.ActionBar
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
@@ -50,7 +51,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
-
         setEnterListener()
         login.setOnClickListener { login() }
     }

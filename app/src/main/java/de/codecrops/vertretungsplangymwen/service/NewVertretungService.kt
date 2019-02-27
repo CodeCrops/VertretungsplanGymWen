@@ -31,7 +31,7 @@ class NewVertretungService : JobService() {
                 val notifyManager = AppNotificationManager(this)
                 notifyManager.isNew = true
                 if(!list.isEmpty()) {
-                    notifyManager.set(list.size)
+                    notifyManager.setVertretungCount(list.size)
                     notifyManager.show()
                 }
                 //boolean true für rescedule

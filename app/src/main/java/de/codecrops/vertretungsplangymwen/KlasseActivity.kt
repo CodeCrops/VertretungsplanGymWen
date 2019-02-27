@@ -207,17 +207,37 @@ class KlasseActivity : AppCompatActivity() {
 
     private fun enterCourse(dialog: Dialog) {
         val text = dialog.editText.text.toString()
+        val preferenceList : ArrayList<String> = arrayListOf()
+        for(p in DBManager.getAllPreferences(this)) {
+            preferenceList.add(p.course)
+        }
         if(grade_dropdown.selectedItemPosition == 6) {
             if(text.startsWith("1")) {
-                addItem(dialog.editText.text.toString())
-                dialog.dismiss()
+                if(!preferenceList.contains(text)) {
+                    if(text.length >= 2 ) {
+                        addItem(text)
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(this, "Dieser Kursname ist zu kurz!", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Dieser Kurs ist bereits vorhanden!", Toast.LENGTH_LONG).show()
+                }
             } else {
                 Toast.makeText(this, "Der Kurs muss mit \'1\' starten!", Toast.LENGTH_LONG).show()
             }
         } else if(grade_dropdown.selectedItemPosition == 7) {
             if(text.startsWith("2")) {
-                addItem(dialog.editText.text.toString())
-                dialog.dismiss()
+                if(!preferenceList.contains(text)) {
+                    if(text.length >= 2 ) {
+                        addItem(text)
+                        dialog.dismiss()
+                    } else {
+                        Toast.makeText(this, "Dieser Kursname ist zu kurz!", Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Dieser Kurs ist bereits vorhanden!", Toast.LENGTH_LONG).show()
+                }
             } else {
                 Toast.makeText(this, "Der Kurs muss mit \'2\' starten!", Toast.LENGTH_LONG).show()
             }

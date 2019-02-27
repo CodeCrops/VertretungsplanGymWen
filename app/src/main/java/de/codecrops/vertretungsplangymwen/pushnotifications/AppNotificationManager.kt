@@ -4,11 +4,11 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.support.graphics.drawable.R
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.content.ContextCompat
 import de.codecrops.vertretungsplangymwen.LoginActivity
-import de.codecrops.vertretungsplangymwen.data.VertretungData
+import de.codecrops.vertretungsplangymwen.R
 
 /**
  * Diese Klasse bietet alle nötigen Methoden um dem Nutzer zu informieren
@@ -45,6 +45,7 @@ class AppNotificationManager(val context: Context) {
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
         if(isNew) {
             notificationBuilder.setContentText("Du hast $vertretungCount neue Vertretungen!")
         } else {
@@ -71,7 +72,7 @@ class AppNotificationManager(val context: Context) {
      * lässt ein Vertretungobjekt hinzufügen
      * @param vertretungData Vertretungsobjekt
      */
-    fun set(number: Int) {
-        vertretungCount = number
+    fun setVertretungCount(count: Int) {
+        vertretungCount = count
     }
 }

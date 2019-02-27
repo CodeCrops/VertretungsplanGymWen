@@ -1,6 +1,6 @@
 package de.codecrops.vertretungsplangymwen.data
 
-import de.codecrops.vertretungsplangymwen.sqlite.DBManager
+import de.codecrops.vertretungsplangymwen.Utils
 import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,7 +34,11 @@ class Extractor(data: HttpReturnData) {
             HttpURLConnection.HTTP_UNAUTHORIZED -> unauthorized = true
             HttpURLConnection.HTTP_OK -> {
                 if(data.data != null) {
-                    extract(data.data)
+                    val thread = Thread {
+                        extract(data.data)
+                    }
+                    thread.start()
+                    thread.join()
                 } else networkError = true
             }
             else -> networkError = true
@@ -50,6 +54,10 @@ class Extractor(data: HttpReturnData) {
                 data.indexOf("</Title>") - 10,
                 data.indexOf("</Title>")
         ))
+
+        val c = Calendar.getInstance()
+        c.time = date
+        val d = Utils.formGermanDate(c)
 
         //Schneidet die eigentliche Tabelle aus dem html Document String
         val tableString = data.substring(
@@ -72,10 +80,26 @@ class Extractor(data: HttpReturnData) {
             val colonList = line.split("</td>").toMutableList()
             colonList.removeAt(colonList.size - 1)
 
+            val klasseList: ArrayList<String> = arrayListOf()
             //Setzt die Werte, die für das VertretungData Objekt nötig sind
             val klasse = colonList[0].substring(colonList[0].lastIndexOf(">"))
                     .replace(">", "")
                     .replace(" ", "")
+            if(klasse.length > 3) {
+                val index = klasse.substring(0, 1).toInt()
+                when(index) {
+                    5 -> { extractMultiKlasse(klasse, klasseList, index) }
+                    6 -> { extractMultiKlasse(klasse, klasseList, index) }
+                    7 -> { extractMultiKlasse(klasse, klasseList, index) }
+                    8 -> { extractMultiKlasse(klasse, klasseList, index) }
+                    9 -> { extractMultiKlasse(klasse, klasseList, index) }
+                    1 -> {
+                        if(klasse.startsWith("10")) {
+                            extractMultiKlasse(klasse, klasseList, index)
+                        }
+                    }
+                }
+            }
             val stunde = colonList[1].substring(colonList[1].lastIndexOf(">"))
                     .replace(">", "")
                     .replace(" ", "").toInt()
@@ -91,7 +115,27 @@ class Extractor(data: HttpReturnData) {
                     .replace(">", "")
 
             //fügt das VertretungData Objelt der Tabelle hinzu
-            table.add(VertretungData(klasse, stunde, vertreung, fach, raum, kommentar))
+            if(klasseList.isNotEmpty()) {
+                for(k in klasseList) {
+                    table.add(VertretungData(k, stunde, vertreung, fach, raum, kommentar))
+                }
+            } else {
+                table.add(VertretungData(klasse, stunde, vertreung, fach, raum, kommentar))
+            }
         }
+    }
+
+    private fun extractMultiKlasse(klasse: String, klasseList: ArrayList<String>, index: Int) {
+        val k = removeNonAlphabetic(klasse)
+        val list = k.toCharArray()
+        for(c in list) {
+            klasseList.add("$index$c")
+        }
+    }
+
+    private fun removeNonAlphabetic(s: String) : String {
+        val r = Regex("[^a-z]")
+        s.replace(r, "")
+        return s
     }
 }

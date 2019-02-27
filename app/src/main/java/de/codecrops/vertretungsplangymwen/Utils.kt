@@ -15,6 +15,10 @@ import android.R
 import android.app.Activity
 import android.support.v4.content.ContextCompat
 import android.view.WindowManager
+import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.CoordinatorLayout
+
+
 
 
 
@@ -92,9 +96,14 @@ object Utils {
             DBManager.clearVertretungsDB(context)
         }
         if(!(extractToday.unauthorized || extractToday.networkError)) {
+            val nextDateReturn = Utils.dateEqualsNextDay(extractToday.date)
             if(Utils.dateEqualsToday(extractToday.date)) {
                 for(v: VertretungData in extractToday.table) {
                     DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extractToday.date)
+                }
+            } else if(nextDateReturn.isNextDay) {
+                for(v: VertretungData in extractToday.table) {
+                    DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
                 }
             }
         }
@@ -106,6 +115,10 @@ object Utils {
             if (nextDateReturn.isNextDay) {
                 for (v: VertretungData in extractNextDay.table) {
                     DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, nextDateReturn.date)
+                }
+            } else if(Utils.dateEqualsToday(extractNextDay.date)) {
+                for (v: VertretungData in extractNextDay.table) {
+                    DBManager.addVertretungsstunde(context, v.klasse, v.stunde, v.vertretung, v.fach, v.raum, v.kommentar, extractNextDay.date)
                 }
             }
         }
