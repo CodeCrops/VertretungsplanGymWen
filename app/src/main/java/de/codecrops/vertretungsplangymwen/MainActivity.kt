@@ -34,6 +34,7 @@ import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
 import de.codecrops.vertretungsplangymwen.service.AllVertretungService
 import de.codecrops.vertretungsplangymwen.service.NewVertretungService
 import de.codecrops.vertretungsplangymwen.service.ScheduleManager
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Utils.fillDatabase(this)
         update()
 
-        ScheduleManager.scheduleAllVertretungJob(this, 15)
+        scheduleServices()
     }
 
     override fun onResume() {
@@ -387,5 +388,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             s.setAction("OK", { s.dismiss() })
             s.show()
         }
+    }
+
+    private fun scheduleServices() {
+        //Starting RefreshManager (contains Alarmmanager and ScheduleManager)
+        RefreshManager(this)
     }
 }

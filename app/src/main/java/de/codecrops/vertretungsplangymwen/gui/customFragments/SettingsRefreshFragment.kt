@@ -3,13 +3,13 @@ package de.codecrops.vertretungsplangymwen.gui.customFragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v14.preference.PreferenceFragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.util.Log
 import de.codecrops.vertretungsplangymwen.ClockSettingsActivity
 import de.codecrops.vertretungsplangymwen.R
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
 import de.codecrops.vertretungsplangymwen.settings.SettingsSPAdapter
 import java.lang.Exception
 
@@ -68,5 +68,4 @@ class SettingsRefreshFragment : PreferenceFragmentCompat() {
         }
         super.onPause()
     }
-
 }

@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar
 import android.util.Log
 import de.codecrops.vertretungsplangymwen.gui.ClockAdapter
 import de.codecrops.vertretungsplangymwen.gui.customFragments.dialogs.TimePickerForClockFragment
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
 import de.codecrops.vertretungsplangymwen.settings.SettingsManager
 import kotlinx.android.synthetic.main.activity_clock_settings.*
 
@@ -15,7 +16,7 @@ class ClockSettingsActivity : AppCompatActivity() {
 
     private val list = arrayListOf<String?>()
     private lateinit var adapter: ClockAdapter
-    public var adapterSize = 1;
+    var adapterSize = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +41,16 @@ class ClockSettingsActivity : AppCompatActivity() {
         clock_listView.adapter = adapter
 
         loadDatesOffDB()
+
+        //Restarting RefreshServices (only need the Clock-Feature, so the init of the Manager is enough)
+        RefreshManager(this)
     }
 
     fun addItem(name: String) {
         list.add(name)
-        adapterSize++;
+        adapterSize++
         adapter.notifyDataSetChanged()
     }
-
-    //clockstring zB: 7:0//8:0 -> noch 0er einfügen
 
     private fun loadDatesOffDB() {
         val clockstring = SettingsManager.getBackgroundRefreshAutoClock(this)
@@ -61,8 +63,8 @@ class ClockSettingsActivity : AppCompatActivity() {
 
         //-> add in Adapter
         for(item in correctedStrings) {
-            var add : String = ""
-            var list = item.split(":")
+            var add = ""
+            val list = item.split(":")
             when(list[0].toCharArray().size < 2) { //Adding a 0 in front of 1,2,3,4,5 use in Hours
                 true -> add = "0${list[0]}"
                 false -> add = list[0]

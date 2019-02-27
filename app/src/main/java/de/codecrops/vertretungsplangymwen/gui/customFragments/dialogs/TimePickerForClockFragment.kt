@@ -10,6 +10,7 @@ import android.view.Gravity
 import android.widget.TextView
 import android.widget.TimePicker
 import de.codecrops.vertretungsplangymwen.ClockSettingsActivity
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
 import de.codecrops.vertretungsplangymwen.settings.SettingsManager
 import java.util.*
 
@@ -53,7 +54,7 @@ class TimePickerForClockFragment : DialogFragment(), TimePickerDialog.OnTimeSetL
         if(oldVal.isNullOrBlank()) {
             SettingsManager.setBackgroundRefreshAutoClock(context!!, "$newh:$newm")
         } else {
-            var newvalue = oldVal + "//" + newh + ":" + newm
+            val newvalue = oldVal + "//" + newh + ":" + newm
             SettingsManager.setBackgroundRefreshAutoClock(context!!, newvalue)
         }
 

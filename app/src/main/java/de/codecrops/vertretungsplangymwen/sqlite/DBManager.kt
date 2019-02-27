@@ -6,6 +6,7 @@ import android.database.Cursor
 import de.codecrops.vertretungsplangymwen.data.LehrerData
 import de.codecrops.vertretungsplangymwen.data.VertretungData
 import java.util.*
+import kotlin.collections.ArrayList
 
 class DBManager {
 
@@ -326,6 +327,41 @@ class DBManager {
                 )
             }
             cursor.close()
+            return result
+        }
+
+        fun searchForCourse(context: Context, input: String) : ArrayList<VertretungData> {
+            //result wird vorbereitet
+            val result = ArrayList<VertretungData>()
+
+            //Selektion wird vorbereitet
+            val selektion = "${DBContracts.PlanContract.COLUMN_FACH} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$input' " +
+                    "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$input'"
+
+            //cursor wird von DB geholt
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selektion, null, null)
+
+            //while schleife zum bearbeiten des Cursors
+            while (cursor.moveToNext()) {
+                result.add( //füget result die neue Vertretungsstunde hinzu
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
+                                cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_FACH)), //Fach
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_RAUM)), //Raum
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_SONSTIGES))) //Sonstiges
+                )
+            }
+
+            //Schließt den Cursor, damit keine MemoryLeaks auftreten
+            cursor.close()
+
             return result
         }
     }

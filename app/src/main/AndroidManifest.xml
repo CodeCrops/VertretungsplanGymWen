@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".KlasseActivity"></activity>
+        <activity android:name=".KlasseActivity"/>
         <activity android:name=".InfoActivity" />
         <activity
             android:name=".LoginActivity"
@@ -29,6 +29,7 @@
         <activity android:name=".VertretungsContentActivity" />
         <activity android:name=".ContactActivity" />
         <activity android:name=".SettingsActivity" />
+        <activity android:name=".ClockSettingsActivity" />
 
         <provider
             android:name=".sqlite.DataProvider"
