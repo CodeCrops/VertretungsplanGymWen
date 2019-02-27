@@ -134,7 +134,7 @@ class Extractor(data: HttpReturnData) {
     }
 
     private fun removeNonAlphabetic(s: String) : String {
-        val r = Regex("[^a-z]")
+        val r = Regex("[^a-h]")
         s.replace(r, "")
         return s
     }

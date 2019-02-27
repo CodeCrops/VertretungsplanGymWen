@@ -330,7 +330,7 @@ class DBManager {
             return result
         }
 
-        fun searchForCourse(context: Context, input: String) : ArrayList<VertretungData> {
+        fun search(context: Context, input: String) : ArrayList<VertretungData> {
             //result wird vorbereitet
             val result = ArrayList<VertretungData>()
 

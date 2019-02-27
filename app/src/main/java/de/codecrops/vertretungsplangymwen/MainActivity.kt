@@ -2,18 +2,12 @@ package de.codecrops.vertretungsplangymwen
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.job.JobInfo
-import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.support.constraint.ConstraintLayout
-import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -21,8 +15,8 @@ import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
+import android.view.KeyEvent
 import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -34,17 +28,11 @@ import de.codecrops.vertretungsplangymwen.data.VertretungData
 import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
 import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
-import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
-import de.codecrops.vertretungsplangymwen.service.AllVertretungService
-import de.codecrops.vertretungsplangymwen.service.NewVertretungService
-import de.codecrops.vertretungsplangymwen.service.ScheduleManager
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
 import java.util.*
 import kotlinx.android.synthetic.main.header_layout.*
 import kotlinx.android.synthetic.main.search_layout.*
-import kotlinx.android.synthetic.main.search_layout.view.*
 import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import kotlin.collections.ArrayList
@@ -61,6 +49,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private lateinit var vertretungsOption: VertretungsOption
     private var searching = false
+    private lateinit var optionsMenu: Menu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,6 +139,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         header_icon.setImageResource(R.drawable.ic_date_black)
     }
 
+    private fun setHeaderSearch() {
+        header.text = "Durchsucht alle Daten..."
+        header_icon.setImageResource(R.drawable.ic_search_black)
+    }
+
     private fun addListeners() {
         setNavigationViewListener()
         addDrawerListener()
@@ -158,6 +152,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         addOnFabClickListener()
         addOnNoInternetIconClickListener()
         setPullToRefreshListener()
+        addSearchListeners()
     }
 
     //WICHTIG
@@ -215,6 +210,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if(drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
+        } else if(searching) {
+            turnSearchOff(optionsMenu.findItem(R.id.toolbar_search_button))
         } else {
             finish()
         }
@@ -239,6 +236,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
+        optionsMenu = menu
         return true
     }
 
@@ -250,23 +248,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.toolbar_search_button -> {
                 if(searching) {
-                    fab.show()
-                    search_bar.visibility = View.INVISIBLE
-                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputMethodManager.hideSoftInputFromWindow(searchEditText.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
-                    searching = false
+                    turnSearchOff(item)
                 } else {
-                    fab.hide()
-                    search_bar.visibility = View.VISIBLE
-                    searchEditText.requestFocus()
-                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputMethodManager.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
-                    searching = true
+                    turnSearchOn(item)
                 }
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun turnSearchOn(item: MenuItem) {
+        fab.hide()
+        item.setIcon(R.drawable.ic_cancel_black)
+        setHeaderSearch()
+        search_bar.visibility = View.VISIBLE
+        search_edit_text.requestFocus()
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(search_edit_text, InputMethodManager.SHOW_IMPLICIT)
+        searching = true
+    }
+
+    private fun turnSearchOff(item: MenuItem) {
+        fab.show()
+        update()
+        item.setIcon(R.drawable.ic_search_black)
+        search_edit_text.clearFocus()
+        search_edit_text.text = null
+        search_bar.visibility = View.INVISIBLE
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(search_edit_text.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        searching = false
     }
 
     //Click Listener für die Elemente im NavigationDrawer
@@ -390,8 +402,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun addSearchListeners() {
+        searchButton.setOnClickListener {
+            search(search_edit_text.text.toString())
+        }
+        search_edit_text.setOnKeyListener { _, keyCode, event ->
+            if(event.action == KeyEvent.ACTION_UP)
+                if(keyCode == KeyEvent.KEYCODE_ENTER) {
+                    search(search_edit_text.text.toString())
+                    true
+                }
+            false
+        }
+    }
+
+    private fun search(searchString: String) {
+        val list = DBManager.search(this, searchString)
+        val adapter = VertretungsAdapter(list, this)
+        vertretungs_list.adapter = adapter
+        if(list.isNullOrEmpty()) {
+            Toast.makeText(this, "Leider wurde nichts gefunden!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun scheduleServices() {
         //Starting RefreshManager (contains Alarmmanager and ScheduleManager)
-        RefreshManager(this)
+        //RefreshManager(this)
     }
 }
