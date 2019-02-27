@@ -15,6 +15,10 @@ import android.R
 import android.app.Activity
 import android.support.v4.content.ContextCompat
 import android.view.WindowManager
+import android.support.design.widget.FloatingActionButton
+import android.support.design.widget.CoordinatorLayout
+
+
 
 
 

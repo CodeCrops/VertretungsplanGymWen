@@ -23,7 +23,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".VertretungsContentActivity" />
         <activity android:name=".ContactActivity" />
         <activity android:name=".SettingsActivity" />

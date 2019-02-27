@@ -11,6 +11,9 @@ import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
+import android.support.constraint.ConstraintLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
@@ -19,9 +22,12 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBar
 import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
+import android.widget.Toast
 import de.codecrops.vertretungsplangymwen.R.layout.activity_main
 import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
 import de.codecrops.vertretungsplangymwen.data.VertretungData
@@ -33,8 +39,11 @@ import de.codecrops.vertretungsplangymwen.service.NewVertretungService
 import de.codecrops.vertretungsplangymwen.service.ScheduleManager
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.view.*
 import java.util.*
 import kotlinx.android.synthetic.main.header_layout.*
+import kotlinx.android.synthetic.main.search_layout.*
+import kotlinx.android.synthetic.main.search_layout.view.*
 import java.net.HttpURLConnection
 import java.text.SimpleDateFormat
 import kotlin.collections.ArrayList
@@ -50,6 +59,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private lateinit var vertretungsOption: VertretungsOption
+    private var searching = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +72,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         actionbar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setHomeAsUpIndicator(R.drawable.ic_menu)
+            setTitle("Vertretungsplan")
         }
 
         val aToggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
@@ -225,15 +236,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         navigationView.setNavigationItemSelectedListener(this)
     }
 
-    //Verhindert, dass das 3 Punkte Menü oben rechts erstellt wird.
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        return false
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 drawer_layout.openDrawer(GravityCompat.START)
+                true
+            }
+            R.id.toolbar_search_button -> {
+                if(searching) {
+                    fab.show()
+                    search_bar.visibility = View.INVISIBLE
+                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.hideSoftInputFromWindow(searchEditText.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
+                    searching = false
+                } else {
+                    fab.hide()
+                    search_bar.visibility = View.VISIBLE
+                    searchEditText.requestFocus()
+                    val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.showSoftInput(searchEditText, InputMethodManager.SHOW_IMPLICIT)
+                    searching = true
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -292,7 +320,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(intent)
             }
         }
-        drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
