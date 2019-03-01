@@ -335,16 +335,66 @@ class DBManager {
             val result = ArrayList<VertretungData>()
 
             //Selektion wird vorbereitet
-            val selektion = "${DBContracts.PlanContract.COLUMN_FACH} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$input' " +
-                    "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$input'"
+            var selection = ""
+            val splitted : List<String> = input.split(" ")
+            for(item in splitted) {
+                selection = "$selection " +
+                        "${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' "
+            }
 
             //cursor wird von DB geholt
-            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selektion, null, null)
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
+
+            //while schleife zum bearbeiten des Cursors
+            while (cursor.moveToNext()) {
+                result.add( //füget result die neue Vertretungsstunde hinzu
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
+                                cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_FACH)), //Fach
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_RAUM)), //Raum
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_SONSTIGES))) //Sonstiges
+                )
+            }
+
+            //Schließt den Cursor, damit keine MemoryLeaks auftreten
+            cursor.close()
+
+            return result
+        }
+
+        fun search(context: Context, datum: Date, input: String) : ArrayList<VertretungData> {
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
+
+            //result wird vorbereitet
+            val result = ArrayList<VertretungData>()
+
+            //Selektion wird vorbereitet
+            var selection = ""
+            val splitted : List<String> = input.split(" ")
+            for(item in splitted) {
+                selection = "$selection " +
+                        "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' "
+            }
+
+            //cursor wird von DB geholt
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
 
             //while schleife zum bearbeiten des Cursors
             while (cursor.moveToNext()) {
