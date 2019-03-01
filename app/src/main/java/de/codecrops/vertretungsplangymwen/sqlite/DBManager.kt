@@ -384,13 +384,13 @@ class DBManager {
             val splitted : List<String> = input.split(" ")
             for(item in splitted) {
                 selection = "$selection " +
-                        "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' " +
-                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp' "
+                        "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') "
             }
 
             //cursor wird von DB geholt
