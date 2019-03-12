@@ -6,17 +6,18 @@
         android:key="@string/shared_preferences_settings_background_refresh_master"
         android:title="@string/settings_refresh_master_title" />
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:enabled="false"
+        android:defaultValue="false"
         android:key="@string/shared_preferences_settings_background_refresh_smart"
         android:summary="Aktualisiert die Daten intelligent"
         android:title="@string/settings_refresh_smartmode_title" />
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="@string/shared_preferences_settings_background_refresh_auto"
         android:summary="Basiert auf Intervallen und Uhrzeiten"
         android:title="@string/settings_refresh_automode_title" />
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="15"
         android:entries="@array/settings_refresh_auto_interval_entries"
         android:entryValues="@array/settings_refresh_auto_interval_values"
         android:key="@string/shared_preferences_settings_background_refresh_auto_interval"

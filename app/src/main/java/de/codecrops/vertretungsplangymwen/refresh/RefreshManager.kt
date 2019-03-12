@@ -36,6 +36,13 @@ class RefreshManager(val context: Context) {
     class ClockRefresher {
         companion object {
             fun startRefreshJobs(context: Context) {
+
+                //Refresh disabled by User
+                if(!SettingsManager.getBackgroundRefreshMaster(context)) {
+                    Log.i(LOG_TAG, "ClockRefresh cancel because BRMaster is disabled")
+                    return
+                }
+
                 val clockstring = SettingsManager.getBackgroundRefreshAutoClock(context)
                 val splittedStrings : List<String> = clockstring.split("//") //contains the time formated as "14:02"
 
@@ -102,6 +109,13 @@ class RefreshManager(val context: Context) {
         companion object {
 
             fun startRefreshJobs(context: Context) {
+
+                //Refresh disabled by User
+                if(!SettingsManager.getBackgroundRefreshMaster(context)) {
+                    Log.i(LOG_TAG, "ScheduleRefresh canceled because BRMaster is disabled")
+                    return
+                }
+
                 var interval = SettingsManager.getBackgroundRefreshAutoInterval(context).toLong()
 
                 if(interval == 0.toLong()) {
@@ -123,6 +137,7 @@ class RefreshManager(val context: Context) {
 
             fun cancelRefreshJob(context: Context) : Boolean {
                 ScheduleManager.chancelAllVertretungJob(context)
+                Log.i(LOG_TAG, "Cancelation of ScheduleRefreshAlarms done!")
                 return true
             }
         }

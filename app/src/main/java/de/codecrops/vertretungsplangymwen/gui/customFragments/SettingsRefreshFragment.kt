@@ -3,6 +3,7 @@ package de.codecrops.vertretungsplangymwen.gui.customFragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.v14.preference.SwitchPreference
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
@@ -34,6 +35,34 @@ class SettingsRefreshFragment : PreferenceFragmentCompat() {
             val intent = Intent(context, ClockSettingsActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
             startActivity(intent)
+
+            true
+        }
+
+        //Registrieren enes onClickListeners für das Deaktivieren des AutomatikModus und des SmartModus, sollte der Master ausgeschaltet werden
+        val masterSwitch = findPreference("BackgroundRefreshMaster")
+        val automatikSwitch = findPreference("BackgroundRefreshAuto")
+        val smartSwitch = findPreference("BackgroundRefreshSmart")
+        val interval = findPreference("BackgroundRefreshAutoInterval")
+        masterSwitch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, any ->
+            val pref : SwitchPreference = preference as SwitchPreference
+
+            /*
+            Achtung, das isChecked bedeutet genau das Gegenteil xD
+             */
+
+            if(pref.isChecked) {
+                smartSwitch.setEnabled(false)
+                automatikSwitch.setEnabled(false)
+                interval.setEnabled(false)
+                clocksettings.setEnabled(false)
+            } else {
+                //smartSwitch.setEnabled(true) //currently disabled
+                automatikSwitch.setEnabled(true)
+                interval.setEnabled(true)
+                clocksettings.setEnabled(true)
+            }
+
 
             true
         }
