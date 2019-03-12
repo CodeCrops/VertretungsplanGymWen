@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import de.codecrops.vertretungsplangymwen.R
 import de.codecrops.vertretungsplangymwen.service.ScheduleManager
 import de.codecrops.vertretungsplangymwen.settings.SettingsManager
 import java.lang.Exception
@@ -18,6 +19,7 @@ class RefreshManager(val context: Context) {
     init {
         ClockRefresher.cancelRefreshJobs(context)
         ClockRefresher.startRefreshJobs(context)
+        ScheduleRefresher.cancelRefreshJob(context)
         ScheduleRefresher.startRefreshJobs(context)
     }
 
@@ -35,12 +37,18 @@ class RefreshManager(val context: Context) {
         companion object {
             fun startRefreshJobs(context: Context) {
                 val clockstring = SettingsManager.getBackgroundRefreshAutoClock(context)
-                val splittedStrings : List<String> = clockstring.split("//")
+                val splittedStrings : List<String> = clockstring.split("//") //contains the time formated as "14:02"
 
                 for(item in splittedStrings) {
-                    startRefreshJob(context, item[0].toInt(), item[1].toInt())
-                }
+                    if(splittedStrings.isNullOrEmpty() || clockstring.isNullOrBlank()) {
+                        Log.e(LOG_TAG, "NO RefreshJobs (Clock) were started, because no RefreshAutoClocks were found in Settings")
+                        return
+                    } else {
+                        val splittedTime : List<String> = item.split(":") //contains hour in [0] and minute in [1]
+                        startRefreshJob(context, splittedTime[0].toInt(), splittedTime[1].toInt())
+                    }
 
+                }
                 Log.i(LOG_TAG, "loadDatesOffDB done with ${splittedStrings.size} Dates loaded!")
             }
 
@@ -94,8 +102,15 @@ class RefreshManager(val context: Context) {
         companion object {
 
             fun startRefreshJobs(context: Context) {
-                val interval = SettingsManager.getBackgroundRefreshAutoInterval(context).toLong()
-                startRefreshJob(context, interval)
+                var interval = SettingsManager.getBackgroundRefreshAutoInterval(context).toLong()
+
+                if(interval == 0.toLong()) {
+                    Log.e(LOG_TAG, "NO RefreshJobs (Schedule) were started, because Interval from Settings was 0")
+                } else {
+                    Log.i(LOG_TAG, "Trying to start ScheduleRefreshJob for Interval $interval")
+                    startRefreshJob(context, interval)
+                }
+
             }
 
             fun startRefreshJob(context: Context, interval: Long) {

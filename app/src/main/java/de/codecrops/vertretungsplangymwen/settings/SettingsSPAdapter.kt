@@ -17,78 +17,84 @@ class SettingsSPAdapter(context: Context) : PreferenceDataStore() {
     val sp = context.getSharedPreferences(context.resources.getString(R.string.shared_preferences_settings_path), Context.MODE_PRIVATE)
 
     override fun getBoolean(key: String?, defValue: Boolean): Boolean {
-        Log.i(LOG_TAG, "Boolean-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getBoolean(key, defValue)}")
-        return sp.getBoolean(key, defValue)
+        val ret = sp.getBoolean(key, defValue)
+        Log.i(LOG_TAG, "Boolean-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun getFloat(key: String?, defValue: Float): Float {
-        Log.i(LOG_TAG, "Float-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getFloat(key, defValue)}")
-        return sp.getFloat(key, defValue)
+        val ret = sp.getFloat(key, defValue)
+        Log.i(LOG_TAG, "Float-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun getInt(key: String?, defValue: Int): Int {
-        Log.i(LOG_TAG, "Int-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getInt(key, defValue)}")
-        return sp.getInt(key, defValue)
+        val ret = sp.getInt(key, defValue)
+        Log.i(LOG_TAG, "Int-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun getLong(key: String?, defValue: Long): Long {
-        Log.i(LOG_TAG, "Long-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getLong(key, defValue)}")
-        return sp.getLong(key, defValue)
+        val ret = sp.getLong(key, defValue)
+        Log.i(LOG_TAG, "Long-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun getString(key: String?, defValue: String?): String? {
-        Log.i(LOG_TAG, "String-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getString(key, defValue)}")
-        return sp.getString(key, defValue)
+        val ret = sp.getString(key, defValue)
+        Log.i(LOG_TAG, "String-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun getStringSet(key: String?, defValues: MutableSet<String>?): MutableSet<String> {
-        Log.i(LOG_TAG, "StringSet-Werteabfrage für '$key' ausgeführt! Ergebnis: ${sp.getStringSet(key, defValues)}")
-        return sp.getStringSet(key, defValues)
+        val ret = sp.getStringSet(key, defValues)
+        Log.i(LOG_TAG, "StringSet-Werteabfrage für '$key' ausgeführt! Ergebnis: $ret")
+        return ret
     }
 
     override fun putBoolean(key: String?, value: Boolean) {
-        Log.i(LOG_TAG, "Boolean wird in SettingsSP eingefügt... (key: '$key')")
+        Log.i(LOG_TAG, "Boolean wird in SettingsSP eingefügt... (key: '$key', value: '$value')")
         with(sp.edit()) {
             putBoolean(key, value)
             apply()
         }
-        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key')")
+        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key', value: '$value')")
     }
 
     override fun putFloat(key: String?, value: Float) {
-        Log.i(LOG_TAG, "Float wird in SettingsSP eingefügt... (key: '$key')")
+        Log.i(LOG_TAG, "Float wird in SettingsSP eingefügt... (key: '$key', value: '$value')")
         with(sp.edit()) {
             putFloat(key, value)
             apply()
         }
-        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key')")
+        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key', value: '$value')")
     }
 
     override fun putInt(key: String?, value: Int) {
-        Log.i(LOG_TAG, "Int wird in SettingsSP eingefügt... (key: '$key')")
+        Log.i(LOG_TAG, "Int wird in SettingsSP eingefügt... (key: '$key', value: '$value')")
         with(sp.edit()) {
             putInt(key, value)
             apply()
         }
-        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key')")
+        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key', value: '$value')")
     }
 
     override fun putLong(key: String?, value: Long) {
-        Log.i(LOG_TAG, "Long wird in SettingsSP eingefügt... (key: '$key')")
+        Log.i(LOG_TAG, "Long wird in SettingsSP eingefügt... (key: '$key', value: '$value')")
         with(sp.edit()) {
             putLong(key, value)
             apply()
         }
-        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key')")
+        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key', value: '$value')")
     }
 
     override fun putString(key: String?, value: String?) {
-        Log.i(LOG_TAG, "String wird in SettingsSP eingefügt... (key: '$key')")
+        Log.i(LOG_TAG, "String wird in SettingsSP eingefügt... (key: '$key', value: '$value')")
         with(sp.edit()) {
             putString(key, value)
             apply()
         }
-        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key')")
+        Log.i(LOG_TAG, "Einfügen erfolgreich! (key: '$key', value: '$value')")
     }
 
     override fun putStringSet(key: String?, values: MutableSet<String>?) {

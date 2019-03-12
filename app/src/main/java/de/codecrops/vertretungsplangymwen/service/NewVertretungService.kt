@@ -34,6 +34,7 @@ class NewVertretungService : JobService() {
                     notifyManager.setVertretungCount(list.size)
                     notifyManager.show()
                 }
+
                 //boolean true für rescedule
                 jobFinished(params, false)
             }

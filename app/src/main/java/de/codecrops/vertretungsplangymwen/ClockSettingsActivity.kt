@@ -43,7 +43,8 @@ class ClockSettingsActivity : AppCompatActivity() {
         loadDatesOffDB()
 
         //Restarting RefreshServices (only need the Clock-Feature, so the init of the Manager is enough)
-        RefreshManager(this)
+        Log.i(LOG_TAG, "Stopping ClockRefreshJobs...")
+        RefreshManager.ClockRefresher.cancelRefreshJobs(this)
     }
 
     fun addItem(name: String) {
@@ -81,5 +82,11 @@ class ClockSettingsActivity : AppCompatActivity() {
 
         Log.i(LOG_TAG, "loadDatesOffDB done with ${correctedStrings.size} Dates loaded!")
 
+    }
+
+    override fun onStop() {
+        Log.i(LOG_TAG, "Starting ClockRefreshJobs...")
+        RefreshManager.ClockRefresher.startRefreshJobs(this)
+        super.onStop()
     }
 }

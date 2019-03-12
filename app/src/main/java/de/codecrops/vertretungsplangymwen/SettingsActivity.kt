@@ -6,10 +6,14 @@ import android.support.v4.app.Fragment
 import android.support.v7.app.ActionBar
 import android.support.v7.preference.Preference
 import android.support.v7.preference.PreferenceFragmentCompat
+import android.util.Log
 import de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsHeadersFragment
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
 import kotlinx.android.synthetic.main.activity_settings.*
 
 class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+
+    val LOG_TAG = "SettingsActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,5 +63,11 @@ class SettingsActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPrefere
     override fun onBackPressed() {
         supportActionBar!!.setTitle("Einstellungen")
         super.onBackPressed()
+    }
+
+    override fun onStop() {
+        Log.i(LOG_TAG, "Restarting RefreshManager...")
+        RefreshManager(this)
+        super.onStop()
     }
 }

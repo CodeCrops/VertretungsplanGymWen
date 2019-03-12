@@ -176,7 +176,7 @@ class SettingsManager() {
          * @return Integer Value indicating the Value of the BR-Auto-Interval in Minutes
          */
         fun getBackgroundRefreshAutoInterval(context: Context) : Int {
-            return context.getSharedPreferences(getIDString(context,SHARED_PREFERENCES_SETTINGS_PATH), Context.MODE_PRIVATE).getInt(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_INTERVAL), 1)
+            return context.getSharedPreferences(getIDString(context,SHARED_PREFERENCES_SETTINGS_PATH), Context.MODE_PRIVATE).getString(getIDString(context,SHARED_PREFERENCES_SETTINGS_BACKGROUND_REFRESH_AUTO_INTERVAL), "0").toInt()
         }
 
         /**
