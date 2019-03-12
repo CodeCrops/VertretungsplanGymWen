@@ -382,16 +382,28 @@ class DBManager {
             //Selektion wird vorbereitet
             var selection = ""
             val splitted : List<String> = input.split(" ")
-            for(item in splitted) {
-                selection = "$selection " +
-                        "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
-                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') "
+            if(splitted.size > 1) {
+                for(item in splitted) {
+                    selection = "$selection OR " +
+                            "((${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp'))"
+                }
+            } else {
+                val item = splitted[0]
+                selection = "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp')"
             }
+
 
             //cursor wird von DB geholt
             val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
