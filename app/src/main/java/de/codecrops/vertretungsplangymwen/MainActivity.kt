@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var vertretungsOption: VertretungsOption
     private var searching = false
     private lateinit var optionsMenu: Menu
+    private lateinit var currentDate: Date
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,11 +77,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if(day == Utils.DAY.SATURDAY || day == Utils.DAY.SUNDAY) {
             menu.findItem(R.id.today).isVisible = false
             menu.findItem(R.id.today_complete).isVisible = false
-            vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
+            vertretungsOption = if(DBManager.getAllPreferences(this).isNullOrEmpty()) {
+                VertretungsOption.NEXT_DAY_COMPLETE
+            } else {
+                VertretungsOption.NEXT_DAY_FILTERED
+            }
         } else {
             menu.findItem(R.id.today).isVisible = true
             menu.findItem(R.id.today_complete).isVisible = true
-            vertretungsOption = VertretungsOption.TODAY_COMPLETE
+            vertretungsOption = if(DBManager.getAllPreferences(this).isNullOrEmpty()) {
+                VertretungsOption.TODAY_COMPLETE
+            } else {
+                VertretungsOption.TODAY_FILTERED
+            }
         }
         addListeners()
 
@@ -105,19 +114,25 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         when(vertretungsOption) {
             VertretungsOption.TODAY_FILTERED -> {
-                setListData(Calendar.getInstance().time, true)
+                val date = Calendar.getInstance().time
+                setListData(date, true)
+                currentDate = date
                 setHeaderToday()
             }
             VertretungsOption.TODAY_COMPLETE -> {
-                setListData(Calendar.getInstance().time, false)
+                val date = Calendar.getInstance().time
+                setListData(date, false)
+                currentDate = date
                 setHeaderToday()
             }
             VertretungsOption.NEXT_DAY_FILTERED -> {
                 val date = loadNextDayFromDatabase(true)
+                currentDate = date
                 setHeaderNextDay(date)
             }
             VertretungsOption.NEXT_DAY_COMPLETE -> {
                 val date = loadNextDayFromDatabase(false)
+                currentDate = date
                 setHeaderNextDay(date)
             }
         }
@@ -140,7 +155,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun setHeaderSearch() {
-        header.text = "Durchsucht alle Daten..."
         header_icon.setImageResource(R.drawable.ic_search_black)
     }
 
@@ -404,20 +418,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun addSearchListeners() {
         searchButton.setOnClickListener {
-            search(search_edit_text.text.toString())
+            search(search_edit_text.text.toString(), currentDate)
         }
         search_edit_text.setOnKeyListener { _, keyCode, event ->
             if(event.action == KeyEvent.ACTION_UP)
                 if(keyCode == KeyEvent.KEYCODE_ENTER) {
-                    search(search_edit_text.text.toString())
+                    search(search_edit_text.text.toString(), currentDate)
                     true
                 }
             false
         }
     }
 
-    private fun search(searchString: String) {
-        val list = DBManager.search(this, searchString)
+    private fun search(searchString: String, date: Date) {
+        val list = DBManager.search(this, date, searchString)
         val adapter = VertretungsAdapter(list, this)
         vertretungs_list.adapter = adapter
         if(list.isNullOrEmpty()) {
