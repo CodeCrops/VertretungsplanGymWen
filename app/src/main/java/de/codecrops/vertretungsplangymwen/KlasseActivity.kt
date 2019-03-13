@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import de.codecrops.vertretungsplangymwen.data.PreferenceReadInData
 import de.codecrops.vertretungsplangymwen.gui.KlasseAdapter
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import de.codecrops.vertretungsplangymwen.sqlite.PREFERENCETYPE
@@ -108,7 +109,7 @@ class KlasseActivity : AppCompatActivity() {
     private fun fillDatabaseForKlasse() {
         if(!DBManager.getAllPreferences(this).isEmpty()) {
             val itemIndex: String = DBManager.getAllPreferences(this)[0].course.substring(0, 2)
-            if (itemIndex != "11" && itemIndex[0] != '2') {
+            if (itemIndex[0] == '5' || itemIndex[0] == '6' || itemIndex[0] == '7' || itemIndex[0] == '8' || itemIndex[0] == '9' || itemIndex == "10") {
                 DBManager.clearPreference(this)
                 DBManager.addPreference(this, grade_dropdown.selectedItem.toString() + klasse_dropdown.selectedItem.toString(), PREFERENCETYPE.REGULÄR)
             }
