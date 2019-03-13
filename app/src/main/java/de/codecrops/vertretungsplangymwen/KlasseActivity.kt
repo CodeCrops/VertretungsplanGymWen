@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import de.codecrops.vertretungsplangymwen.data.PreferenceReadInData
 import de.codecrops.vertretungsplangymwen.gui.KlasseAdapter
 import de.codecrops.vertretungsplangymwen.sqlite.DBManager
 import de.codecrops.vertretungsplangymwen.sqlite.PREFERENCETYPE
