@@ -307,7 +307,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.logout -> {
                 CredentialsManager.deleteHTTPCredentials(this)
                 val i = Intent(this, LoginActivity::class.java)
-                i.putExtra("logout", true)
+                //TODO: remove i.putExtra("logout", true)
                 finish()
                 drawer_layout.closeDrawer(GravityCompat.START)
                 startActivity(i)
