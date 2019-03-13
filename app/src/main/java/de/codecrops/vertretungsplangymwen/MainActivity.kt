@@ -3,18 +3,352 @@ package de.codecrops.vertretungsplangymwen
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBar
+import android.support.v7.app.ActionBarDrawerToggle
+import android.view.KeyEvent
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import android.widget.Toast
+import de.codecrops.vertretungsplangymwen.R.layout.activity_main
+import de.codecrops.vertretungsplangymwen.credentials.CredentialsManager
+import de.codecrops.vertretungsplangymwen.data.VertretungData
+import de.codecrops.vertretungsplangymwen.gui.VertretungsAdapter
+import de.codecrops.vertretungsplangymwen.network.HttpGetRequest
 import de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager
+import de.codecrops.vertretungsplangymwen.refresh.RefreshManager
+import de.codecrops.vertretungsplangymwen.sqlite.DBManager
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlinx.android.synthetic.main.header_layout.*
+import kotlinx.android.synthetic.main.search_layout.*
+import java.net.HttpURLConnection
+import java.text.SimpleDateFormat
+import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity() {
-    val vertretungsNotification = de.codecrops.vertretungsplangymwen.pushnotifications.AppNotificationManager(this)
+/**
+ * @author K1TR1K
+ */
+
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+
+    enum class VertretungsOption {
+        TODAY_COMPLETE, TODAY_FILTERED, NEXT_DAY_COMPLETE, NEXT_DAY_FILTERED
+    }
+
+    private lateinit var vertretungsOption: VertretungsOption
+    private var searching = false
+    private lateinit var optionsMenu: Menu
+    private lateinit var currentDate: Date
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(activity_main)
         createNotificationChannel()
+
+        setSupportActionBar(toolbar)
+
+        val actionbar: ActionBar? = supportActionBar
+        actionbar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeAsUpIndicator(R.drawable.ic_menu)
+            setTitle("Vertretungsplan")
+        }
+
+        val aToggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.open, R.string.close)
+        drawer_layout.addDrawerListener(aToggle)
+        aToggle.syncState()
+
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+        val menu = nav_view.menu
+        if(day == Utils.DAY.SATURDAY || day == Utils.DAY.SUNDAY) {
+            menu.findItem(R.id.today).isVisible = false
+            menu.findItem(R.id.today_complete).isVisible = false
+            vertretungsOption = if(DBManager.getAllPreferences(this).isNullOrEmpty()) {
+                VertretungsOption.NEXT_DAY_COMPLETE
+            } else {
+                VertretungsOption.NEXT_DAY_FILTERED
+            }
+        } else {
+            menu.findItem(R.id.today).isVisible = true
+            menu.findItem(R.id.today_complete).isVisible = true
+            vertretungsOption = if(DBManager.getAllPreferences(this).isNullOrEmpty()) {
+                VertretungsOption.TODAY_COMPLETE
+            } else {
+                VertretungsOption.TODAY_FILTERED
+            }
+        }
+        addListeners()
+
+        swipe_refresh_layout.setColorSchemeColors(ContextCompat.getColor(this, R.color.colorPrimary), ContextCompat.getColor(this, R.color.colorAccent))
+
+        Utils.fillDatabase(this)
+        update()
+
+        scheduleServices()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        update()
+    }
+
+    private fun update() {
+        if(HttpGetRequest.getResponseCodeForPasswordCheck(this) == HttpURLConnection.HTTP_OK) {
+            no_internet_icon.visibility = View.INVISIBLE
+        } else {
+            no_internet_icon.visibility = View.VISIBLE
+        }
+        when(vertretungsOption) {
+            VertretungsOption.TODAY_FILTERED -> {
+                val date = Calendar.getInstance().time
+                setListData(date, true)
+                currentDate = date
+                setHeaderToday()
+            }
+            VertretungsOption.TODAY_COMPLETE -> {
+                val date = Calendar.getInstance().time
+                setListData(date, false)
+                currentDate = date
+                setHeaderToday()
+            }
+            VertretungsOption.NEXT_DAY_FILTERED -> {
+                val date = loadNextDayFromDatabase(true)
+                currentDate = date
+                setHeaderNextDay(date)
+            }
+            VertretungsOption.NEXT_DAY_COMPLETE -> {
+                val date = loadNextDayFromDatabase(false)
+                currentDate = date
+                setHeaderNextDay(date)
+            }
+        }
+    }
+
+    private fun setHeaderToday() {
+        val calendar = Calendar.getInstance()
+        val currentDate: Date = calendar.time
+        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(currentDate.time)
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
+    }
+
+    private fun setHeaderNextDay(date: Date) {
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        val day = SimpleDateFormat("EEEE", Locale.GERMAN).format(date.time)
+        header.text = "$day der ${Utils.formGermanDate(calendar)}"
+        header_icon.setImageResource(R.drawable.ic_date_black)
+    }
+
+    private fun setHeaderSearch() {
+        header_icon.setImageResource(R.drawable.ic_search_black)
+    }
+
+    private fun addListeners() {
+        setNavigationViewListener()
+        addDrawerListener()
+        nav_view.setNavigationItemSelectedListener(this)
+        addOnItemClickListener()
+        addOnFabClickListener()
+        addOnNoInternetIconClickListener()
+        setPullToRefreshListener()
+        addSearchListeners()
+    }
+
+    //WICHTIG
+    private fun loadNextDayFromDatabase(filtered: Boolean) : Date {
+        val currentCalendar = Calendar.getInstance()
+        val currentDate: Date = currentCalendar.time
+        val day = SimpleDateFormat("EE", Locale.GERMAN).format(currentDate.time)
+        when(day) {
+            Utils.DAY.FRIDAY -> {
+                currentCalendar.add(Calendar.DATE, 3)
+            }
+            Utils.DAY.SATURDAY -> {
+                currentCalendar.add(Calendar.DATE, 2)
+            }
+            Utils.DAY.SUNDAY -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+            else -> {
+                currentCalendar.add(Calendar.DATE, 1)
+            }
+        }
+        setListData(currentCalendar.time, filtered)
+        return currentCalendar.time
+    }
+
+    //WICHTIG
+    private fun setListData(date: Date, filtered: Boolean) {
+        var list: ArrayList<VertretungData> = arrayListOf()
+        if(filtered) {
+            for(p in DBManager.getAllPreferences(this)) {
+                list.addAll(DBManager.getVertretungenByKlasse(this, p.course, date))
+            }
+        } else {
+            list = DBManager.getAllVertretungen(this, date)
+        }
+        val adapter = VertretungsAdapter(list, this)
+        vertretungs_list.adapter = adapter
+
+        if(list.isEmpty()) {
+            vertretungs_list.visibility = View.INVISIBLE
+            if(filtered) {
+                no_vertretung.visibility = View.VISIBLE
+                no_data.visibility = View.INVISIBLE
+            } else {
+                no_vertretung.visibility = View.INVISIBLE
+                no_data.visibility = View.VISIBLE
+            }
+        } else {
+            vertretungs_list.visibility = View.VISIBLE
+            no_vertretung.visibility = View.INVISIBLE
+            no_data.visibility = View.INVISIBLE
+        }
+    }
+
+    override fun onBackPressed() {
+        if(drawer_layout.isDrawerOpen(GravityCompat.START)) {
+            drawer_layout.closeDrawer(GravityCompat.START)
+        } else if(searching) {
+            turnSearchOff(optionsMenu.findItem(R.id.toolbar_search_button))
+        } else {
+            finish()
+        }
+    }
+
+    private fun setPullToRefreshListener() {
+        swipe_refresh_layout.setOnRefreshListener {
+            Thread {
+                Utils.fillDatabase(this)
+                runOnUiThread {
+                    update()
+                    swipe_refresh_layout.isRefreshing = false
+                }
+            }.start()
+        }
+    }
+
+    private fun setNavigationViewListener() {
+        val navigationView = nav_view
+        navigationView.setNavigationItemSelectedListener(this)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        optionsMenu = menu
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                drawer_layout.openDrawer(GravityCompat.START)
+                true
+            }
+            R.id.toolbar_search_button -> {
+                if(searching) {
+                    turnSearchOff(item)
+                } else {
+                    turnSearchOn(item)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun turnSearchOn(item: MenuItem) {
+        fab.hide()
+        item.setIcon(R.drawable.ic_cancel_black)
+        setHeaderSearch()
+        search_bar.visibility = View.VISIBLE
+        search_edit_text.requestFocus()
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.showSoftInput(search_edit_text, InputMethodManager.SHOW_IMPLICIT)
+        searching = true
+    }
+
+    private fun turnSearchOff(item: MenuItem) {
+        fab.show()
+        update()
+        item.setIcon(R.drawable.ic_search_black)
+        search_edit_text.clearFocus()
+        search_edit_text.text = null
+        search_bar.visibility = View.INVISIBLE
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(search_edit_text.windowToken, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        searching = false
+    }
+
+    //Click Listener für die Elemente im NavigationDrawer
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.website -> {
+                val i = Intent(Intent.ACTION_VIEW).setData(Uri.parse("http://gym-wen.de/vp/"))
+                startActivity(i)
+                drawer_layout.closeDrawer(GravityCompat.START)
+            }
+            R.id.logout -> {
+                CredentialsManager.deleteHTTPCredentials(this)
+                val i = Intent(this, LoginActivity::class.java)
+                i.putExtra("logout", true)
+                finish()
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.help -> {
+                val i = Intent(this, ContactActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.settings -> {
+                val i = Intent(this, SettingsActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(i)
+            }
+            R.id.today -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                vertretungsOption = VertretungsOption.TODAY_FILTERED
+                update()
+            }
+            R.id.next_day -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                vertretungsOption = VertretungsOption.NEXT_DAY_FILTERED
+                update()
+            }
+            R.id.next_day_complete -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                vertretungsOption = VertretungsOption.NEXT_DAY_COMPLETE
+                update()
+            }
+            R.id.today_complete -> {
+                drawer_layout.closeDrawer(GravityCompat.START)
+                vertretungsOption = VertretungsOption.TODAY_COMPLETE
+                update()
+            }
+            R.id.info_activity -> {
+                val intent = Intent(this, InfoActivity::class.java)
+                drawer_layout.closeDrawer(GravityCompat.START)
+                startActivity(intent)
+            }
+        }
+        return true
     }
 
     private fun createNotificationChannel() {
@@ -29,5 +363,85 @@ class MainActivity : AppCompatActivity() {
                     getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    private fun addDrawerListener() {
+        drawer_layout.addDrawerListener(
+                object : DrawerLayout.DrawerListener {
+                    override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+                    override fun onDrawerOpened(drawerView: View) {}
+                    override fun onDrawerClosed(drawerView: View) {}
+                    override fun onDrawerStateChanged(newState: Int) {}
+                }
+        )
+    }
+
+    private fun addOnItemClickListener() {
+        vertretungs_list.setOnItemClickListener { parent, view, position, id ->
+            val item = parent.getItemAtPosition(position) as VertretungData
+            val intent = Intent(this, VertretungsContentActivity::class.java)
+            intent.apply {
+                putExtra("klasse", item.klasse)
+                putExtra("stunde", item.stunde)
+                putExtra("vertretung", item.vertretung)
+                putExtra("fach", item.fach)
+                putExtra("raum", item.raum)
+                putExtra("kommentar", item.kommentar)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun addOnFabClickListener() {
+        fab.setOnClickListener {
+            Thread {
+                runOnUiThread { swipe_refresh_layout.isRefreshing = true }
+                Utils.fillDatabase(this)
+                runOnUiThread {
+                    update()
+                    swipe_refresh_layout.isRefreshing = false
+                }
+            }.start()
+        }
+    }
+
+    private fun addOnNoInternetIconClickListener() {
+        no_internet_icon.setOnClickListener {
+            val s = Snackbar.make(drawer_layout,
+                    getString(R.string.old_data),
+                    Snackbar.LENGTH_INDEFINITE)
+            val textView = s.view.findViewById(android.support.design.R.id.snackbar_text) as TextView
+            textView.maxLines = 5
+            s.setAction("OK", { s.dismiss() })
+            s.show()
+        }
+    }
+
+    private fun addSearchListeners() {
+        searchButton.setOnClickListener {
+            search(search_edit_text.text.toString(), currentDate)
+        }
+        search_edit_text.setOnKeyListener { _, keyCode, event ->
+            if(event.action == KeyEvent.ACTION_UP)
+                if(keyCode == KeyEvent.KEYCODE_ENTER) {
+                    search(search_edit_text.text.toString(), currentDate)
+                    true
+                }
+            false
+        }
+    }
+
+    private fun search(searchString: String, date: Date) {
+        val list = DBManager.search(this, date, searchString)
+        val adapter = VertretungsAdapter(list, this)
+        vertretungs_list.adapter = adapter
+        if(list.isNullOrEmpty()) {
+            Toast.makeText(this, "Leider wurde nichts gefunden!", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun scheduleServices() {
+        //Starting RefreshManager (contains Alarmmanager and ScheduleManager)
+        RefreshManager(this)
     }
 }

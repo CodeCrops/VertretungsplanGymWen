@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+    <item android:title="Gefiltert" >
+        <menu>
+            <group android:checkableBehavior="none" >
+                <item
+                    android:id="@+id/today"
+                    android:title="@string/today" />
+                <item
+                    android:id="@+id/next_day"
+                    android:title="@string/next_day" />
+            </group>
+        </menu>
+    </item>
+    <item android:title="Komplett">
+        <menu>
+            <group android:checkableBehavior="none" >
+                <item
+                    android:id="@+id/today_complete"
+                    android:title="@string/today_complete" />
+                <item
+                    android:id="@+id/next_day_complete"
+                    android:title="@string/next_day_complete" />
+            </group>
+        </menu>
+    </item>
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/website"
+            android:title="@string/website" />
+        <item
+            android:id="@+id/settings"
+            android:title="@string/settings" />
+        <item
+            android:id="@+id/logout"
+            android:title="@string/logout" />
+        <item
+            android:id="@+id/help"
+            android:title="@string/contact" />
+        <item
+            android:id="@+id/info_activity"
+            android:title="@string/info" />
+    </group>
+</menu>

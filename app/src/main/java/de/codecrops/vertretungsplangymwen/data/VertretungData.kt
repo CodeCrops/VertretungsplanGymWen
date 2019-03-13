@@ -1,6 +1,7 @@
 package de.codecrops.vertretungsplangymwen.data
 
 /**
+ * @author K1TR1K
  * Diese Klasse ist das Datenobjekt der Vertretungen mit allen möglichen Variablem
  * @param klasse Bezeichnung der Klasse oder des Kurses
  * @param stunde Schulstunde

@@ -1,4 +1,4 @@
-package de.codecrops.vertretungsplangymwen.sqlite
+package de.codecrops.vertretungsplangymwen.data
 
 /**
  * @param kuerzel Das Kürzel der Lehrkraft

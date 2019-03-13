@@ -11,7 +11,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     companion object {
         //Einstellungen
-        val DB_VERSION = 1
+        val DB_VERSION = 4
         val DB_NAME = "VertretungsPlanApp.db"
 
         //Konstante zur Erstellung des SCHEDULE TABLEs aus PlanContract
@@ -23,7 +23,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                         DBContracts.PlanContract.COLUMN_VERTRETUNG + " TEXT NOT NULL, " +
                         DBContracts.PlanContract.COLUMN_FACH + " TEXT, " +
                         DBContracts.PlanContract.COLUMN_RAUM + " TEXT, " +
-                        DBContracts.PlanContract.COLUMN_SONSTIGES + " TEXT" +
+                        DBContracts.PlanContract.COLUMN_SONSTIGES + " TEXT," +
+                        DBContracts.PlanContract.COLUMN_DATE + " TEXT" +
                         ")"
         private const val SQL_CREATE_LEHRER =
                 "CREATE TABLE IF NOT EXISTS " + DBContracts.LehrerContract.TABLE_NAME + " (" +
@@ -31,16 +32,23 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                         DBContracts.LehrerContract.COLUMN_KUERZEL + " TEXT NOT NULL, " +
                         DBContracts.LehrerContract.COLUMN_NACHNAME + " TEXT NOT NULL, " +
                         DBContracts.LehrerContract.COLUMN_VORNAME + " TEXT, " +
-                        DBContracts.LehrerContract.COLUMN_GESCHLECHT + " TEXT" +
+                        DBContracts.LehrerContract.COLUMN_GESCHLECHT + " TEXT," +
+                        DBContracts.LehrerContract.COLUMN_DATE + " TEXT" +
                         ")"
-
+        private const val SQL_CREATE_PREFERENCES =
+                "CREATE TABLE IF NOT EXISTS " + DBContracts.PreferencesContract.TABLE_NAME + " (" +
+                        DBContracts.PreferencesContract.COLUMN_LISTID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        DBContracts.PreferencesContract.COLUMN_KURS + " TEXT NOT NULL, " +
+                        DBContracts.PreferencesContract.COLUMN_TYPEOFKURS + " INTEGER NOT NULL" +
+                        ")"
 
         //Konstante zur Löschung aller Inhalte der DB
         private const val SQL_DELETE_SCHEDULE =
                 "DROP TABLE IF EXISTS ${DBContracts.PlanContract.TABLE_NAME}"
         private const val SQL_DELETE_LEHRER =
                 "DROP TABLE IF EXISTS ${DBContracts.LehrerContract.TABLE_NAME}"
-
+        private const val SQL_DELETE_PREFERENCES =
+                "DROP TABLE IF EXISTS ${DBContracts.LehrerContract.TABLE_NAME}"
     }
 
     /**
@@ -50,6 +58,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         //Erstellt in der DB die TABLES usw. (Init für DB)
         db.execSQL(SQL_CREATE_SCHEDULE)
         db.execSQL(SQL_CREATE_LEHRER)
+        db.execSQL(SQL_CREATE_PREFERENCES)
     }
 
     /**
@@ -59,6 +68,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         //Flusht alte DB und erstellt neue TABLES usw (mithilfe von onCreate())
         db.execSQL(SQL_DELETE_SCHEDULE)
         db.execSQL(SQL_DELETE_LEHRER)
+        db.execSQL(SQL_DELETE_PREFERENCES)
         onCreate(db)
     }
 

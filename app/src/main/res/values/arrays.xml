@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="settings_refresh_auto_interval_entries">
+        <item>15 Minuten</item>
+        <item>30 Minuten</item>
+        <item>60 Minuten</item>
+        <item>3 Stunden</item>
+        <item>6 Stunden</item>
+    </string-array>
+
+    <string-array name="settings_refresh_auto_interval_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+    </string-array>
+</resources>

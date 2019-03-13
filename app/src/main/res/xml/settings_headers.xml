@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:title="Hintergrundaktualisierung"
+        android:icon="@drawable/ic_refresh_black"
+        android:fragment="de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsRefreshFragment"
+        />
+    <Preference
+        android:title="Benachrichtigungen"
+        android:icon="@drawable/ic_baseline_notifications_24px"
+        android:fragment="de.codecrops.vertretungsplangymwen.gui.customFragments.SettingsNotificationFragment"
+        />
+    <Preference
+        android:title="Klassenfilter"
+        android:icon="@drawable/ic_baseline_filter_list_24px">
+        <intent
+            android:targetPackage="de.codecrops.vertretungsplangymwen"
+            android:targetClass="de.codecrops.vertretungsplangymwen.KlasseActivity"/>
+    </Preference>
+
+
+</PreferenceScreen>

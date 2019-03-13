@@ -3,6 +3,10 @@ package de.codecrops.vertretungsplangymwen.sqlite
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import de.codecrops.vertretungsplangymwen.data.LehrerData
+import de.codecrops.vertretungsplangymwen.data.VertretungData
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DBManager {
 
@@ -16,14 +20,19 @@ class DBManager {
          * @param fach Das Fach, welches anstelle des ursprünglichen Fachs unterrichtet wird (nur nötig, wenn es entfällt)
          * @param raum Der Raum, in welchem anstelle des ursprünglichen Raums unterrichtet wird (nicht nötig, wenn es entfällt)
          * @param sonstiges Sonstige Informationen
+         * @param datum Datum der Vertretungsstunde
          */
-        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?) {
+        fun addVertretungsstunde(context: Context, klasse: String, stunde: Int, vertretung: String, fach: String?, raum: String?, sonstiges: String?, datum: Date) {
             /*
             ACHTUNG:
-
-                - Die Parameter klasse, stunde und vertretung sind nicht nullable -> sie müssen übergeben werden!
+                - Die Parameter klasse, stunde und vertretung (&datum) sind nicht nullable -> sie müssen übergeben werden!
                 - Die Paramter fach, raum und sonstiges sind nullable -> sie können weggelassen werden und sollten dies auch bei leeren Werten bitte werden! Kein "" anstatt null
              */
+
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
 
             //Erstellt ein ContentValues-Objekt und fügt die Daten hinzu
             val values = ContentValues().apply {
@@ -33,6 +42,7 @@ class DBManager {
                 if(fach != null) put(DBContracts.PlanContract.COLUMN_FACH, fach)
                 if(raum != null) put(DBContracts.PlanContract.COLUMN_RAUM, raum)
                 if(sonstiges != null) put(DBContracts.PlanContract.COLUMN_SONSTIGES, sonstiges)
+                put(DBContracts.PlanContract.COLUMN_DATE, timestamp)
             }
 
             //Erstellt eine neue Zeile in der DB mit den Daten von values
@@ -41,12 +51,19 @@ class DBManager {
 
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
+         * @param klasse Klasse
+         * @param datum Datum des durchsuchten Tages
          * @return Cursor
          */
-        fun getPlanCursorByKlasse(context: Context, klasse: String): Cursor {
+        private fun getPlanCursorByKlasse(context: Context, klasse: String, datum: Date): Cursor {
+
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
 
             //Erstellt die Selection (die WHERE-Clause)
-            val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse'"
+            val selection = "${DBContracts.PlanContract.COLUMN_KLASSE} = '$klasse' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp'"
 
             //Erhalte den Cursor von der DB
             val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
@@ -57,11 +74,36 @@ class DBManager {
 
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
+         * @param datum Datum des durchsuchten Tages
+         * @return Cursor
+         */
+        private fun getPlanCursorByDate(context: Context, datum: Date): Cursor {
+
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
+
+            //Erstellt die Selection (die WHERE-Clause)
+            val selection = "${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp'"
+
+            //Erhalte den Cursor von der DB
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
+
+            //Gebe den Cursor zurück
+            return cursor
+        }
+
+
+
+        /**
+         * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
          * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
+         * @param datum Datum des Tages, welcher überprüft werder soll
          * @return Boolean, True : "Schüler hat Vertretung", False : "Schüler hat normal Unterricht"
          */
-        fun hasPupilVertretung(context: Context, klasse: String) : Boolean {
-            val cursor = getPlanCursorByKlasse(context, klasse)
+        fun hasPupilVertretung(context: Context, klasse: String, datum: Date) : Boolean {
+            val cursor = getPlanCursorByKlasse(context, klasse, datum)
             if(cursor.moveToNext()) {
                 cursor.close()
                 return true
@@ -71,20 +113,52 @@ class DBManager {
         /**
          * @param context Context der App - muss übergeben werden, um auf den contentResolver zuzugreifen
          * @param klasse Die Klasse/der Kurs, in welchem sich der Schüler befindet
-         * @return ArrayList<ScheduleEntry> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
+         * @param datum Datum des Tages, für welchen Vertretungen gefunden werden sollen
+         * @return ArrayList<VertretungData> : Eine ArrayList, welche pro element eine Vertretungsstunde enthält
          */
-        fun getVertretungenByKlasse(context: Context, klasse: String): ArrayList<ScheduleEntry> {
+        fun getVertretungenByKlasse(context: Context, klasse: String, datum: Date): ArrayList<VertretungData> {
 
             //result wird vorbereitet
-            val result = ArrayList<ScheduleEntry>()
+            val result = ArrayList<VertretungData>()
 
             //cursor wird von DB geholt
-            val cursor = getPlanCursorByKlasse(context, klasse)
+            val cursor = getPlanCursorByKlasse(context, klasse, datum)
 
             //while schleife zum bearbeiten des Cursors
             while (cursor.moveToNext()) {
                 result.add( //füget result die neue Vertretungsstunde hinzu
-                        ScheduleEntry( //erstellt ein neues Objekt von ScheduleEntry
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
+                                cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_FACH)), //Fach
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_RAUM)), //Raum
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_SONSTIGES))) //Sonstiges
+                )
+            }
+
+            //Schließt den Cursor, damit keine MemoryLeaks auftreten
+            cursor.close()
+
+            return result
+        }
+
+        fun getAllVertretungen(context: Context, datum: Date) : ArrayList<VertretungData> {
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
+
+            //result wird vorbereitet
+            val result = ArrayList<VertretungData>()
+
+            //cursor wird von DB geholt
+            val cursor = getPlanCursorByDate(context, datum)
+
+            //while schleife zum bearbeiten des Cursors
+            while (cursor.moveToNext()) {
+                result.add( //füget result die neue Vertretungsstunde hinzu
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
                                 cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
                                 cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
                                 cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
@@ -107,7 +181,7 @@ class DBManager {
          */
         fun isLehrerInDB(context: Context, kuerzel: String) : Boolean {
 
-            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '${kuerzel.toLowerCase()}'"
             val cursor = context.contentResolver.query(DBContracts.LehrerContract.CONTENT_URI, arrayOf("*"), selection, null, null)
             if(cursor.moveToNext()) {
                 cursor.close()
@@ -120,7 +194,7 @@ class DBManager {
          * @param kuerzel Das Kürzel des Lehrers, welcher entfernt werden soll
          */
         fun removeLehrerFromDB(context: Context, kuerzel: String) {
-            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '$kuerzel'"
+            val selection = "${DBContracts.LehrerContract.COLUMN_KUERZEL} = '${kuerzel.toLowerCase()}'"
             context.contentResolver.delete(DBContracts.LehrerContract.CONTENT_URI, selection, null)
         }
 
@@ -144,7 +218,7 @@ class DBManager {
 
             //Erstellt ein ContentValues-Objekt und fügt die Daten hinzu
             val values = ContentValues().apply {
-                put(DBContracts.LehrerContract.COLUMN_KUERZEL, kuerzel)
+                put(DBContracts.LehrerContract.COLUMN_KUERZEL, kuerzel.toLowerCase())
                 put(DBContracts.LehrerContract.COLUMN_NACHNAME, nachname)
                 if(vorname != null) put(DBContracts.LehrerContract.COLUMN_VORNAME, vorname)
                 put(DBContracts.LehrerContract.COLUMN_GESCHLECHT, geschlecht)
@@ -154,7 +228,7 @@ class DBManager {
             if(isLehrerInDB(context, kuerzel)) {
                 updateLehrerInDB(context, values)
                 return
-            //ist noch nicht vorhanden
+                //ist noch nicht vorhanden
             } else {
                 context.contentResolver.insert(DBContracts.LehrerContract.CONTENT_URI, values)
             }
@@ -181,8 +255,176 @@ class DBManager {
             } else cursor.close(); return LehrerData(kuerzel, kuerzel, "", "") //kuerzel wird auch als Nachname ausgegeben, damit es zur Not nicht auffällt (sollte ja eh nicht auftreten)
         }
 
+        /**
+         * @param context Kontext der App
+         */
         fun clearVertretungsDB(context: Context) {
             context.contentResolver.delete(DBContracts.PlanContract.CONTENT_URI, null, null)
+        }
+
+        /**
+         * @param context Kontext der App
+         */
+        fun clearVertretungsDB(context: Context, datum: Date) {
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
+
+            //Selektion
+            val selection = "${DBContracts.PlanContract.COLUMN_DATE}='$timestamp'"
+
+            context.contentResolver.delete(DBContracts.PlanContract.CONTENT_URI, selection, null)
+        }
+
+        /**
+         * @context Context of App
+         * @courseName Name des Kurses, welcher hinzugefügt werden soll (zB. 6b oder 1m2)
+         * @type Typ des Kurses (zB PREFERENCETYPE.REGULÄR = normale stunde)
+         */
+        fun addPreference(context: Context, courseName: String, type: PREFERENCETYPE) {
+            val values = ContentValues().apply {
+                put(DBContracts.PreferencesContract.COLUMN_KURS, courseName)
+                put(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS, type.id)
+            }
+            context.contentResolver.insert(DBContracts.PreferencesContract.CONTENT_URI, values)
+        }
+
+        /**
+         * @context Context of App
+         * @courseName Name des Kurses, welcher gelöscht werden soll (zB. 6b oder 1m2)
+         */
+        fun deletePreference(context: Context, courseName: String) {
+            //Selektion
+            val selection = "${DBContracts.PreferencesContract.COLUMN_KURS} = '$courseName'"
+
+            context.contentResolver.delete(DBContracts.PreferencesContract.CONTENT_URI, selection, null)
+        }
+
+        //TODO: Kommentieren
+        fun clearPreference(context: Context) {
+            context.contentResolver.delete(DBContracts.PreferencesContract.CONTENT_URI, null, null)
+        }
+
+        /**
+         * @param context Context of App
+         * @return ArrayList<PreferenceData> mit allen Kursen/Klassen, welche der Nutzer eingetragen hat
+         */
+        fun getAllPreferences(context: Context) : ArrayList<PreferencesData> {
+            //result wird vorbereitet
+            val result = ArrayList<PreferencesData>()
+
+            //Cursor mit Daten aus DB
+            val cursor = context.contentResolver.query(DBContracts.PreferencesContract.CONTENT_URI, arrayOf("*"), null, null, null)
+
+            //Umwandeln in PreferenceData und einfügen in result
+            while(cursor.moveToNext()) {
+                result.add(
+                        PreferencesData(
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PreferencesContract.COLUMN_KURS)),
+                                PREFERENCETYPE.byID(cursor.getInt(cursor.getColumnIndex(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS)))
+                        )
+                )
+            }
+            cursor.close()
+            return result
+        }
+
+        fun search(context: Context, input: String) : ArrayList<VertretungData> {
+            //result wird vorbereitet
+            val result = ArrayList<VertretungData>()
+
+            //Selektion wird vorbereitet
+            var selection = ""
+            val splitted : List<String> = input.split(" ")
+            for(item in splitted) {
+                selection = "$selection " +
+                        "${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' " +
+                        "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' "
+            }
+
+            //cursor wird von DB geholt
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
+
+            //while schleife zum bearbeiten des Cursors
+            while (cursor.moveToNext()) {
+                result.add( //füget result die neue Vertretungsstunde hinzu
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
+                                cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_FACH)), //Fach
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_RAUM)), //Raum
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_SONSTIGES))) //Sonstiges
+                )
+            }
+
+            //Schließt den Cursor, damit keine MemoryLeaks auftreten
+            cursor.close()
+
+            return result
+        }
+
+        fun search(context: Context, datum: Date, input: String) : ArrayList<VertretungData> {
+            //Datum/Kalendar
+            val date = Calendar.getInstance()
+            date.time = datum
+            val timestamp = "${date.get(Calendar.DAY_OF_MONTH)}.${date.get(Calendar.MONTH)}.${date.get(Calendar.YEAR)}"
+
+            //result wird vorbereitet
+            val result = ArrayList<VertretungData>()
+
+            //Selektion wird vorbereitet
+            var selection = ""
+            val splitted : List<String> = input.split(" ")
+            if(splitted.size > 1) {
+                for(item in splitted) {
+                    selection = "$selection OR " +
+                            "((${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                            "(OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp'))"
+                }
+            } else {
+                val item = splitted[0]
+                selection = "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_DATE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
+                        "OR (${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp')"
+            }
+
+
+            //cursor wird von DB geholt
+            val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
+
+            //while schleife zum bearbeiten des Cursors
+            while (cursor.moveToNext()) {
+                result.add( //füget result die neue Vertretungsstunde hinzu
+                        VertretungData( //erstellt ein neues Objekt von VertretungData
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_KLASSE)), //Klasse
+                                cursor.getInt(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_STUNDE)), //Stunde
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_VERTRETUNG)), //Vertretung
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_FACH)), //Fach
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_RAUM)), //Raum
+                                cursor.getString(cursor.getColumnIndex(DBContracts.PlanContract.COLUMN_SONSTIGES))) //Sonstiges
+                )
+            }
+
+            //Schließt den Cursor, damit keine MemoryLeaks auftreten
+            cursor.close()
+
+            return result
         }
     }
 }

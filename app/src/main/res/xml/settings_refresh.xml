@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/shared_preferences_settings_background_refresh_master"
+        android:title="@string/settings_refresh_master_title" />
+    <CheckBoxPreference
+        android:enabled="false"
+        android:defaultValue="false"
+        android:key="@string/shared_preferences_settings_background_refresh_smart"
+        android:summary="Aktualisiert die Daten intelligent"
+        android:title="@string/settings_refresh_smartmode_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/shared_preferences_settings_background_refresh_auto"
+        android:summary="Basiert auf Intervallen und Uhrzeiten"
+        android:title="@string/settings_refresh_automode_title" />
+    <ListPreference
+        android:defaultValue="15"
+        android:entries="@array/settings_refresh_auto_interval_entries"
+        android:entryValues="@array/settings_refresh_auto_interval_values"
+        android:key="@string/shared_preferences_settings_background_refresh_auto_interval"
+        android:summary="%s"
+        android:title="@string/settings_refresh_auto_interval_title" />
+    <Preference
+        android:title="Uhrzeit-Aktualisierung"
+        android:key="clocksettings">
+</Preference>
+</PreferenceScreen>

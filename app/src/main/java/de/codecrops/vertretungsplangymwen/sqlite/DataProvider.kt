@@ -17,6 +17,8 @@ class DataProvider :  ContentProvider() {
     private val LEHRER_ID = 101
     private val VERTRETUNGSPLAN = 102
     private val VERTRETUNGSPLAN_ID = 103
+    private val PREFERENCES = 104
+    private val PREFERENCES_ID = 105
 
     //Name, welcher bei Fehlermeldungen mit ausgegeben wird
     private val LOG_TAG = this.javaClass.simpleName
@@ -28,7 +30,8 @@ class DataProvider :  ContentProvider() {
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_LEHRER + "/#", LEHRER_ID)
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_SCHEDULE, VERTRETUNGSPLAN)
         sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_SCHEDULE + "/#", VERTRETUNGSPLAN_ID)
-
+        sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_PREFERENCES, PREFERENCES)
+        sUriMatcher.addURI(DBContracts.CONTENT_AUTHORITY, DBContracts.PATH_PREFERENCES + "/#", PREFERENCES_ID)
     }
 
     override fun onCreate(): Boolean {
@@ -58,7 +61,15 @@ class DataProvider :  ContentProvider() {
                 // HIER HAB ICH DAS EINFACH WEGGELASSEN, da es nicht funktioniert hat :D Sollte auch ohne gehen: selectionArgs = Array<String>(ContentUris.parseId(uri).toInt()) { ContentUris.parseId(uri).toString()}
                 cursor = db.query(DBContracts.PlanContract.TABLE_NAME, projection, localselection, selectionArgs, null, null, sortOrder)
             }
-            else -> throw IllegalArgumentException("Cannot query unknown URI $uri!")
+            PREFERENCES -> cursor = db.query(DBContracts.PreferencesContract.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder)
+            PREFERENCES_ID -> {
+                val localselection = DBContracts.PreferencesContract._ID + "=?"
+                // HIER HAB ICH DAS EINFACH WEGGELASSEN, da es nicht funktioniert hat :D Sollte auch ohne gehen: selectionArgs = Array<String>(ContentUris.parseId(uri).toInt()) { ContentUris.parseId(uri).toString()}
+                cursor = db.query(DBContracts.PreferencesContract.TABLE_NAME, projection, localselection, selectionArgs, null, null, sortOrder)
+            }
+
+            else -> throw IllegalArgumentException("Cannot query unknown URI $uri!")     //Hier muss einen Exception geworfen werden, da sonst cursor nicht funktioniert (außerdem kommen hier eh keine falschen daten an)
+
         }
 
         return cursor
@@ -69,6 +80,7 @@ class DataProvider :  ContentProvider() {
         when(match) {
             LEHRER -> return insertLehrer(uri, values)
             VERTRETUNGSPLAN -> return insertVertretungsplan(uri, values)
+            PREFERENCES -> return insertPreferences(uri, values)
             else -> throw IllegalArgumentException("Insertion is not supported for $uri")
         }
     }
@@ -86,9 +98,16 @@ class DataProvider :  ContentProvider() {
         if(nachnameValue.isNullOrBlank()) {
             invalidData = true
         }
+        //Date-Validation
+        val dateValue = values.getAsString(DBContracts.LehrerContract.COLUMN_DATE)
+        if(dateValue.isNullOrBlank()) {
+            invalidData = true
+        }
         //invalidData-Check
         if(invalidData) {
-            throw java.lang.IllegalArgumentException("Failed to insert new Lehrer into DB! Invalid Values!")
+            //throw java.lang.IllegalArgumentException("Failed to insert new Lehrer into DB! Invalid Values!")   <-- weggelassen, um ein crashen der app zu verhindern (mit Log.e ersetzt)
+            Log.e(LOG_TAG, "Failed to insert new Lehrer into DB! Invalid Values!")
+            return null
         }
 
         val db = mDBHelper.writableDatabase
@@ -122,9 +141,15 @@ class DataProvider :  ContentProvider() {
         if(vertretungValue.isNullOrBlank()) {
             invalidData = true
         }
+        //Date-Validation
+        val dateValue = values.getAsString(DBContracts.PlanContract.COLUMN_DATE)
+        if(dateValue.isNullOrBlank()) {
+            invalidData = true
+        }
         //invalidData-Check
         if(invalidData) {
-            throw java.lang.IllegalArgumentException("Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!")
+            //throw java.lang.IllegalArgumentException("Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!")   <-- weggelassen, um ein crashen der app zu verhindern (mit Log.e ersetzt)
+            Log.e(LOG_TAG, "Failed to insert new Vertretungsplan (Stunde) into DB! Invalid Values!")
         }
 
         val db = mDBHelper.writableDatabase
@@ -140,9 +165,42 @@ class DataProvider :  ContentProvider() {
         return ContentUris.withAppendedId(uri, id)
     }
 
+    private fun insertPreferences(uri: Uri, values: ContentValues) : Uri? {
+        //Sanity-Checks
+        var invalidData = false
+
+        //Kurs-Validation
+        val kursValue = values.getAsString(DBContracts.PreferencesContract.COLUMN_KURS)
+        if(kursValue.isNullOrBlank()) {
+            invalidData = true
+        }
+        //Type-Validation
+        val typeValue = values.getAsInteger(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS)
+        if(typeValue == null) {
+            invalidData = true
+        }
+
+        if(invalidData) {
+            Log.e(LOG_TAG, "Failed to insert new Preference into DB! Invalid Values!")
+            return null
+        }
+
+        val db = mDBHelper.writableDatabase
+        val id : Long = db.insert(DBContracts.PreferencesContract.TABLE_NAME, null, values)
+
+        //db.insert() fehlgeschlagen:
+        if(id.equals(-1)) {
+            Log.e(LOG_TAG, "Failed to insert row for $uri")
+            return null
+        }
+
+        //db.insert() hat funktioniert
+        return ContentUris.withAppendedId(uri, id)
+    }
+
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<String>?): Int {
         val db = mDBHelper.writableDatabase
-        val match : Int = sUriMatcher.match(uri)
+        val match = sUriMatcher.match(uri)
         when(match) {
             LEHRER -> return db.delete(DBContracts.LehrerContract.TABLE_NAME, selection, selectionArgs)
             LEHRER_ID -> {
@@ -156,7 +214,13 @@ class DataProvider :  ContentProvider() {
                 val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
                 return db.delete(DBContracts.PlanContract.TABLE_NAME, localselection, localselectionArgs)
             }
-            else -> throw java.lang.IllegalArgumentException("Deletion is not supportet for $uri")
+            PREFERENCES -> return db.delete(DBContracts.PreferencesContract.TABLE_NAME, selection, selectionArgs)
+            PREFERENCES_ID -> {
+                val localselection = DBContracts.PreferencesContract._ID + "=?"
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return db.delete(DBContracts.PreferencesContract.TABLE_NAME, localselection, localselectionArgs)
+            }
+            else -> throw java.lang.IllegalArgumentException("Deletion is not supportet for $uri")     //Hier muss einen Exception geworfen werden (außerdem kommen hier eh keine falschen daten an)
         }
     }
 
@@ -174,6 +238,12 @@ class DataProvider :  ContentProvider() {
                 val localselection = DBContracts.LehrerContract._ID + "=?"
                 val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
                 return updateVertretungsplan(values, localselection, localselectionArgs)
+            }
+            PREFERENCES -> return updatePreferences(values, selection, selectionArgs)
+            PREFERENCES_ID -> {
+                val localselection = DBContracts.PreferencesContract._ID + "=?"
+                val localselectionArgs = arrayOf(ContentUris.parseId(uri).toString())
+                return updateLehrer(values, localselection, localselectionArgs)
             }
             else -> throw java.lang.IllegalArgumentException("Update is not supported for $uri")
         }
@@ -225,6 +295,24 @@ class DataProvider :  ContentProvider() {
         return mDBHelper.writableDatabase.update(DBContracts.PlanContract.TABLE_NAME, values, selection, selectionArgs)
     }
 
+    private fun updatePreferences(values: ContentValues, selection: String?, selectionArgs: Array<String>?) : Int {
+        //Sanity-Check
+        //Kurs-Validation
+        if(values.containsKey(DBContracts.PreferencesContract.COLUMN_KURS)) {
+            if(values.getAsString(DBContracts.PreferencesContract.COLUMN_KURS).isNullOrBlank()) {
+                return 0
+            }
+        }
+
+        //Type-Validation
+        if(!values.containsKey(DBContracts.PreferencesContract.COLUMN_TYPEOFKURS)) {
+            return 0
+        }
+
+        //DB-Update
+        return mDBHelper.writableDatabase.update(DBContracts.PreferencesContract.TABLE_NAME, values, selection, selectionArgs)
+    }
+
     override fun getType(uri: Uri): String? {
         val match = sUriMatcher.match(uri)
         when(match) {
@@ -232,6 +320,8 @@ class DataProvider :  ContentProvider() {
             LEHRER_ID -> return DBContracts.LehrerContract.CONTENT_ITEM_TYPE
             VERTRETUNGSPLAN -> return DBContracts.PlanContract.CONTENT_LIST_TYPE
             VERTRETUNGSPLAN_ID -> return DBContracts.PlanContract.CONTENT_ITEM_TYPE
+            PREFERENCES -> return DBContracts.PreferencesContract.CONTENT_LIST_TYPE
+            PREFERENCES_ID -> return DBContracts.PreferencesContract.CONTENT_ITEM_TYPE
             else -> throw IllegalStateException("Unknown URI $uri with match $match")
         }
     }

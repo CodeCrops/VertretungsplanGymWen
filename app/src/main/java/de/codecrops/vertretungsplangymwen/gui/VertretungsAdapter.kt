@@ -1,0 +1,103 @@
+package de.codecrops.vertretungsplangymwen.gui
+
+import android.R.attr.layout_centerInParent
+import android.support.design.widget.CoordinatorLayout.Behavior.setTag
+import android.view.animation.AnimationUtils.loadAnimation
+import android.view.animation.Animation
+import android.widget.TextView
+import android.R.attr.name
+import android.content.Context
+import android.graphics.Color
+import android.support.constraint.ConstraintLayout
+import android.support.constraint.ConstraintSet
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
+import android.text.Html
+import android.view.View
+import android.widget.ArrayAdapter
+import de.codecrops.vertretungsplangymwen.R
+import de.codecrops.vertretungsplangymwen.R.layout.vertretungs_list_item
+import de.codecrops.vertretungsplangymwen.Utils
+import de.codecrops.vertretungsplangymwen.data.VertretungData
+import kotlinx.android.synthetic.main.vertretungs_list_item.view.*
+
+/**
+ * @author K1TR1K
+ */
+
+class VertretungsAdapter(data: ArrayList<VertretungData>, context: Context) :
+        ArrayAdapter<VertretungData>(context, vertretungs_list_item, data!!), View.OnClickListener {
+
+    private class ViewHolder {
+        internal var klasse: TextView? = null
+        internal var stunde: TextView? = null
+        internal var vertretung: TextView? = null
+        internal var fach: TextView? = null
+        internal var raum: TextView? = null
+        internal var kommentar: TextView? = null
+    }
+
+    override fun onClick(v: View?) {
+
+    }
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val vertretungData: VertretungData = getItem(position)!!
+        lateinit var viewHolder: ViewHolder
+        lateinit var view: View
+
+        if(convertView == null) {
+            viewHolder = ViewHolder()
+            val inflater = LayoutInflater.from(context)
+            view = inflater.inflate(vertretungs_list_item, parent, false) as View
+            viewHolder.klasse = view.klasse
+            viewHolder.stunde = view.stunde
+            viewHolder.vertretung = view.vertretung
+            viewHolder.fach = view.fach
+            viewHolder.raum = view.raum
+            viewHolder.kommentar = view.kommentar
+
+            view.tag = viewHolder
+        } else {
+            viewHolder = convertView.tag as ViewHolder
+            view = convertView
+        }
+
+        if(vertretungData.vertretung.contains("entfällt")) {
+            //TODO: TEST OB RICHTIG ANGEZEIGT
+            viewHolder.vertretung!!.text = Utils.fromHtml(vertretungData.vertretung)
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background_red)
+            viewHolder.raum!!.visibility = View.INVISIBLE
+            viewHolder.kommentar!!.visibility = View.INVISIBLE
+
+        } else {
+            //TODO: TEST OB RICHTIG ANGEZEIGT
+            viewHolder.vertretung!!.text = "Vertretung: ${Utils.fromHtml(vertretungData.vertretung)}"
+            viewHolder.stunde!!.background = context.getDrawable(R.drawable.ic_hour_background)
+            viewHolder.raum!!.visibility = View.VISIBLE
+            viewHolder.kommentar!!.visibility = View.VISIBLE
+        }
+
+        if(vertretungData.fach.isEmpty()) {
+            viewHolder.fach!!.visibility = View.INVISIBLE
+        } else {
+            viewHolder.fach!!.visibility = View.VISIBLE
+        }
+
+        if(vertretungData.klasse.isEmpty()) {
+            viewHolder.klasse!!.visibility = View.INVISIBLE
+        } else {
+            viewHolder.klasse!!.text = "Klasse ${Utils.fromHtml(vertretungData.klasse)}"
+            viewHolder.klasse!!.visibility = View.VISIBLE
+        }
+
+        viewHolder.stunde!!.text = "${Utils.fromHtml(vertretungData.stunde.toString())}.h"
+        viewHolder.fach!!.text = "Fach: ${Utils.fromHtml(vertretungData.fach)}"
+        viewHolder.raum!!.text = "Raum: ${Utils.fromHtml(vertretungData.raum)}"
+        viewHolder.kommentar!!.text = "Kommentar: ${Utils.fromHtml(vertretungData.kommentar)}"
+
+        return view
+    }
+}
