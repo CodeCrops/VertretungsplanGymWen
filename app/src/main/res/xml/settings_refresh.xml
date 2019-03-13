@@ -4,27 +4,32 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="@string/shared_preferences_settings_background_refresh_master"
-        android:title="@string/settings_refresh_master_title" />
+        android:title="@string/settings_refresh_master_title"
+        android:icon="@drawable/ic_on_off"/>
     <CheckBoxPreference
         android:enabled="false"
         android:defaultValue="false"
         android:key="@string/shared_preferences_settings_background_refresh_smart"
         android:summary="Aktualisiert die Daten intelligent"
-        android:title="@string/settings_refresh_smartmode_title" />
+        android:title="@string/settings_refresh_smartmode_title"
+        android:icon="@drawable/ic_smart_mode"/>
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/shared_preferences_settings_background_refresh_auto"
         android:summary="Basiert auf Intervallen und Uhrzeiten"
-        android:title="@string/settings_refresh_automode_title" />
+        android:title="@string/settings_refresh_automode_title"
+        android:icon="@drawable/ic_car"/>
     <ListPreference
         android:defaultValue="15"
         android:entries="@array/settings_refresh_auto_interval_entries"
         android:entryValues="@array/settings_refresh_auto_interval_values"
         android:key="@string/shared_preferences_settings_background_refresh_auto_interval"
         android:summary="%s"
-        android:title="@string/settings_refresh_auto_interval_title" />
+        android:title="@string/settings_refresh_auto_interval_title"
+        android:icon="@drawable/ic_metronome"/>
     <Preference
         android:title="Uhrzeit-Aktualisierung"
-        android:key="clocksettings">
+        android:key="@string/shared_preferences_settings_background_refresh_auto_clock"
+        android:icon="@drawable/ic_clock">
 </Preference>
 </PreferenceScreen>

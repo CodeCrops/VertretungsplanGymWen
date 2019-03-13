@@ -30,7 +30,7 @@ class SettingsRefreshFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.settings_refresh, rootKey)
 
         //Registrieren eines onClickListeners für die ClockSettingsActivity (da ein spezielles Intent programmiert werden muss)
-        val clocksettings = findPreference("clocksettings")
+        val clocksettings = findPreference(resources.getString(R.string.shared_preferences_settings_background_refresh_auto_clock))
         clocksettings.onPreferenceClickListener = Preference.OnPreferenceClickListener {
             val intent = Intent(context, ClockSettingsActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
@@ -39,28 +39,27 @@ class SettingsRefreshFragment : PreferenceFragmentCompat() {
             true
         }
 
-        //Registrieren enes onClickListeners für das Deaktivieren des AutomatikModus und des SmartModus, sollte der Master ausgeschaltet werden
-        val masterSwitch = findPreference("BackgroundRefreshMaster")
-        val automatikSwitch = findPreference("BackgroundRefreshAuto")
-        val smartSwitch = findPreference("BackgroundRefreshSmart")
-        val interval = findPreference("BackgroundRefreshAutoInterval")
+        //Registrieren enes onPreferenceChangeListeners für das Deaktivieren des AutomatikModus und des SmartModus, sollte der Master ausgeschaltet werden
+        val masterSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_background_refresh_master))
+        val automatikSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_background_refresh_auto))
+        val smartSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_background_refresh_smart))
+        val interval = findPreference(resources.getString(R.string.shared_preferences_settings_background_refresh_auto_interval))
         masterSwitch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, any ->
             val pref : SwitchPreference = preference as SwitchPreference
 
             /*
             Achtung, das isChecked bedeutet genau das Gegenteil xD
              */
-
             if(pref.isChecked) {
-                smartSwitch.setEnabled(false)
-                automatikSwitch.setEnabled(false)
-                interval.setEnabled(false)
-                clocksettings.setEnabled(false)
+                smartSwitch.isEnabled = false
+                automatikSwitch.isEnabled = false
+                interval.isEnabled = false
+                clocksettings.isEnabled = false
             } else {
-                //smartSwitch.setEnabled(true) //currently disabled
-                automatikSwitch.setEnabled(true)
-                interval.setEnabled(true)
-                clocksettings.setEnabled(true)
+                //smartSwitch.isEnabled = true //currently disabled
+                automatikSwitch.isEnabled = true
+                interval.isEnabled = true
+                clocksettings.isEnabled = true
             }
 
 

@@ -5,19 +5,22 @@
         android:id="@+id/swNotificationMaster"
         android:defaultValue="true"
         android:key="@string/shared_preferences_settings_notifications_master"
-        android:title="@string/settings_notification_master_title" />
+        android:title="@string/settings_notification_master_title"
+        android:icon="@drawable/ic_on_off"/>
     <PreferenceCategory android:title="Vibrationseinstellungen">
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/shared_preferences_settings_notifications_vibration"
-            android:title="@string/settings_notification_use_vibration" />
+            android:title="@string/settings_notification_use_vibration"
+            android:icon="@drawable/ic_baseline_vibration_24px"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Ton-Einstellungen">
 
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/shared_preferences_settings_notification_sound"
-            android:title="@string/settings_notification_use_sound" />
+            android:title="@string/settings_notification_use_sound"
+            android:icon="@drawable/ic_baseline_volume_up_24px"/>
     </PreferenceCategory>
 </PreferenceScreen>

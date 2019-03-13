@@ -38,6 +38,30 @@ class SettingsNotificationFragment : PreferenceFragmentCompat() {
 
             true
         }*/
+
+        //Registrieren enes onPreferenceChangeListeners für das Deaktivieren von allen, sollte der Master ausgeschaltet werden
+        val masterSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_notifications_master))
+        val vibrationSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_notifications_vibration))
+        val soundSwitch = findPreference(resources.getString(R.string.shared_preferences_settings_notification_sound))
+
+        masterSwitch.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { preference, any ->
+            val pref : SwitchPreference = preference as SwitchPreference
+
+            /*
+            Achtung, das isChecked bedeutet genau das Gegenteil xD
+             */
+            if(pref.isChecked) {
+                vibrationSwitch.isEnabled = false
+                soundSwitch.isEnabled = false
+            } else {
+                vibrationSwitch.isEnabled = true
+                soundSwitch.isEnabled = true
+            }
+
+
+            true
+        }
+
     }
 
     override fun onStart() {
