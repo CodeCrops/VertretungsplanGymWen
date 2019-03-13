@@ -68,7 +68,11 @@ class KlasseActivity : AppCompatActivity() {
                         dialog.setMessage("Durch den Wechsel gehen alle deine bisher gespeicherten Kurse verloren! Willst du das wirklich?")
                         dialog.setPositiveButton("JA") { dialog, which ->
                             DBManager.clearPreference(context)
-                            setKlasseGUI()
+                            if(position == 6 || position == 7) {
+                                setCourseGUI()
+                            } else {
+                                setKlasseGUI()
+                            }
                             gradeDropdownPosition = position
                             dialog.dismiss()
                         }
@@ -95,15 +99,20 @@ class KlasseActivity : AppCompatActivity() {
         }
         klasse_dropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                fillDatabaseForKlasse()
+                    fillDatabaseForKlasse()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
 
     private fun fillDatabaseForKlasse() {
-        DBManager.clearPreference(this)
-        DBManager.addPreference(this, grade_dropdown.selectedItem.toString() + klasse_dropdown.selectedItem.toString(), PREFERENCETYPE.REGULÄR)
+        if(!DBManager.getAllPreferences(this).isEmpty()) {
+            val itemIndex: String = DBManager.getAllPreferences(this)[0].course.substring(0, 2)
+            if (itemIndex != "11" && itemIndex[0] != '2') {
+                DBManager.clearPreference(this)
+                DBManager.addPreference(this, grade_dropdown.selectedItem.toString() + klasse_dropdown.selectedItem.toString(), PREFERENCETYPE.REGULÄR)
+            }
+        }
     }
 
     private fun initGUI() {
@@ -144,6 +153,7 @@ class KlasseActivity : AppCompatActivity() {
                     if(itemIndex1 == "10") {
                         setGradeDropdownPosition(5)
                         setKlasseGUI()
+                        initKlasseDropdown()
                     } else {
                         setGradeDropdownPosition(6)
                         setCourseGUI()
@@ -158,13 +168,14 @@ class KlasseActivity : AppCompatActivity() {
 
     private fun initKlasseDropdown() {
         val klasse : Char = DBManager.getAllPreferences(this)[0].course.substring(1, 2).single()
+        spinnerSelectedByMachine = true
         val index = klassen.indexOf(klasse)
-        klasse_dropdown.setSelection(index)
+        klasse_dropdown.setSelection(index, false)
     }
 
     private fun setGradeDropdownPosition(pos: Int) {
         spinnerSelectedByMachine = true
-        grade_dropdown.setSelection(pos)
+        grade_dropdown.setSelection(pos, false)
         gradeDropdownPosition = pos
     }
 
