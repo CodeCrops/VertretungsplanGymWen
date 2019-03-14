@@ -112,6 +112,9 @@ class KlasseActivity : AppCompatActivity() {
                 DBManager.clearPreference(this)
                 DBManager.addPreference(this, grade_dropdown.selectedItem.toString() + klasse_dropdown.selectedItem.toString(), PREFERENCETYPE.REGULÄR)
             }
+        } else {
+            DBManager.clearPreference(this)
+            DBManager.addPreference(this, grade_dropdown.selectedItem.toString() + klasse_dropdown.selectedItem.toString(), PREFERENCETYPE.REGULÄR)
         }
     }
 
