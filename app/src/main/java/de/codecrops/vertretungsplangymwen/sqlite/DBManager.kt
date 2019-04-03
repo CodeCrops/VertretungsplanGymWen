@@ -336,6 +336,19 @@ class DBManager {
 
             //Selektion wird vorbereitet
             var selection = ""
+
+            selection = "" +
+                    "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_DATE} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$input') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$input')" +
+                    ""
+
+            //old code: supports splitting to words but is bugged for multiple words
+            /*
             val splitted : List<String> = input.split(" ")
             for(item in splitted) {
                 selection = "$selection " +
@@ -347,6 +360,8 @@ class DBManager {
                         "OR ${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' " +
                         "OR ${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' "
             }
+
+            */
 
             //cursor wird von DB geholt
             val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
@@ -381,6 +396,19 @@ class DBManager {
 
             //Selektion wird vorbereitet
             var selection = ""
+
+            selection = "" +
+                    "(${DBContracts.PlanContract.COLUMN_FACH} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_DATE} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_KLASSE} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_RAUM} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_STUNDE} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') OR " +
+                    "(${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$input' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp')" +
+                    ""
+
+            //old code: supports splitting to words but is bugged for multiple words
+            /*
             val splitted : List<String> = input.split(" ")
             if(splitted.size > 1) {
                 for(item in splitted) {
@@ -403,7 +431,7 @@ class DBManager {
                         "OR (${DBContracts.PlanContract.COLUMN_VERTRETUNG} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp') " +
                         "OR (${DBContracts.PlanContract.COLUMN_SONSTIGES} LIKE '$item' AND ${DBContracts.PlanContract.COLUMN_DATE} = '$timestamp')"
             }
-
+            */
 
             //cursor wird von DB geholt
             val cursor = context.contentResolver.query(DBContracts.PlanContract.CONTENT_URI, arrayOf("*"), selection, null, null)
