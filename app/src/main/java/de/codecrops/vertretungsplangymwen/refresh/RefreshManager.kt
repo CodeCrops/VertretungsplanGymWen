@@ -17,9 +17,9 @@ class RefreshManager(val context: Context) {
 
     //Only gets initialized when the whole object is created (way of (re-)loading this manager)
     init {
-        ClockRefresher.cancelRefreshJobs(context)
+        //ClockRefresher.cancelRefreshJobs(context)
         ClockRefresher.startRefreshJobs(context)
-        ScheduleRefresher.cancelRefreshJob(context)
+        //ScheduleRefresher.cancelRefreshJob(context)
         ScheduleRefresher.startRefreshJobs(context)
     }
 
